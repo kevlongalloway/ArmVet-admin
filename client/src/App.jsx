@@ -979,6 +979,16 @@ body {
 }
 
 /* ─── Calendar View ─── */
+.cal-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 20px;
+  align-items: start;
+}
+.cal-left { min-width: 0; }
+.cal-right { position: sticky; top: 80px; }
+.cal-mobile-upcoming { display: none; margin-top: 24px; }
+
 .cal-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -987,12 +997,12 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .cal-header-cell {
   background: var(--bg-secondary);
-  padding: 10px;
+  padding: 10px 6px;
   text-align: center;
   font-size: 11px;
   font-weight: 700;
@@ -1003,35 +1013,36 @@ body {
 
 .cal-cell {
   background: var(--bg-card);
-  padding: 8px;
-  min-height: 90px;
+  padding: 8px 8px 6px;
+  min-height: 100px;
   font-size: 12px;
   position: relative;
+  cursor: pointer;
+  transition: background var(--transition);
+  overflow: hidden;
 }
-
-.cal-cell.other-month {
-  background: var(--bg-secondary);
-  opacity: 0.4;
-}
-
-.cal-cell.today {
-  background: var(--accent-dim);
-}
+.cal-cell:hover:not(.other-month) { background: var(--bg-card-hover); }
+.cal-cell.selected { background: rgba(200,168,78,0.08) !important; box-shadow: inset 0 0 0 1.5px var(--accent); }
+.cal-cell.other-month { background: var(--bg-secondary); opacity: 0.45; cursor: default; }
 
 .cal-day-num {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
   font-weight: 600;
+  font-size: 13px;
   color: var(--text-secondary);
   margin-bottom: 4px;
-  font-size: 13px;
 }
-
-.cal-cell.today .cal-day-num {
-  color: var(--accent);
-}
+.cal-cell.today .cal-day-num { background: var(--accent); color: #0C0F14; }
+.cal-cell.selected:not(.today) .cal-day-num { color: var(--accent); }
 
 .cal-event {
-  background: var(--accent-dim);
-  color: var(--accent);
+  background: var(--green-dim);
+  color: var(--green);
   padding: 2px 6px;
   border-radius: 3px;
   font-size: 10px;
@@ -1041,72 +1052,152 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;
+  transition: opacity var(--transition);
 }
+.cal-event:hover { opacity: 0.8; }
+.cal-event.on-cal { background: var(--purple-dim); color: var(--purple); }
+.cal-event-more { font-size: 10px; color: var(--text-muted); padding: 1px 4px; }
 
-.cal-event:hover {
-  background: var(--accent-glow);
-}
-
-.cal-event.approved {
-  background: var(--green-dim);
-  color: var(--green);
-}
+/* Mobile-only: dots instead of event chips */
+.cal-dots { display: none; gap: 3px; margin-top: 4px; flex-wrap: wrap; }
+.cal-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.cal-dot.green { background: var(--green); }
+.cal-dot.purple { background: var(--purple); }
 
 .cal-nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
+  gap: 12px;
 }
-
 .cal-month {
   font-family: 'Syne', sans-serif;
   font-size: 20px;
   font-weight: 700;
 }
-
-.cal-nav-btns {
-  display: flex;
-  gap: 8px;
-}
-
+.cal-nav-btns { display: flex; gap: 6px; }
 .cal-nav-btn {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 8px 14px;
+  padding: 7px 13px;
   color: var(--text-secondary);
   font-size: 13px;
   cursor: pointer;
   font-family: inherit;
   transition: all var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
+.cal-nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+.cal-nav-icon { padding: 7px 10px; }
 
-.cal-nav-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+.cal-legend { display: flex; gap: 16px; margin-bottom: 4px; flex-wrap: wrap; }
+.cal-legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+.cal-legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+.cal-legend-dot.green { background: var(--green); }
+.cal-legend-dot.purple { background: var(--purple); }
+
+/* Right detail panel */
+.cal-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  min-height: 200px;
 }
-
-.cal-legend {
+.cal-panel-header {
   display: flex;
-  gap: 16px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 16px;
 }
+.cal-panel-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+.cal-panel-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px;
+  flex-shrink: 0;
+  transition: color var(--transition);
+}
+.cal-panel-close:hover { color: var(--text-primary); }
+.cal-panel-empty {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 24px 0;
+  line-height: 1.6;
+}
+.cal-panel-event {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.cal-panel-event:hover { border-color: var(--accent); background: var(--accent-dim); }
+.cal-panel-event-time {
+  font-size: 10px;
+  color: var(--accent);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.cal-panel-event-name { font-size: 14px; font-weight: 600; margin-top: 4px; }
+.cal-panel-event-service { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+.cal-panel-event-org { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
-.cal-legend-item {
+/* Upcoming list in panel */
+.cal-upcoming-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--text-secondary);
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-light);
+  cursor: pointer;
 }
-
-.cal-legend-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+.cal-upcoming-item:last-child { border-bottom: none; }
+.cal-upcoming-item:hover .cal-upcoming-name { color: var(--accent); }
+.cal-upcoming-badge {
+  width: 42px;
+  text-align: center;
+  flex-shrink: 0;
 }
+.cal-upcoming-badge-month {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  line-height: 1;
+}
+.cal-upcoming-badge-day {
+  font-size: 22px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text-primary);
+}
+.cal-upcoming-name {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color var(--transition);
+}
+.cal-upcoming-meta { font-size: 11px; color: var(--text-secondary); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* ─── Toast ─── */
 .toast-container {
@@ -1211,8 +1302,14 @@ body {
   .detail-grid {
     grid-template-columns: 1fr;
   }
-  .cal-grid { display: none; }
-  .cal-mobile-list { display: block !important; }
+  .cal-layout { grid-template-columns: 1fr; }
+  .cal-right { display: none; }
+  .cal-mobile-upcoming { display: block; }
+  .cal-cell { min-height: 56px; padding: 5px 4px; }
+  .cal-event { display: none; }
+  .cal-event-more { display: none; }
+  .cal-dots { display: flex; }
+  .cal-day-num { width: 22px; height: 22px; font-size: 12px; }
   .page-header h2 { font-size: 20px; }
   .toast-container {
     left: 16px;
@@ -1856,8 +1953,13 @@ function ContactDetail({ contact, onBack, onUpdateStatus, onDelete, addToast }) 
 
 function CalendarPage({ bookings, setPage, setSelectedBooking }) {
   const [monthOffset, setMonthOffset] = useState(0);
-  const today = new Date(2026, 2, 17); // March 17, 2026
-  const viewDate = new Date(today.getFullYear(), today.getMonth() + monthOffset, 1);
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  const todayObj = new Date();
+  todayObj.setHours(0, 0, 0, 0);
+  const todayStr = todayObj.toISOString().split("T")[0];
+
+  const viewDate = new Date(todayObj.getFullYear(), todayObj.getMonth() + monthOffset, 1);
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
   const monthName = viewDate.toLocaleString("en-US", { month: "long", year: "numeric" });
@@ -1868,87 +1970,164 @@ function CalendarPage({ bookings, setPage, setSelectedBooking }) {
 
   const cells = [];
   for (let i = firstDay - 1; i >= 0; i--) {
-    cells.push({ day: daysInPrev - i, otherMonth: true });
+    cells.push({ day: daysInPrev - i, otherMonth: true, dateStr: null });
   }
   for (let d = 1; d <= daysInMonth; d++) {
-    cells.push({ day: d, otherMonth: false });
+    const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    cells.push({ day: d, otherMonth: false, dateStr });
   }
-  const remaining = 42 - cells.length;
-  for (let i = 1; i <= remaining; i++) {
-    cells.push({ day: i, otherMonth: true });
+  while (cells.length < 42) {
+    cells.push({ day: cells.length - firstDay - daysInMonth + 1, otherMonth: true, dateStr: null });
   }
 
   const calBookings = bookings.filter((b) => b.status === "approved" || b.status === "on-calendar");
 
-  function eventsForDay(day) {
-    const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-    return calBookings.filter((b) => b.date === dateStr);
-  }
+  const eventsForDate = (dateStr) =>
+    calBookings
+      .filter((b) => b.date === dateStr)
+      .sort((a, b) => (a.time || "").localeCompare(b.time || ""));
 
-  const isToday = (day) => !day.otherMonth && day.day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
-
-  // Mobile: list of upcoming events
   const upcoming = calBookings
-    .filter((b) => new Date(b.date + "T00:00:00") >= new Date(today.toDateString()))
-    .sort((a, b) => a.date.localeCompare(b.date));
+    .filter((b) => b.date >= todayStr)
+    .sort((a, b) => a.date.localeCompare(b.date) || (a.time || "").localeCompare(b.time || ""));
+
+  const selectedEvents = selectedDate ? eventsForDate(selectedDate) : null;
+
+  const handleDayClick = (cell) => {
+    if (cell.otherMonth) return;
+    setSelectedDate((prev) => (prev === cell.dateStr ? null : cell.dateStr));
+  };
+
+  const handleMonthChange = (delta) => {
+    setMonthOffset((m) => m + delta);
+    setSelectedDate(null);
+  };
 
   return (
     <div>
       <div className="page-header">
         <h2>Calendar</h2>
-        <p>View approved consultations and scheduled appointments</p>
+        <p>Your approved consultations and scheduled appointments</p>
       </div>
 
-      <div className="cal-legend">
-        <div className="cal-legend-item">
-          <div className="cal-legend-dot" style={{ background: "var(--accent)" }} />
-          Approved
-        </div>
-        <div className="cal-legend-item">
-          <div className="cal-legend-dot" style={{ background: "var(--purple)" }} />
-          On Calendar
-        </div>
-      </div>
-
-      <div className="cal-nav">
-        <span className="cal-month">{monthName}</span>
-        <div className="cal-nav-btns">
-          <button className="cal-nav-btn" onClick={() => setMonthOffset((m) => m - 1)}>← Prev</button>
-          <button className="cal-nav-btn" onClick={() => setMonthOffset(0)}>Today</button>
-          <button className="cal-nav-btn" onClick={() => setMonthOffset((m) => m + 1)}>Next →</button>
-        </div>
-      </div>
-
-      <div className="cal-grid">
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-          <div key={d} className="cal-header-cell">{d}</div>
-        ))}
-        {cells.map((cell, i) => {
-          const events = cell.otherMonth ? [] : eventsForDay(cell.day);
-          return (
-            <div key={i} className={`cal-cell ${cell.otherMonth ? "other-month" : ""} ${isToday(cell) ? "today" : ""}`}>
-              <div className="cal-day-num">{cell.day}</div>
-              {events.map((ev) => (
-                <div
-                  key={ev.id}
-                  className={`cal-event ${ev.status === "on-calendar" ? "" : "approved"}`}
-                  style={ev.status === "on-calendar" ? { background: "var(--purple-dim)", color: "var(--purple)" } : {}}
-                  onClick={() => { setSelectedBooking(ev.id); setPage("booking-detail"); }}
-                  title={`${ev.name} — ${ev.service}`}
-                >
-                  {ev.time} {ev.name.split(" ")[1] || ev.name}
-                </div>
-              ))}
+      <div className="cal-layout">
+        {/* ── Left: calendar grid ── */}
+        <div className="cal-left">
+          <div className="cal-nav">
+            <span className="cal-month">{monthName}</span>
+            <div className="cal-nav-btns">
+              <button className="cal-nav-btn cal-nav-icon" onClick={() => handleMonthChange(-1)} title="Previous month">{Icons.back}</button>
+              <button className="cal-nav-btn" onClick={() => { setMonthOffset(0); setSelectedDate(null); }}>Today</button>
+              <button className="cal-nav-btn cal-nav-icon" onClick={() => handleMonthChange(1)} title="Next month">{Icons.chevronRight}</button>
             </div>
-          );
-        })}
+          </div>
+
+          <div className="cal-grid">
+            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+              <div key={d} className="cal-header-cell">{d}</div>
+            ))}
+            {cells.map((cell, i) => {
+              const events = cell.dateStr ? eventsForDate(cell.dateStr) : [];
+              const isToday = cell.dateStr === todayStr;
+              const isSelected = cell.dateStr && cell.dateStr === selectedDate;
+              return (
+                <div
+                  key={i}
+                  className={`cal-cell${cell.otherMonth ? " other-month" : ""}${isToday ? " today" : ""}${isSelected ? " selected" : ""}`}
+                  onClick={() => handleDayClick(cell)}
+                >
+                  <div className="cal-day-num">{cell.day}</div>
+                  {!cell.otherMonth && events.slice(0, 2).map((ev) => (
+                    <div
+                      key={ev.id}
+                      className={`cal-event${ev.status === "on-calendar" ? " on-cal" : ""}`}
+                      onClick={(e) => { e.stopPropagation(); setSelectedBooking(ev.id); setPage("booking-detail"); }}
+                      title={`${ev.name} — ${ev.service}`}
+                    >
+                      {ev.time ? formatTime(ev.time) + " " : ""}{ev.name.split(" ")[0]}
+                    </div>
+                  ))}
+                  {!cell.otherMonth && events.length > 2 && (
+                    <div className="cal-event-more">+{events.length - 2} more</div>
+                  )}
+                  {/* Mobile: colored dots only */}
+                  {!cell.otherMonth && events.length > 0 && (
+                    <div className="cal-dots">
+                      {events.map((ev) => (
+                        <div key={ev.id} className={`cal-dot ${ev.status === "on-calendar" ? "purple" : "green"}`} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="cal-legend">
+            <div className="cal-legend-item"><div className="cal-legend-dot green" />Approved</div>
+            <div className="cal-legend-item"><div className="cal-legend-dot purple" />On Calendar</div>
+          </div>
+        </div>
+
+        {/* ── Right: detail / upcoming panel ── */}
+        <div className="cal-right">
+          <div className="cal-panel">
+            {selectedDate && selectedEvents ? (
+              <>
+                <div className="cal-panel-header">
+                  <div className="cal-panel-title">{formatDateLong(selectedDate)}</div>
+                  <button className="cal-panel-close" onClick={() => setSelectedDate(null)} title="Close">{Icons.x}</button>
+                </div>
+                {selectedEvents.length === 0 ? (
+                  <div className="cal-panel-empty">No bookings on this day.<br />Click any other day to view its events.</div>
+                ) : selectedEvents.map((ev) => (
+                  <div key={ev.id} className="cal-panel-event" onClick={() => { setSelectedBooking(ev.id); setPage("booking-detail"); }}>
+                    <div className="cal-panel-event-time">{formatTime(ev.time) || "Time TBD"}</div>
+                    <div className="cal-panel-event-name">{ev.name}</div>
+                    <div className="cal-panel-event-service">{ev.service}</div>
+                    <div className="cal-panel-event-org">{ev.org}</div>
+                    <span className={`status-badge status-${ev.status}`} style={{ marginTop: 8, display: "inline-block" }}>
+                      {ev.status === "on-calendar" ? "On Calendar" : "Approved"}
+                    </span>
+                  </div>
+                ))}
+              </>
+            ) : (
+              <>
+                <div className="cal-panel-title" style={{ marginBottom: 16 }}>Upcoming</div>
+                {upcoming.length === 0 ? (
+                  <div className="cal-panel-empty">No upcoming consultations.<br />Approve bookings to see them here.</div>
+                ) : upcoming.slice(0, 12).map((b) => {
+                  const monthAbbr = new Date(b.date + "T00:00:00").toLocaleString("en-US", { month: "short" });
+                  const dayNum = Number(b.date.split("-")[2]);
+                  return (
+                    <div key={b.id} className="cal-upcoming-item" onClick={() => { setSelectedBooking(b.id); setPage("booking-detail"); }}>
+                      <div className="cal-upcoming-badge">
+                        <div className="cal-upcoming-badge-month">{monthAbbr}</div>
+                        <div className="cal-upcoming-badge-day">{dayNum}</div>
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div className="cal-upcoming-name">{b.name}</div>
+                        <div className="cal-upcoming-meta">{formatTime(b.time) || b.time} · {b.service}</div>
+                        <span className={`status-badge status-${b.status}`} style={{ marginTop: 4, display: "inline-block" }}>
+                          {b.status === "on-calendar" ? "On Calendar" : "Approved"}
+                        </span>
+                      </div>
+                      <span style={{ color: "var(--text-muted)", flexShrink: 0 }}>{Icons.chevronRight}</span>
+                    </div>
+                  );
+                })}
+              </>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Mobile list fallback */}
-      <div className="cal-mobile-list" style={{ display: "none" }}>
+      {/* Mobile: upcoming list always visible below grid */}
+      <div className="cal-mobile-upcoming">
         <div className="section-title" style={{ marginBottom: 12 }}>Upcoming Consultations</div>
         {upcoming.length === 0 ? (
-          <div className="empty-state"><p>No upcoming approved consultations.</p></div>
+          <div className="cal-panel-empty" style={{ textAlign: "center", padding: "24px 0" }}>No upcoming approved consultations.</div>
         ) : (
           <div className="card-list">
             {upcoming.map((b) => (
@@ -1957,7 +2136,7 @@ function CalendarPage({ bookings, setPage, setSelectedBooking }) {
                 <div className="card-body">
                   <div className="card-top-row">
                     <span className="card-name">{b.name}</span>
-                    <span className="card-date">{b.time}</span>
+                    <span className="card-date">{formatTime(b.time) || b.time}</span>
                   </div>
                   <div className="card-preview">{b.service} — {formatDate(b.date)}</div>
                   <div className="card-tags">
