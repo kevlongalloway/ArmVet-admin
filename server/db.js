@@ -52,6 +52,11 @@ async function initDb() {
     );
   `);
 
+  // Unique index prevents double-booking the same slot; safe to run on existing DBs
+  await pool.query(`
+    CREATE UNIQUE INDEX IF NOT EXISTS avail_slots_date_time_unique
+    ON availability_slots (date, start_time)
+  `);
 }
 
 async function getOrCreateJwtSecret() {

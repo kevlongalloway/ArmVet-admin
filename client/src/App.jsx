@@ -177,12 +177,27 @@ const CSS = `
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+html {
+  overflow-x: hidden;
+  height: 100%;
+}
+
 body {
   font-family: 'DM Sans', sans-serif;
   background: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+  min-height: 100%;
+  min-height: -webkit-fill-available;
+}
+
+#root {
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
 }
 
 .login-page {
@@ -1157,37 +1172,66 @@ body {
 }
 
 /* ─── Availability Page ─── */
+.avail-intro {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
 .avail-form-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 24px;
+  padding: 28px;
   margin-bottom: 28px;
 }
 .avail-form-card h3 {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
-  margin-bottom: 20px;
+  margin-bottom: 6px;
 }
-.avail-form-row {
+.avail-form-card .avail-section-hint {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+.avail-form-row { display: flex; flex-direction: column; gap: 18px; }
+.avail-form-inline {
   display: grid;
-  grid-template-columns: 1fr 1fr 140px 1fr auto;
-  gap: 12px;
-  align-items: flex-end;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.avail-field-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 5px;
+  line-height: 1.5;
 }
 .avail-form-row .form-group { margin-bottom: 0; }
-.avail-date-group {
-  margin-bottom: 28px;
-}
-.avail-date-header {
+.avail-preview {
+  background: var(--accent-dim);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 14px 18px;
   font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+.avail-preview strong { color: var(--accent); }
+.avail-date-group { margin-bottom: 32px; }
+.avail-date-header {
+  font-size: 15px;
   font-weight: 700;
-  color: var(--text-secondary);
-  padding: 8px 0;
-  margin-bottom: 8px;
+  color: var(--text-primary);
+  padding: 10px 0;
+  margin-bottom: 10px;
   border-bottom: 1px solid var(--border);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 .avail-slot-row {
   display: flex;
@@ -1199,58 +1243,59 @@ body {
   border-radius: var(--radius);
   margin-bottom: 8px;
   transition: border-color var(--transition);
+  flex-wrap: wrap;
 }
 .avail-slot-row:hover { border-color: var(--border-light); }
-.avail-slot-time {
-  font-weight: 600;
-  font-size: 14px;
-  min-width: 60px;
-}
-.avail-slot-duration {
-  font-size: 12px;
-  color: var(--text-muted);
-  min-width: 60px;
-}
-.avail-slot-label {
-  font-size: 13px;
-  color: var(--text-secondary);
-  flex: 1;
-  font-style: italic;
-}
-.avail-slot-booked-by {
-  font-size: 12px;
-  color: var(--text-secondary);
-  flex: 1;
-  cursor: pointer;
-}
+.avail-slot-time { font-weight: 700; font-size: 15px; min-width: 80px; }
+.avail-slot-duration { font-size: 12px; color: var(--text-muted); min-width: 55px; }
+.avail-slot-label { font-size: 13px; color: var(--text-secondary); flex: 1; font-style: italic; }
+.avail-slot-booked-by { font-size: 13px; color: var(--text-secondary); flex: 1; cursor: pointer; }
 .avail-slot-booked-by:hover { color: var(--accent); text-decoration: underline; }
 .btn-delete {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px;
-  background: transparent;
-  color: var(--text-muted);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all var(--transition);
-  flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 7px; background: transparent; color: var(--text-muted);
+  border: 1px solid var(--border); border-radius: 6px; cursor: pointer;
+  transition: all var(--transition); flex-shrink: 0;
 }
 .btn-delete:hover { background: var(--red-dim); color: var(--red); border-color: var(--red); }
 .avail-empty {
-  text-align: center;
-  padding: 48px 20px;
-  color: var(--text-muted);
-  font-size: 14px;
-  background: var(--bg-card);
-  border: 1px dashed var(--border);
-  border-radius: var(--radius-lg);
+  text-align: center; padding: 56px 20px; color: var(--text-muted); font-size: 14px;
+  background: var(--bg-card); border: 1px dashed var(--border); border-radius: var(--radius-lg);
 }
-.avail-empty p { margin-top: 8px; color: var(--text-muted); font-size: 13px; }
+.avail-empty .avail-empty-icon { font-size: 40px; margin-bottom: 12px; }
+.avail-empty p { color: var(--text-muted); font-size: 14px; margin-top: 6px; line-height: 1.6; }
+
+/* ─── Tutorial Overlay ─── */
+.tutorial-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.88);
+  z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 24px;
+}
+.tutorial-card {
+  background: var(--bg-card); border: 1px solid var(--accent);
+  border-radius: var(--radius-lg); padding: 44px 36px;
+  max-width: 500px; width: 100%; text-align: center;
+}
+.tutorial-icon { font-size: 48px; margin-bottom: 16px; }
+.tutorial-step-num {
+  font-size: 11px; font-weight: 700; color: var(--accent);
+  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px;
+}
+.tutorial-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 16px; }
+.tutorial-body { font-size: 16px; color: var(--text-secondary); line-height: 1.75; margin-bottom: 32px; }
+.tutorial-dots { display: flex; justify-content: center; gap: 8px; margin-bottom: 28px; }
+.tutorial-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--border); transition: background var(--transition); }
+.tutorial-dot.active { background: var(--accent); }
+.tutorial-btn-row { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.tutorial-next { width: 100%; padding: 14px; background: var(--accent); color: #0C0F14; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all var(--transition); }
+.tutorial-next:hover { background: #D4B65E; }
+.tutorial-skip { background: none; border: none; color: var(--text-muted); font-size: 13px; cursor: pointer; font-family: inherit; text-decoration: underline; }
+.tutorial-skip:hover { color: var(--text-secondary); }
+
 @media (max-width: 768px) {
-  .avail-form-row { grid-template-columns: 1fr 1fr; }
-  .avail-form-row > *:last-child { grid-column: 1 / -1; }
+  .avail-form-inline { grid-template-columns: 1fr; }
+  .tutorial-card { padding: 32px 24px; }
+  .tutorial-title { font-size: 19px; }
+  .tutorial-body { font-size: 15px; }
 }
 `;
 
@@ -1839,30 +1884,45 @@ function CalendarPage({ bookings, setPage, setSelectedBooking }) {
 }
 
 // ─── Availability Page ───
+function previewSlots(fromTime, toTime, duration) {
+  if (!fromTime || !toTime || !duration) return [];
+  const [fh, fm] = fromTime.split(":").map(Number);
+  const [th, tm] = toTime.split(":").map(Number);
+  const from = fh * 60 + fm;
+  const to = th * 60 + tm;
+  if (to <= from) return [];
+  const slots = [];
+  for (let m = from; m + duration <= to; m += duration) {
+    const h = Math.floor(m / 60);
+    const min = m % 60;
+    slots.push(`${String(h).padStart(2, "0")}:${String(min).padStart(2, "0")}`);
+  }
+  return slots;
+}
+
 function AvailabilityPage({ slots, setSlots, addToast, setPage, setSelectedBooking }) {
   const today = new Date().toISOString().split("T")[0];
-  const [form, setForm] = useState({ date: "", startTime: "", durationMinutes: 60, label: "" });
+  const [form, setForm] = useState({ date: "", fromTime: "09:00", toTime: "17:00", durationMinutes: 60, label: "" });
   const [saving, setSaving] = useState(false);
 
-  const handleAdd = async () => {
-    if (!form.date || !form.startTime) {
-      addToast({ message: "Date and start time are required", type: "error" });
-      return;
-    }
+  const preview = previewSlots(form.fromTime, form.toTime, Number(form.durationMinutes));
+  const canSubmit = form.date && preview.length > 0;
+
+  const handleOpen = async () => {
+    if (!canSubmit) { addToast({ message: "Please fill in the date and a valid time range.", type: "error" }); return; }
     setSaving(true);
     try {
-      const created = await api.createSlot({
-        date: form.date,
-        startTime: form.startTime,
-        durationMinutes: Number(form.durationMinutes),
-        label: form.label,
-      });
+      const result = await api.createSlotRange({ date: form.date, fromTime: form.fromTime, toTime: form.toTime, durationMinutes: Number(form.durationMinutes), label: form.label });
       const fresh = await api.getAvailability();
       setSlots(fresh);
-      setForm({ date: form.date, startTime: "", durationMinutes: 60, label: "" });
-      addToast({ message: `Slot added — ${formatDate(form.date)} at ${formatTime(form.startTime)}` });
+      const skipped = result.total - result.count;
+      const msg = skipped > 0
+        ? `${result.count} slots opened for ${formatDateLong(form.date)} (${skipped} already existed)`
+        : `${result.count} slots opened for ${formatDateLong(form.date)}`;
+      addToast({ message: msg });
+      setForm((f) => ({ ...f, date: "" }));
     } catch {
-      addToast({ message: "Failed to add slot", type: "error" });
+      addToast({ message: "Could not open those slots. Please try again.", type: "error" });
     } finally {
       setSaving(false);
     }
@@ -1876,53 +1936,83 @@ function AvailabilityPage({ slots, setSlots, addToast, setPage, setSelectedBooki
     } catch (err) {
       const msg = err?.message || "";
       if (msg.includes("409") || msg.toLowerCase().includes("booked")) {
-        addToast({ message: "Cannot delete a booked slot", type: "error" });
+        addToast({ message: "This slot has already been booked and cannot be removed.", type: "error" });
       } else {
-        addToast({ message: "Failed to delete slot", type: "error" });
+        addToast({ message: "Could not remove that slot. Please try again.", type: "error" });
       }
     }
   };
 
-  // Group slots by date
-  const grouped = slots.reduce((acc, s) => {
-    (acc[s.date] = acc[s.date] || []).push(s);
-    return acc;
-  }, {});
+  const grouped = slots.reduce((acc, s) => { (acc[s.date] = acc[s.date] || []).push(s); return acc; }, {});
   const sortedDates = Object.keys(grouped).sort();
 
   return (
     <div>
       <div className="page-header">
         <h2>Availability</h2>
-        <p>Set your bookable time slots. Visitors on the main site will see and book these.</p>
+        <p>Control when clients can book a session with you.</p>
       </div>
 
-      {/* Add slot form */}
+      <div className="avail-intro">
+        <strong>How this works:</strong> Pick a day and the hours you're free. We'll automatically create one bookable time slot for every session in that window. Those open slots will appear on your website for clients to choose from — when someone books one, it shows up here as a new booking.
+      </div>
+
       <div className="avail-form-card">
-        <h3>Add a Time Slot</h3>
+        <h3>Open Up a Day</h3>
+        <p className="avail-section-hint">Tell us the date and the hours you're available. We'll take care of splitting it into individual appointment slots.</p>
+
         <div className="avail-form-row">
+          {/* Row 1: Date */}
           <div className="form-group">
-            <label>Date</label>
+            <label>What day are you available?</label>
             <input type="date" min={today} value={form.date} onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))} />
           </div>
-          <div className="form-group">
-            <label>Start Time</label>
-            <input type="time" value={form.startTime} onChange={(e) => setForm((f) => ({ ...f, startTime: e.target.value }))} />
+
+          {/* Row 2: Time range */}
+          <div className="avail-form-inline">
+            <div className="form-group">
+              <label>Available from</label>
+              <input type="time" value={form.fromTime} onChange={(e) => setForm((f) => ({ ...f, fromTime: e.target.value }))} />
+              <div className="avail-field-hint">The earliest you can start a session</div>
+            </div>
+            <div className="form-group">
+              <label>Available until</label>
+              <input type="time" value={form.toTime} onChange={(e) => setForm((f) => ({ ...f, toTime: e.target.value }))} />
+              <div className="avail-field-hint">The latest a session should end</div>
+            </div>
           </div>
-          <div className="form-group">
-            <label>Duration</label>
-            <select value={form.durationMinutes} onChange={(e) => setForm((f) => ({ ...f, durationMinutes: Number(e.target.value) }))}>
-              <option value={30}>30 min</option>
-              <option value={60}>60 min</option>
-              <option value={90}>90 min</option>
-            </select>
+
+          {/* Row 3: Duration + Label */}
+          <div className="avail-form-inline">
+            <div className="form-group">
+              <label>How long is each session?</label>
+              <select value={form.durationMinutes} onChange={(e) => setForm((f) => ({ ...f, durationMinutes: Number(e.target.value) }))}>
+                <option value={30}>30 minutes</option>
+                <option value={60}>60 minutes (1 hour)</option>
+                <option value={90}>90 minutes (1.5 hours)</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Add a note (optional)</label>
+              <input type="text" placeholder="e.g. Leadership coaching only" maxLength={100} value={form.label} onChange={(e) => setForm((f) => ({ ...f, label: e.target.value }))} />
+            </div>
           </div>
-          <div className="form-group">
-            <label>Label (optional)</label>
-            <input type="text" placeholder="e.g. Leadership only" maxLength={100} value={form.label} onChange={(e) => setForm((f) => ({ ...f, label: e.target.value }))} />
-          </div>
-          <button className="btn-primary" style={{ padding: "12px 20px", width: "auto" }} onClick={handleAdd} disabled={saving}>
-            {saving ? "Adding…" : "Add Slot"}
+
+          {/* Preview */}
+          {form.fromTime && form.toTime && preview.length > 0 && (
+            <div className="avail-preview">
+              <strong>{preview.length} session{preview.length !== 1 ? "s" : ""} will open:</strong>{" "}
+              {preview.map(formatTime).join("  ·  ")}
+            </div>
+          )}
+          {form.fromTime && form.toTime && preview.length === 0 && (
+            <div className="avail-preview" style={{ borderColor: "var(--red)", background: "var(--red-dim)" }}>
+              The time range is too short for even one session at {form.durationMinutes} minutes. Try a wider window or shorter session length.
+            </div>
+          )}
+
+          <button className="btn-primary" onClick={handleOpen} disabled={saving || !canSubmit}>
+            {saving ? "Opening slots…" : `Open ${preview.length > 0 ? preview.length + " slot" + (preview.length !== 1 ? "s" : "") : "Slots"}`}
           </button>
         </div>
       </div>
@@ -1930,8 +2020,9 @@ function AvailabilityPage({ slots, setSlots, addToast, setPage, setSelectedBooki
       {/* Slot list */}
       {sortedDates.length === 0 ? (
         <div className="avail-empty">
-          <div style={{ fontSize: 32 }}>🗓</div>
-          <p>No slots yet — add your first available time above.</p>
+          <div className="avail-empty-icon">🗓</div>
+          <strong>No open slots yet</strong>
+          <p>Use the form above to pick a day and open your available hours.<br />Your clients will see those times on the website and can book directly.</p>
         </div>
       ) : (
         sortedDates.map((date) => (
@@ -1946,19 +2037,16 @@ function AvailabilityPage({ slots, setSlots, addToast, setPage, setSelectedBooki
                   <>
                     <span className="status-badge status-approved" style={{ flexShrink: 0 }}>Booked</span>
                     {slot.bookedBy && (
-                      <span
-                        className="avail-slot-booked-by"
-                        onClick={() => { setSelectedBooking(slot.bookingId); setPage("booking-detail"); }}
-                      >
-                        {slot.bookedBy}
+                      <span className="avail-slot-booked-by" onClick={() => { setSelectedBooking(slot.bookingId); setPage("booking-detail"); }}>
+                        {slot.bookedBy} →
                       </span>
                     )}
                   </>
                 ) : (
                   <>
-                    <span className="status-badge status-new" style={{ flexShrink: 0 }}>Available</span>
+                    <span className="status-badge status-new" style={{ flexShrink: 0 }}>Open</span>
                     <span style={{ flex: 1 }} />
-                    <button className="btn-delete" onClick={() => handleDelete(slot.id)} title="Delete slot">
+                    <button className="btn-delete" onClick={() => handleDelete(slot.id)} title="Remove this slot">
                       {Icons.trash}
                     </button>
                   </>
@@ -1968,6 +2056,82 @@ function AvailabilityPage({ slots, setSlots, addToast, setPage, setSelectedBooki
           </div>
         ))
       )}
+    </div>
+  );
+}
+
+// ─── Tutorial Overlay ───
+const TUTORIAL_STEPS = [
+  {
+    icon: "👋",
+    title: "Welcome to Your Dashboard",
+    body: "This is your home base. At a glance you can see new booking requests, unread messages, and anything that needs your attention — all in one place.",
+  },
+  {
+    icon: "📋",
+    title: "Managing Bookings",
+    body: "When someone on your website requests a consultation, it shows up here under Bookings. You can review the details, approve or decline the request, and add approved sessions to your calendar.",
+  },
+  {
+    icon: "✉️",
+    title: "Your Inbox",
+    body: "General messages and inquiries from the website land here. You can mark them as replied or archive them once you've followed up.",
+  },
+  {
+    icon: "🕐",
+    title: "Setting Your Availability",
+    body: "This is how clients book sessions with you. Go to the Availability page, pick a day and your available hours, and we'll create the open time slots automatically. Clients see those slots on the website and choose a time.",
+  },
+  {
+    icon: "📅",
+    title: "Your Calendar",
+    body: "Once you approve a booking and add it to your calendar, it shows up here. This gives you a clear view of your upcoming consultation schedule.",
+  },
+  {
+    icon: "📱",
+    title: "Install as an App",
+    body: "You can add this dashboard to your phone or tablet's home screen so it opens like a regular app — no browser address bar, full screen.\n\niPhone/iPad: Tap the Share button (the box with an arrow), then tap \"Add to Home Screen\".\n\nAndroid: Tap the three-dot menu in the top right, then tap \"Add to Home Screen\" or \"Install App\".",
+  },
+];
+
+function TutorialOverlay({ onDone }) {
+  const [step, setStep] = useState(0);
+  const current = TUTORIAL_STEPS[step];
+  const isLast = step === TUTORIAL_STEPS.length - 1;
+
+  const handleNext = async () => {
+    if (isLast) {
+      try { await api.completeTutorial(); } catch {}
+      onDone();
+    } else {
+      setStep((s) => s + 1);
+    }
+  };
+
+  const handleSkip = async () => {
+    try { await api.completeTutorial(); } catch {}
+    onDone();
+  };
+
+  return (
+    <div className="tutorial-overlay">
+      <div className="tutorial-card">
+        <div className="tutorial-icon">{current.icon}</div>
+        <div className="tutorial-step-num">Step {step + 1} of {TUTORIAL_STEPS.length}</div>
+        <div className="tutorial-title">{current.title}</div>
+        <div className="tutorial-body" style={{ whiteSpace: "pre-line" }}>{current.body}</div>
+        <div className="tutorial-dots">
+          {TUTORIAL_STEPS.map((_, i) => (
+            <div key={i} className={`tutorial-dot${i === step ? " active" : ""}`} />
+          ))}
+        </div>
+        <div className="tutorial-btn-row">
+          <button className="tutorial-next" onClick={handleNext}>
+            {isLast ? "Got it, let's go! →" : "Next →"}
+          </button>
+          {!isLast && <button className="tutorial-skip" onClick={handleSkip}>Skip tutorial</button>}
+        </div>
+      </div>
     </div>
   );
 }
@@ -1984,8 +2148,8 @@ function LoginScreen({ onLogin }) {
     setLoading(true);
     setError("");
     try {
-      await api.login(username, password);
-      onLogin();
+      const data = await api.login(username, password);
+      onLogin(data.tutorialComplete === false);
     } catch {
       setError("Invalid credentials. Please try again.");
     } finally {
@@ -2022,6 +2186,7 @@ function LoginScreen({ onLogin }) {
 // ─── Main App ───
 export default function ArmvetDashboard() {
   const [loggedIn, setLoggedIn] = useState(api.hasToken());
+  const [showTutorial, setShowTutorial] = useState(false);
   const [page, setPage] = useState("dashboard");
   const [bookings, setBookings] = useState([]);
   const [contacts, setContacts] = useState([]);
@@ -2077,6 +2242,7 @@ export default function ArmvetDashboard() {
   const handleLogout = () => {
     api.logout();
     setLoggedIn(false);
+    setShowTutorial(false);
     setBookings([]);
     setContacts([]);
     setSlots([]);
@@ -2090,7 +2256,7 @@ export default function ArmvetDashboard() {
     return (
       <>
         <style>{CSS}</style>
-        <LoginScreen onLogin={() => setLoggedIn(true)} />
+        <LoginScreen onLogin={(showTut) => { setLoggedIn(true); setShowTutorial(!!showTut); }} />
       </>
     );
   }
@@ -2126,6 +2292,7 @@ export default function ArmvetDashboard() {
           {content}
         </main>
         <Toast toasts={toasts} />
+        {showTutorial && <TutorialOverlay onDone={() => setShowTutorial(false)} />}
       </div>
     </>
   );

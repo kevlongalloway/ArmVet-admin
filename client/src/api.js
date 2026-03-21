@@ -50,6 +50,8 @@ export const api = {
   updateContactStatus: (id, status) => request('PUT', `/contacts/${id}/status`, { status }),
   getAvailability: () => request('GET', '/availability'),
   createSlot: (slot) => request('POST', '/availability', slot),
+  createSlotRange: (range) => request('POST', '/availability/batch', range),
   deleteSlot: (id) => request('DELETE', `/availability/${id}`),
+  completeTutorial: () => request('PUT', '/auth/tutorial-complete'),
   hasToken: () => !!getToken(),
 };
