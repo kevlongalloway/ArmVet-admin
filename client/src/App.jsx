@@ -1531,27 +1531,34 @@ body {
 .tutorial-dismiss:hover { color: var(--text-secondary); }
 .tutorial-no-show { background: none; border: 1px solid var(--border); color: var(--text-muted); font-size: 12px; cursor: pointer; font-family: inherit; padding: 8px 16px; border-radius: 6px; transition: all var(--transition); }
 .tutorial-no-show:hover { border-color: var(--red); color: var(--red); }
-.sidebar-visit-wrap { padding: 16px 20px 8px; }
+.sidebar-visit-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 20px 0;
+}
+.sidebar-visit-divider::before,
+.sidebar-visit-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
 .sidebar-visit-btn {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  background: var(--accent-dim);
-  border: 1px solid var(--accent);
-  border-radius: 8px;
-  color: var(--accent);
-  font-size: 13px;
-  font-weight: 700;
+  gap: 5px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
   font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  padding: 10px 16px;
   text-decoration: none;
-  transition: background var(--transition), opacity var(--transition);
-  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  white-space: nowrap;
+  transition: color var(--transition);
 }
-.sidebar-visit-btn:hover { background: rgba(200,168,78,0.2); }
+.sidebar-visit-btn:hover { color: var(--text-secondary); }
 .sidebar-tutorial-btn { display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: none; color: var(--text-muted); font-size: 13px; font-family: inherit; cursor: pointer; padding: 10px 24px; transition: color var(--transition); text-align: left; }
 .sidebar-tutorial-btn:hover { color: var(--text-secondary); }
 
@@ -1771,13 +1778,16 @@ function Sidebar({ page, setPage, bookings, contacts, isOpen, onClose, onLogout,
               {item.badge > 0 && <span className="nav-badge">{item.badge}</span>}
             </div>
           ))}
-          <div className="sidebar-visit-wrap">
-            <a className="sidebar-visit-btn" href="https://ArmVet.onrender.com" target="_blank" rel="noopener noreferrer">
-              {Icons.sun}
-              Visit Website
-            </a>
-          </div>
         </nav>
+        <div className="sidebar-visit-divider">
+          <a className="sidebar-visit-btn" href="https://ArmVet.onrender.com" target="_blank" rel="noopener noreferrer">
+            Visit Website
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+              <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+          </a>
+        </div>
         <div className="sidebar-footer">
           <button className="sidebar-tutorial-btn" onClick={() => { onShowTutorial(); onClose(); }}>
             {Icons.helpCircle}
