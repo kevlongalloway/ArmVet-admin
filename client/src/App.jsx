@@ -1531,8 +1531,27 @@ body {
 .tutorial-dismiss:hover { color: var(--text-secondary); }
 .tutorial-no-show { background: none; border: 1px solid var(--border); color: var(--text-muted); font-size: 12px; cursor: pointer; font-family: inherit; padding: 8px 16px; border-radius: 6px; transition: all var(--transition); }
 .tutorial-no-show:hover { border-color: var(--red); color: var(--red); }
-.sidebar-visit-btn { display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: none; color: var(--accent); font-size: 13px; font-family: inherit; cursor: pointer; padding: 10px 24px; transition: opacity var(--transition); text-decoration: none; font-weight: 600; }
-.sidebar-visit-btn:hover { opacity: 0.75; }
+.sidebar-visit-wrap { padding: 16px 20px 8px; }
+.sidebar-visit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  padding: 10px 16px;
+  text-decoration: none;
+  transition: background var(--transition), opacity var(--transition);
+  letter-spacing: 0.3px;
+}
+.sidebar-visit-btn:hover { background: rgba(200,168,78,0.2); }
 .sidebar-tutorial-btn { display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: none; color: var(--text-muted); font-size: 13px; font-family: inherit; cursor: pointer; padding: 10px 24px; transition: color var(--transition); text-align: left; }
 .sidebar-tutorial-btn:hover { color: var(--text-secondary); }
 
@@ -1752,12 +1771,14 @@ function Sidebar({ page, setPage, bookings, contacts, isOpen, onClose, onLogout,
               {item.badge > 0 && <span className="nav-badge">{item.badge}</span>}
             </div>
           ))}
+          <div className="sidebar-visit-wrap">
+            <a className="sidebar-visit-btn" href="https://ArmVet.onrender.com" target="_blank" rel="noopener noreferrer">
+              {Icons.sun}
+              Visit Website
+            </a>
+          </div>
         </nav>
         <div className="sidebar-footer">
-          <a className="sidebar-visit-btn" href="https://ArmVet.onrender.com" target="_blank" rel="noopener noreferrer">
-            {Icons.sun}
-            Visit Website
-          </a>
           <button className="sidebar-tutorial-btn" onClick={() => { onShowTutorial(); onClose(); }}>
             {Icons.helpCircle}
             Show Tutorial
