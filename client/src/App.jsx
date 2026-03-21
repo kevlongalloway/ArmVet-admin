@@ -987,7 +987,7 @@ body {
 }
 .cal-left { min-width: 0; }
 .cal-right { position: sticky; top: 80px; }
-.cal-mobile-upcoming { display: none; margin-top: 24px; }
+.cal-mobile-upcoming { display: none; margin-top: 24px; grid-column: 1 / -1; }
 
 .cal-grid {
   display: grid;
@@ -1303,7 +1303,9 @@ body {
     grid-template-columns: 1fr;
   }
   .cal-layout { grid-template-columns: 1fr; }
-  .cal-right { display: none; }
+  .cal-right { display: none; position: static; margin-top: 16px; }
+  .cal-layout.day-selected .cal-right { display: block; }
+  .cal-layout.day-selected .cal-mobile-upcoming { display: none; }
   .cal-mobile-upcoming { display: block; }
   .cal-cell { min-height: 56px; padding: 5px 4px; }
   .cal-event { display: none; }
@@ -2010,7 +2012,7 @@ function CalendarPage({ bookings, setPage, setSelectedBooking }) {
         <p>Your approved consultations and scheduled appointments</p>
       </div>
 
-      <div className="cal-layout">
+      <div className={`cal-layout${selectedDate ? " day-selected" : ""}`}>
         {/* ── Left: calendar grid ── */}
         <div className="cal-left">
           <div className="cal-nav">
@@ -2121,33 +2123,33 @@ function CalendarPage({ bookings, setPage, setSelectedBooking }) {
             )}
           </div>
         </div>
-      </div>
 
-      {/* Mobile: upcoming list always visible below grid */}
-      <div className="cal-mobile-upcoming">
-        <div className="section-title" style={{ marginBottom: 12 }}>Upcoming Consultations</div>
-        {upcoming.length === 0 ? (
-          <div className="cal-panel-empty" style={{ textAlign: "center", padding: "24px 0" }}>No upcoming approved consultations.</div>
-        ) : (
-          <div className="card-list">
-            {upcoming.map((b) => (
-              <div key={b.id} className="list-card" onClick={() => { setSelectedBooking(b.id); setPage("booking-detail"); }}>
-                <div className="card-status-dot" style={{ background: b.status === "on-calendar" ? "var(--purple)" : "var(--green)" }} />
-                <div className="card-body">
-                  <div className="card-top-row">
-                    <span className="card-name">{b.name}</span>
-                    <span className="card-date">{formatTime(b.time) || b.time}</span>
+        {/* Mobile: upcoming list — shown by default, hidden when a day is selected */}
+        <div className="cal-mobile-upcoming">
+          <div className="section-title" style={{ marginBottom: 12 }}>Upcoming Consultations</div>
+          {upcoming.length === 0 ? (
+            <div className="cal-panel-empty" style={{ textAlign: "center", padding: "24px 0" }}>No upcoming approved consultations.</div>
+          ) : (
+            <div className="card-list">
+              {upcoming.map((b) => (
+                <div key={b.id} className="list-card" onClick={() => { setSelectedBooking(b.id); setPage("booking-detail"); }}>
+                  <div className="card-status-dot" style={{ background: b.status === "on-calendar" ? "var(--purple)" : "var(--green)" }} />
+                  <div className="card-body">
+                    <div className="card-top-row">
+                      <span className="card-name">{b.name}</span>
+                      <span className="card-date">{formatTime(b.time) || b.time}</span>
+                    </div>
+                    <div className="card-preview">{b.service} — {formatDate(b.date)}</div>
+                    <div className="card-tags">
+                      <span className={`status-badge status-${b.status}`}>{b.status === "on-calendar" ? "On Calendar" : "Approved"}</span>
+                    </div>
                   </div>
-                  <div className="card-preview">{b.service} — {formatDate(b.date)}</div>
-                  <div className="card-tags">
-                    <span className={`status-badge status-${b.status}`}>{b.status === "on-calendar" ? "On Calendar" : "Approved"}</span>
-                  </div>
+                  <span className="card-chevron">{Icons.chevronRight}</span>
                 </div>
-                <span className="card-chevron">{Icons.chevronRight}</span>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
