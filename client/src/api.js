@@ -52,6 +52,7 @@ export const api = {
   createSlot: (slot) => request('POST', '/availability', slot),
   createSlotRange: (range) => request('POST', '/availability/batch', range),
   deleteSlot: (id) => request('DELETE', `/availability/${id}`),
+  changePassword: (currentPassword, newPassword) => request('POST', '/auth/change-password', { currentPassword, newPassword }),
   completeTutorial: () => request('PUT', '/auth/tutorial-complete'),
   resetTutorial: () => request('DELETE', '/auth/tutorial-complete'),
   deleteBooking: (id) => request('DELETE', `/bookings/${id}`),

@@ -173,13 +173,29 @@ const Icons = {
       <polyline points="9 22 9 12 15 12 15 22" />
     </svg>
   ),
+  settings: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+    </svg>
+  ),
+  sun: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="5" />
+      <line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" />
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+      <line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" />
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+    </svg>
+  ),
 };
 
 // ─── Styles ───
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap');
 
-:root {
+/* ─── Theme: Dark (default) ─── */
+:root, [data-theme="dark"] {
   --bg-primary: #0C0F14;
   --bg-secondary: #141820;
   --bg-card: #1A1F2B;
@@ -191,22 +207,87 @@ const CSS = `
   --text-secondary: #8A94A6;
   --text-muted: #5A6478;
   --accent: #C8A84E;
-  --accent-dim: rgba(200, 168, 78, 0.12);
-  --accent-glow: rgba(200, 168, 78, 0.25);
-  --green: #34D399;
-  --green-dim: rgba(52, 211, 153, 0.12);
-  --red: #F87171;
-  --red-dim: rgba(248, 113, 113, 0.12);
-  --blue: #60A5FA;
-  --blue-dim: rgba(96, 165, 250, 0.12);
-  --orange: #FBBF24;
-  --orange-dim: rgba(251, 191, 36, 0.12);
-  --purple: #A78BFA;
-  --purple-dim: rgba(167, 139, 250, 0.12);
-  --radius: 10px;
-  --radius-lg: 14px;
+  --accent-dim: rgba(200,168,78,0.12);
+  --accent-glow: rgba(200,168,78,0.25);
+  --green: #34D399; --green-dim: rgba(52,211,153,0.12);
+  --red: #F87171; --red-dim: rgba(248,113,113,0.12);
+  --blue: #60A5FA; --blue-dim: rgba(96,165,250,0.12);
+  --orange: #FBBF24; --orange-dim: rgba(251,191,36,0.12);
+  --purple: #A78BFA; --purple-dim: rgba(167,139,250,0.12);
+  --radius: 10px; --radius-lg: 14px;
   --shadow: 0 2px 12px rgba(0,0,0,0.3);
   --transition: 0.2s ease;
+}
+
+/* ─── Theme: Light ─── */
+[data-theme="light"] {
+  --bg-primary: #F0F2F7;
+  --bg-secondary: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #F5F7FB;
+  --bg-input: #F0F2F7;
+  --border: #DDE1EB;
+  --border-light: #E8ECF3;
+  --text-primary: #1A1F2E;
+  --text-secondary: #5A6478;
+  --text-muted: #9AA3B5;
+  --accent: #A8862A;
+  --accent-dim: rgba(168,134,42,0.12);
+  --accent-glow: rgba(168,134,42,0.25);
+  --green: #059669; --green-dim: rgba(5,150,105,0.1);
+  --red: #DC2626; --red-dim: rgba(220,38,38,0.1);
+  --blue: #2563EB; --blue-dim: rgba(37,99,235,0.1);
+  --orange: #D97706; --orange-dim: rgba(217,119,6,0.1);
+  --purple: #7C3AED; --purple-dim: rgba(124,58,237,0.1);
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+/* ─── Theme: Auto (follows system) ─── */
+@media (prefers-color-scheme: light) {
+  [data-theme="auto"] {
+    --bg-primary: #F0F2F7;
+    --bg-secondary: #FFFFFF;
+    --bg-card: #FFFFFF;
+    --bg-card-hover: #F5F7FB;
+    --bg-input: #F0F2F7;
+    --border: #DDE1EB;
+    --border-light: #E8ECF3;
+    --text-primary: #1A1F2E;
+    --text-secondary: #5A6478;
+    --text-muted: #9AA3B5;
+    --accent: #A8862A;
+    --accent-dim: rgba(168,134,42,0.12);
+    --accent-glow: rgba(168,134,42,0.25);
+    --green: #059669; --green-dim: rgba(5,150,105,0.1);
+    --red: #DC2626; --red-dim: rgba(220,38,38,0.1);
+    --blue: #2563EB; --blue-dim: rgba(37,99,235,0.1);
+    --orange: #D97706; --orange-dim: rgba(217,119,6,0.1);
+    --purple: #7C3AED; --purple-dim: rgba(124,58,237,0.1);
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+}
+
+/* ─── Theme: Alpha Psi Phi (Deep Purple & Gold) ─── */
+[data-theme="alpha-psi-phi"] {
+  --bg-primary: #0F0720;
+  --bg-secondary: #180B33;
+  --bg-card: #1F1040;
+  --bg-card-hover: #281554;
+  --bg-input: #180B33;
+  --border: #3D1F72;
+  --border-light: #2B1558;
+  --text-primary: #F0E8FF;
+  --text-secondary: #B89FD8;
+  --text-muted: #7B5FA0;
+  --accent: #D4AF37;
+  --accent-dim: rgba(212,175,55,0.15);
+  --accent-glow: rgba(212,175,55,0.32);
+  --green: #34D399; --green-dim: rgba(52,211,153,0.12);
+  --red: #F87171; --red-dim: rgba(248,113,113,0.12);
+  --blue: #818CF8; --blue-dim: rgba(129,140,248,0.15);
+  --orange: #FBBF24; --orange-dim: rgba(251,191,36,0.12);
+  --purple: #C084FC; --purple-dim: rgba(192,132,252,0.15);
+  --shadow: 0 2px 16px rgba(0,0,0,0.5);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1453,13 +1534,152 @@ body {
 .sidebar-tutorial-btn { display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: none; color: var(--text-muted); font-size: 13px; font-family: inherit; cursor: pointer; padding: 10px 24px; transition: color var(--transition); text-align: left; }
 .sidebar-tutorial-btn:hover { color: var(--text-secondary); }
 
+/* ─── Settings Page ─── */
+.settings-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  margin-bottom: 20px;
+}
+.settings-section > h3 {
+  font-family: 'Syne', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.settings-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 22px;
+  line-height: 1.6;
+}
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.theme-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--radius);
+  border: 2px solid transparent;
+  transition: all var(--transition);
+}
+.theme-option:hover:not(.active) { border-color: var(--border); }
+.theme-option.active { border-color: var(--accent); }
+.theme-swatch {
+  width: 100%;
+  aspect-ratio: 4/3;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+}
+.theme-swatch-header {
+  height: 32%;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  gap: 4px;
+}
+.theme-swatch-dot { width: 5px; height: 5px; border-radius: 50%; opacity: 0.6; }
+.theme-swatch-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 28% 1fr;
+  gap: 3px;
+  padding: 3px;
+}
+.theme-swatch-sidebar { border-radius: 3px; }
+.theme-swatch-content { display: flex; flex-direction: column; gap: 3px; }
+.theme-swatch-card { flex: 1; border-radius: 3px; }
+.theme-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: center;
+}
+.theme-option.active .theme-label { color: var(--accent); }
+
+/* Generic form elements */
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.form-input {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: var(--text-primary);
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  transition: border-color var(--transition);
+  width: 100%;
+}
+.form-input:focus { border-color: var(--accent); }
+.btn-primary {
+  background: var(--accent);
+  color: #0C0F14;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all var(--transition);
+  align-self: flex-start;
+}
+.btn-primary:hover { opacity: 0.9; }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.settings-form { display: flex; flex-direction: column; gap: 18px; max-width: 420px; }
+.settings-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 14px;
+}
+.settings-info-row:last-child { border-bottom: none; }
+.settings-info-label { color: var(--text-muted); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+.settings-info-value { color: var(--text-primary); font-weight: 500; }
+
 @media (max-width: 768px) {
   .avail-form-inline { grid-template-columns: 1fr; }
   .tutorial-card { padding: 32px 24px; }
   .tutorial-title { font-size: 19px; }
   .tutorial-body { font-size: 15px; }
+  .theme-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
 }
 `;
+
+// ─── Theme init (runs before first render to avoid flash) ───
+if (typeof localStorage !== 'undefined') {
+  document.documentElement.setAttribute('data-theme', localStorage.getItem('armvet_theme') || 'auto');
+}
+
+function useTheme() {
+  const [theme, setThemeState] = useState(() => localStorage.getItem('armvet_theme') || 'auto');
+  const setTheme = (t) => {
+    localStorage.setItem('armvet_theme', t);
+    document.documentElement.setAttribute('data-theme', t);
+    setThemeState(t);
+  };
+  return [theme, setTheme];
+}
 
 // ─── Helpers ───
 function statusColor(s) {
@@ -1518,6 +1738,7 @@ function Sidebar({ page, setPage, bookings, contacts, isOpen, onClose, onLogout,
             { id: "contacts", icon: Icons.inbox, label: "Inbox", badge: newCount },
             { id: "availability", icon: Icons.clock, label: "Availability" },
             { id: "calendar", icon: Icons.calendar, label: "Calendar" },
+            { id: "settings", icon: Icons.settings, label: "Settings" },
           ].map((item) => (
             <div
               key={item.id}
@@ -2332,6 +2553,133 @@ function AvailabilityPage({ slots, setSlots, addToast, setPage, setSelectedBooki
   );
 }
 
+// ─── Settings Page ───
+const THEMES = [
+  {
+    id: 'auto',
+    label: 'Auto',
+    swatch: { header: '#141820', sidebar: '#141820', content: '#0C0F14', card: '#1A1F2B', accent: '#C8A84E' },
+  },
+  {
+    id: 'dark',
+    label: 'Dark',
+    swatch: { header: '#141820', sidebar: '#141820', content: '#0C0F14', card: '#1A1F2B', accent: '#C8A84E' },
+  },
+  {
+    id: 'light',
+    label: 'Light',
+    swatch: { header: '#FFFFFF', sidebar: '#FFFFFF', content: '#F0F2F7', card: '#FFFFFF', accent: '#A8862A' },
+  },
+  {
+    id: 'alpha-psi-phi',
+    label: 'Alpha Ψ Φ',
+    swatch: { header: '#180B33', sidebar: '#180B33', content: '#0F0720', card: '#1F1040', accent: '#D4AF37' },
+  },
+];
+
+function SettingsPage({ addToast }) {
+  const [theme, setTheme] = useTheme();
+  const [currentPw, setCurrentPw] = useState('');
+  const [newPw, setNewPw] = useState('');
+  const [confirmPw, setConfirmPw] = useState('');
+  const [pwSaving, setPwSaving] = useState(false);
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    if (!currentPw) { addToast({ message: 'Current password is required', type: 'error' }); return; }
+    if (newPw.length < 8) { addToast({ message: 'New password must be at least 8 characters', type: 'error' }); return; }
+    if (newPw !== confirmPw) { addToast({ message: "New passwords don't match", type: 'error' }); return; }
+    setPwSaving(true);
+    try {
+      await api.changePassword(currentPw, newPw);
+      addToast({ message: 'Password updated successfully' });
+      setCurrentPw(''); setNewPw(''); setConfirmPw('');
+    } catch (err) {
+      const msg = (err?.message || '').includes('401') || (err?.message || '').toLowerCase().includes('incorrect')
+        ? 'Current password is incorrect'
+        : 'Failed to update password. Please try again.';
+      addToast({ message: msg, type: 'error' });
+    } finally {
+      setPwSaving(false);
+    }
+  };
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>Settings</h2>
+        <p>Manage your account and appearance preferences</p>
+      </div>
+
+      {/* ── Appearance ── */}
+      <div className="settings-section">
+        <h3>Appearance</h3>
+        <p className="settings-desc">Choose how the dashboard looks. <strong>Auto</strong> follows your device's light or dark mode setting automatically.</p>
+        <div className="theme-grid">
+          {THEMES.map((t) => (
+            <div key={t.id} className={`theme-option${theme === t.id ? ' active' : ''}`} onClick={() => setTheme(t.id)}>
+              <div className="theme-swatch">
+                <div className="theme-swatch-header" style={{ background: t.swatch.header, borderBottom: `2px solid ${t.swatch.accent}` }}>
+                  <div className="theme-swatch-dot" style={{ background: t.swatch.accent }} />
+                  <div className="theme-swatch-dot" style={{ background: t.swatch.accent }} />
+                </div>
+                <div className="theme-swatch-body" style={{ background: t.swatch.content }}>
+                  <div className="theme-swatch-sidebar" style={{ background: t.swatch.sidebar }} />
+                  <div className="theme-swatch-content">
+                    <div className="theme-swatch-card" style={{ background: t.swatch.card }} />
+                    <div className="theme-swatch-card" style={{ background: t.swatch.card }} />
+                  </div>
+                </div>
+              </div>
+              <span className="theme-label">{t.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Change Password ── */}
+      <div className="settings-section">
+        <h3>Change Password</h3>
+        <p className="settings-desc">Update your admin login password. Once changed, use the new password to log in. Must be at least 8 characters.</p>
+        <form className="settings-form" onSubmit={handlePasswordChange}>
+          <div className="form-group">
+            <label className="form-label">Current Password</label>
+            <input type="password" className="form-input" value={currentPw} onChange={(e) => setCurrentPw(e.target.value)} autoComplete="current-password" placeholder="Enter your current password" />
+          </div>
+          <div className="form-group">
+            <label className="form-label">New Password</label>
+            <input type="password" className="form-input" value={newPw} onChange={(e) => setNewPw(e.target.value)} autoComplete="new-password" placeholder="At least 8 characters" />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Confirm New Password</label>
+            <input type="password" className="form-input" value={confirmPw} onChange={(e) => setConfirmPw(e.target.value)} autoComplete="new-password" placeholder="Repeat your new password" />
+          </div>
+          <button type="submit" className="btn-primary" disabled={pwSaving}>
+            {pwSaving ? 'Saving...' : 'Update Password'}
+          </button>
+        </form>
+      </div>
+
+      {/* ── About ── */}
+      <div className="settings-section">
+        <h3>About</h3>
+        <div className="settings-info-row">
+          <span className="settings-info-label">Platform</span>
+          <span className="settings-info-value">Armvet Admin Portal</span>
+        </div>
+        <div className="settings-info-row">
+          <span className="settings-info-label">Version</span>
+          <span className="settings-info-value">1.0.0</span>
+        </div>
+        <div className="settings-info-row">
+          <span className="settings-info-label">Support</span>
+          <a href="mailto:support@armvet.com" style={{ color: 'var(--accent)', fontSize: 14 }}>support@armvet.com</a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Tutorial Overlay ───
 const TUTORIAL_STEPS = [
   {
@@ -2568,6 +2916,8 @@ export default function ArmvetDashboard() {
     content = <AvailabilityPage slots={slots} setSlots={setSlots} addToast={addToast} setPage={setPage} setSelectedBooking={setSelectedBooking} />;
   } else if (page === "calendar") {
     content = <CalendarPage bookings={bookings} setPage={setPage} setSelectedBooking={setSelectedBooking} />;
+  } else if (page === "settings") {
+    content = <SettingsPage addToast={addToast} />;
   }
 
   return (
