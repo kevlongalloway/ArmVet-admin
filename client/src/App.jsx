@@ -1531,6 +1531,8 @@ body {
 .tutorial-dismiss:hover { color: var(--text-secondary); }
 .tutorial-no-show { background: none; border: 1px solid var(--border); color: var(--text-muted); font-size: 12px; cursor: pointer; font-family: inherit; padding: 8px 16px; border-radius: 6px; transition: all var(--transition); }
 .tutorial-no-show:hover { border-color: var(--red); color: var(--red); }
+.sidebar-visit-btn { display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: none; color: var(--accent); font-size: 13px; font-family: inherit; cursor: pointer; padding: 10px 24px; transition: opacity var(--transition); text-decoration: none; font-weight: 600; }
+.sidebar-visit-btn:hover { opacity: 0.75; }
 .sidebar-tutorial-btn { display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: none; color: var(--text-muted); font-size: 13px; font-family: inherit; cursor: pointer; padding: 10px 24px; transition: color var(--transition); text-align: left; }
 .sidebar-tutorial-btn:hover { color: var(--text-secondary); }
 
@@ -1752,6 +1754,10 @@ function Sidebar({ page, setPage, bookings, contacts, isOpen, onClose, onLogout,
           ))}
         </nav>
         <div className="sidebar-footer">
+          <a className="sidebar-visit-btn" href="https://ArmVet.onrender.com" target="_blank" rel="noopener noreferrer">
+            {Icons.sun}
+            Visit Website
+          </a>
           <button className="sidebar-tutorial-btn" onClick={() => { onShowTutorial(); onClose(); }}>
             {Icons.helpCircle}
             Show Tutorial
