@@ -51,4 +51,17 @@ router.put('/:id/status', requireAuth, async (req, res) => {
   }
 });
 
+// DELETE /api/contacts/:id
+router.delete('/:id', requireAuth, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const { rows } = await pool.query('DELETE FROM contacts WHERE id = $1 RETURNING id', [id]);
+    if (rows.length === 0) return res.status(404).json({ error: 'Not found' });
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
 module.exports = router;

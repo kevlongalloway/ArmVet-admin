@@ -139,6 +139,40 @@ const Icons = {
       <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
     </svg>
   ),
+  archive: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="21 8 21 21 3 21 3 8" />
+      <rect x="1" y="3" width="22" height="5" />
+      <line x1="10" y1="12" x2="14" y2="12" />
+    </svg>
+  ),
+  helpCircle: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+      <line x1="12" y1="17" x2="12.01" y2="17" />
+    </svg>
+  ),
+  mobile: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+      <line x1="12" y1="18" x2="12.01" y2="18" />
+    </svg>
+  ),
+  clipboardList: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+      <rect x="8" y="2" width="8" height="4" rx="1" />
+      <line x1="9" y1="12" x2="15" y2="12" />
+      <line x1="9" y1="16" x2="15" y2="16" />
+    </svg>
+  ),
+  home: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      <polyline points="9 22 9 12 15 12 15 22" />
+    </svg>
+  ),
 };
 
 // ─── Styles ───
@@ -380,6 +414,19 @@ body {
 }
 .btn-calendar:hover { background: rgba(96, 165, 250, 0.2); }
 
+.btn-delete {
+  background: var(--red-dim);
+  color: var(--red);
+  margin-left: auto;
+}
+.btn-delete:hover { background: rgba(248, 113, 113, 0.2); }
+
+.btn-archive {
+  background: rgba(90,100,120,0.15);
+  color: var(--text-muted);
+}
+.btn-archive:hover { background: rgba(90,100,120,0.25); }
+
 .login-error {
   background: var(--red-dim);
   color: var(--red);
@@ -409,6 +456,8 @@ body {
 .app-layout {
   display: flex;
   min-height: 100vh;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 .sidebar {
@@ -525,6 +574,10 @@ body {
   margin-left: 240px;
   padding: 28px;
   min-height: 100vh;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .mobile-header {
@@ -595,6 +648,8 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 20px;
+  min-width: 0;
+  box-sizing: border-box;
   transition: border-color var(--transition);
 }
 
@@ -684,6 +739,8 @@ body {
   display: flex;
   align-items: center;
   gap: 16px;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .list-card:hover {
@@ -1251,18 +1308,19 @@ body {
 .avail-slot-label { font-size: 13px; color: var(--text-secondary); flex: 1; font-style: italic; }
 .avail-slot-booked-by { font-size: 13px; color: var(--text-secondary); flex: 1; cursor: pointer; }
 .avail-slot-booked-by:hover { color: var(--accent); text-decoration: underline; }
-.btn-delete {
+.btn-slot-delete {
   display: inline-flex; align-items: center; justify-content: center;
   padding: 7px; background: transparent; color: var(--text-muted);
   border: 1px solid var(--border); border-radius: 6px; cursor: pointer;
   transition: all var(--transition); flex-shrink: 0;
 }
-.btn-delete:hover { background: var(--red-dim); color: var(--red); border-color: var(--red); }
+.btn-slot-delete:hover { background: var(--red-dim); color: var(--red); border-color: var(--red); }
 .avail-empty {
   text-align: center; padding: 56px 20px; color: var(--text-muted); font-size: 14px;
   background: var(--bg-card); border: 1px dashed var(--border); border-radius: var(--radius-lg);
 }
-.avail-empty .avail-empty-icon { font-size: 40px; margin-bottom: 12px; }
+.avail-empty .avail-empty-icon { display: flex; justify-content: center; margin-bottom: 12px; color: var(--text-muted); }
+.avail-empty .avail-empty-icon svg { width: 40px; height: 40px; }
 .avail-empty p { color: var(--text-muted); font-size: 14px; margin-top: 6px; line-height: 1.6; }
 
 /* ─── Tutorial Overlay ─── */
@@ -1275,7 +1333,8 @@ body {
   border-radius: var(--radius-lg); padding: 44px 36px;
   max-width: 500px; width: 100%; text-align: center;
 }
-.tutorial-icon { font-size: 48px; margin-bottom: 16px; }
+.tutorial-icon { display: flex; justify-content: center; margin-bottom: 20px; color: var(--accent); }
+.tutorial-icon svg { width: 52px; height: 52px; }
 .tutorial-step-num {
   font-size: 11px; font-weight: 700; color: var(--accent);
   letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px;
@@ -1288,8 +1347,12 @@ body {
 .tutorial-btn-row { display: flex; flex-direction: column; align-items: center; gap: 14px; }
 .tutorial-next { width: 100%; padding: 14px; background: var(--accent); color: #0C0F14; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all var(--transition); }
 .tutorial-next:hover { background: #D4B65E; }
-.tutorial-skip { background: none; border: none; color: var(--text-muted); font-size: 13px; cursor: pointer; font-family: inherit; text-decoration: underline; }
-.tutorial-skip:hover { color: var(--text-secondary); }
+.tutorial-dismiss { background: none; border: none; color: var(--text-muted); font-size: 13px; cursor: pointer; font-family: inherit; }
+.tutorial-dismiss:hover { color: var(--text-secondary); }
+.tutorial-no-show { background: none; border: 1px solid var(--border); color: var(--text-muted); font-size: 12px; cursor: pointer; font-family: inherit; padding: 8px 16px; border-radius: 6px; transition: all var(--transition); }
+.tutorial-no-show:hover { border-color: var(--red); color: var(--red); }
+.sidebar-tutorial-btn { display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: none; color: var(--text-muted); font-size: 13px; font-family: inherit; cursor: pointer; padding: 10px 24px; transition: color var(--transition); text-align: left; }
+.sidebar-tutorial-btn:hover { color: var(--text-secondary); }
 
 @media (max-width: 768px) {
   .avail-form-inline { grid-template-columns: 1fr; }
@@ -1336,7 +1399,7 @@ function Toast({ toasts }) {
   );
 }
 
-function Sidebar({ page, setPage, bookings, contacts, isOpen, onClose, onLogout }) {
+function Sidebar({ page, setPage, bookings, contacts, isOpen, onClose, onLogout, onShowTutorial }) {
   const pendingCount = bookings.filter((b) => b.status === "pending").length;
   const newCount = contacts.filter((c) => c.status === "new").length;
 
@@ -1369,6 +1432,10 @@ function Sidebar({ page, setPage, bookings, contacts, isOpen, onClose, onLogout 
           ))}
         </nav>
         <div className="sidebar-footer">
+          <button className="sidebar-tutorial-btn" onClick={() => { onShowTutorial(); onClose(); }}>
+            {Icons.helpCircle}
+            Show Tutorial
+          </button>
           <button className="logout-btn" onClick={onLogout}>
             {Icons.logout}
             Sign Out
@@ -1536,12 +1603,18 @@ function BookingsPage({ bookings, setPage, setSelectedBooking, searchTerm, setSe
   );
 }
 
-function BookingDetail({ booking, onBack, onUpdateStatus, onAddToCalendar, addToast }) {
+function BookingDetail({ booking, onBack, onUpdateStatus, onAddToCalendar, onDelete, addToast }) {
   if (!booking) return null;
 
   const handleStatusChange = (newStatus) => {
     onUpdateStatus(booking.id, newStatus);
     addToast({ message: `Booking ${newStatus === "approved" ? "approved" : newStatus === "declined" ? "declined" : "updated"} — ${booking.name}`, type: "success" });
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm(`Permanently delete this booking from ${booking.name}? This cannot be undone.`)) return;
+    await onDelete(booking.id);
+    onBack();
   };
 
   return (
@@ -1595,6 +1668,7 @@ function BookingDetail({ booking, onBack, onUpdateStatus, onAddToCalendar, addTo
             <option value="approved">Approved</option>
             <option value="declined">Declined</option>
             <option value="on-calendar">On Calendar</option>
+            <option value="archived">Archived</option>
           </select>
         </div>
 
@@ -1609,7 +1683,7 @@ function BookingDetail({ booking, onBack, onUpdateStatus, onAddToCalendar, addTo
               </button>
             </>
           )}
-          {(booking.status === "approved") && (
+          {booking.status === "approved" && (
             <button className="btn-action btn-calendar" onClick={() => { onAddToCalendar(booking.id); addToast({ message: `Added to calendar — ${booking.name}, ${formatDate(booking.date)}`, type: "info" }); }}>
               {Icons.calendarPlus} Add to Calendar
             </button>
@@ -1625,6 +1699,14 @@ function BookingDetail({ booking, onBack, onUpdateStatus, onAddToCalendar, addTo
           <a href={`tel:${booking.phone}`} className="btn-action" style={{ background: "rgba(255,255,255,0.06)", color: "var(--text-secondary)", textDecoration: "none" }}>
             {Icons.phone} Call
           </a>
+          {booking.status !== "archived" && (
+            <button className="btn-action btn-archive" onClick={() => handleStatusChange("archived")}>
+              {Icons.archive} Archive
+            </button>
+          )}
+          <button className="btn-action btn-delete" onClick={handleDelete}>
+            {Icons.trash} Delete
+          </button>
         </div>
       </div>
     </div>
@@ -1687,12 +1769,18 @@ function ContactsPage({ contacts, setPage, setSelectedContact, searchTerm, setSe
   );
 }
 
-function ContactDetail({ contact, onBack, onUpdateStatus, addToast }) {
+function ContactDetail({ contact, onBack, onUpdateStatus, onDelete, addToast }) {
   if (!contact) return null;
 
   const handleStatusChange = (newStatus) => {
     onUpdateStatus(contact.id, newStatus);
     addToast({ message: `Marked as ${newStatus} — ${contact.name}`, type: "success" });
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm(`Permanently delete this message from ${contact.name}? This cannot be undone.`)) return;
+    await onDelete(contact.id);
+    onBack();
   };
 
   return (
@@ -1753,10 +1841,13 @@ function ContactDetail({ contact, onBack, onUpdateStatus, addToast }) {
             {Icons.phone} Call
           </a>
           {contact.status !== "archived" && (
-            <button className="btn-action" style={{ background: "rgba(90,100,120,0.15)", color: "var(--text-muted)" }} onClick={() => handleStatusChange("archived")}>
-              Archive
+            <button className="btn-action btn-archive" onClick={() => handleStatusChange("archived")}>
+              {Icons.archive} Archive
             </button>
           )}
+          <button className="btn-action btn-delete" onClick={handleDelete}>
+            {Icons.trash} Delete
+          </button>
         </div>
       </div>
     </div>
@@ -2020,7 +2111,7 @@ function AvailabilityPage({ slots, setSlots, addToast, setPage, setSelectedBooki
       {/* Slot list */}
       {sortedDates.length === 0 ? (
         <div className="avail-empty">
-          <div className="avail-empty-icon">🗓</div>
+          <div className="avail-empty-icon">{Icons.calendar}</div>
           <strong>No open slots yet</strong>
           <p>Use the form above to pick a day and open your available hours.<br />Your clients will see those times on the website and can book directly.</p>
         </div>
@@ -2046,7 +2137,7 @@ function AvailabilityPage({ slots, setSlots, addToast, setPage, setSelectedBooki
                   <>
                     <span className="status-badge status-new" style={{ flexShrink: 0 }}>Open</span>
                     <span style={{ flex: 1 }} />
-                    <button className="btn-delete" onClick={() => handleDelete(slot.id)} title="Remove this slot">
+                    <button className="btn-slot-delete" onClick={() => handleDelete(slot.id)} title="Remove this slot">
                       {Icons.trash}
                     </button>
                   </>
@@ -2063,32 +2154,32 @@ function AvailabilityPage({ slots, setSlots, addToast, setPage, setSelectedBooki
 // ─── Tutorial Overlay ───
 const TUTORIAL_STEPS = [
   {
-    icon: "👋",
+    iconKey: "home",
     title: "Welcome to Your Dashboard",
     body: "This is your home base. At a glance you can see new booking requests, unread messages, and anything that needs your attention — all in one place.",
   },
   {
-    icon: "📋",
+    iconKey: "bookings",
     title: "Managing Bookings",
     body: "When someone on your website requests a consultation, it shows up here under Bookings. You can review the details, approve or decline the request, and add approved sessions to your calendar.",
   },
   {
-    icon: "✉️",
+    iconKey: "inbox",
     title: "Your Inbox",
     body: "General messages and inquiries from the website land here. You can mark them as replied or archive them once you've followed up.",
   },
   {
-    icon: "🕐",
+    iconKey: "clock",
     title: "Setting Your Availability",
     body: "This is how clients book sessions with you. Go to the Availability page, pick a day and your available hours, and we'll create the open time slots automatically. Clients see those slots on the website and choose a time.",
   },
   {
-    icon: "📅",
+    iconKey: "calendar",
     title: "Your Calendar",
     body: "Once you approve a booking and add it to your calendar, it shows up here. This gives you a clear view of your upcoming consultation schedule.",
   },
   {
-    icon: "📱",
+    iconKey: "mobile",
     title: "Install as an App",
     body: "You can add this dashboard to your phone or tablet's home screen so it opens like a regular app — no browser address bar, full screen.\n\niPhone/iPad: Tap the Share button (the box with an arrow), then tap \"Add to Home Screen\".\n\nAndroid: Tap the three-dot menu in the top right, then tap \"Add to Home Screen\" or \"Install App\".",
   },
@@ -2099,16 +2190,15 @@ function TutorialOverlay({ onDone }) {
   const current = TUTORIAL_STEPS[step];
   const isLast = step === TUTORIAL_STEPS.length - 1;
 
-  const handleNext = async () => {
+  const handleNext = () => {
     if (isLast) {
-      try { await api.completeTutorial(); } catch {}
       onDone();
     } else {
       setStep((s) => s + 1);
     }
   };
 
-  const handleSkip = async () => {
+  const handleDontShow = async () => {
     try { await api.completeTutorial(); } catch {}
     onDone();
   };
@@ -2116,7 +2206,7 @@ function TutorialOverlay({ onDone }) {
   return (
     <div className="tutorial-overlay">
       <div className="tutorial-card">
-        <div className="tutorial-icon">{current.icon}</div>
+        <div className="tutorial-icon">{Icons[current.iconKey]}</div>
         <div className="tutorial-step-num">Step {step + 1} of {TUTORIAL_STEPS.length}</div>
         <div className="tutorial-title">{current.title}</div>
         <div className="tutorial-body" style={{ whiteSpace: "pre-line" }}>{current.body}</div>
@@ -2127,9 +2217,9 @@ function TutorialOverlay({ onDone }) {
         </div>
         <div className="tutorial-btn-row">
           <button className="tutorial-next" onClick={handleNext}>
-            {isLast ? "Got it, let's go! →" : "Next →"}
+            {isLast ? "Got it, close →" : "Next →"}
           </button>
-          {!isLast && <button className="tutorial-skip" onClick={handleSkip}>Skip tutorial</button>}
+          <button className="tutorial-no-show" onClick={handleDontShow}>Don't show this again</button>
         </div>
       </div>
     </div>
@@ -2239,6 +2329,26 @@ export default function ArmvetDashboard() {
     }
   };
 
+  const deleteBooking = async (id) => {
+    try {
+      await api.deleteBooking(id);
+      setBookings((prev) => prev.filter((b) => b.id !== id));
+      addToast({ message: "Booking deleted", type: "success" });
+    } catch {
+      addToast({ message: "Failed to delete booking", type: "error" });
+    }
+  };
+
+  const deleteContact = async (id) => {
+    try {
+      await api.deleteContact(id);
+      setContacts((prev) => prev.filter((c) => c.id !== id));
+      addToast({ message: "Message deleted", type: "success" });
+    } catch {
+      addToast({ message: "Failed to delete message", type: "error" });
+    }
+  };
+
   const handleLogout = () => {
     api.logout();
     setLoggedIn(false);
@@ -2268,11 +2378,11 @@ export default function ArmvetDashboard() {
   } else if (page === "bookings") {
     content = <BookingsPage bookings={bookings} setPage={setPage} setSelectedBooking={setSelectedBooking} searchTerm={searchTerm} setSearchTerm={setSearchTerm} statusFilter={statusFilter} setStatusFilter={setStatusFilter} categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter} />;
   } else if (page === "booking-detail") {
-    content = <BookingDetail booking={selectedBooking} onBack={() => setPage("bookings")} onUpdateStatus={updateBookingStatus} onAddToCalendar={addToCalendar} addToast={addToast} />;
+    content = <BookingDetail booking={selectedBooking} onBack={() => setPage("bookings")} onUpdateStatus={updateBookingStatus} onAddToCalendar={addToCalendar} onDelete={deleteBooking} addToast={addToast} />;
   } else if (page === "contacts") {
     content = <ContactsPage contacts={contacts} setPage={setPage} setSelectedContact={setSelectedContact} searchTerm={contactSearchTerm} setSearchTerm={setContactSearchTerm} contactStatusFilter={contactStatusFilter} setContactStatusFilter={setContactStatusFilter} />;
   } else if (page === "contact-detail") {
-    content = <ContactDetail contact={selectedContact} onBack={() => setPage("contacts")} onUpdateStatus={updateContactStatus} addToast={addToast} />;
+    content = <ContactDetail contact={selectedContact} onBack={() => setPage("contacts")} onUpdateStatus={updateContactStatus} onDelete={deleteContact} addToast={addToast} />;
   } else if (page === "availability") {
     content = <AvailabilityPage slots={slots} setSlots={setSlots} addToast={addToast} setPage={setPage} setSelectedBooking={setSelectedBooking} />;
   } else if (page === "calendar") {
@@ -2287,7 +2397,7 @@ export default function ArmvetDashboard() {
           <h1>Armvet</h1>
           <button className="mobile-menu-btn" onClick={() => setSidebarOpen(true)}>{Icons.menu}</button>
         </div>
-        <Sidebar page={page} setPage={setPage} bookings={bookings} contacts={contacts} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} onLogout={handleLogout} />
+        <Sidebar page={page} setPage={setPage} bookings={bookings} contacts={contacts} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} onLogout={handleLogout} onShowTutorial={() => setShowTutorial(true)} />
         <main className="main-content">
           {content}
         </main>

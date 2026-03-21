@@ -3,7 +3,7 @@ const { pool } = require('../db');
 const { requireAuth } = require('../middleware/auth');
 const router = express.Router();
 
-const VALID_STATUSES = ['pending', 'approved', 'declined', 'on-calendar'];
+const VALID_STATUSES = ['pending', 'approved', 'declined', 'on-calendar', 'archived'];
 
 // GET /api/bookings
 router.get('/', requireAuth, async (req, res) => {
@@ -49,6 +49,19 @@ router.put('/:id/status', requireAuth, async (req, res) => {
     );
     if (rows.length === 0) return res.status(404).json({ error: 'Not found' });
     res.json(rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+// DELETE /api/bookings/:id
+router.delete('/:id', requireAuth, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const { rows } = await pool.query('DELETE FROM bookings WHERE id = $1 RETURNING id', [id]);
+    if (rows.length === 0) return res.status(404).json({ error: 'Not found' });
+    res.json({ success: true });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Database error' });

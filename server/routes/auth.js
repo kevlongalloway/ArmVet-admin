@@ -43,4 +43,15 @@ router.put('/tutorial-complete', requireAuth, async (req, res) => {
   }
 });
 
+// DELETE /api/auth/tutorial-complete — reset tutorial so it shows again
+router.delete('/tutorial-complete', requireAuth, async (req, res) => {
+  try {
+    await pool.query("DELETE FROM app_config WHERE key = 'tutorial_complete'");
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
 module.exports = router;

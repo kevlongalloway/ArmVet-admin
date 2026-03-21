@@ -53,5 +53,8 @@ export const api = {
   createSlotRange: (range) => request('POST', '/availability/batch', range),
   deleteSlot: (id) => request('DELETE', `/availability/${id}`),
   completeTutorial: () => request('PUT', '/auth/tutorial-complete'),
+  resetTutorial: () => request('DELETE', '/auth/tutorial-complete'),
+  deleteBooking: (id) => request('DELETE', `/bookings/${id}`),
+  deleteContact: (id) => request('DELETE', `/contacts/${id}`),
   hasToken: () => !!getToken(),
 };
