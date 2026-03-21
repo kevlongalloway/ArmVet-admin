@@ -17,15 +17,37 @@ const VALID_SERVICES = [
 ];
 
 // GET /api/public/csrf-token
-// Fetch a short-lived CSRF token before submitting a form
 router.get('/csrf-token', (req, res) => {
   res.json({ token: generateCsrfToken() });
 });
 
+// GET /api/public/availability
+// Returns upcoming un-booked slots for the main site booking UI
+router.get('/availability', async (req, res) => {
+  try {
+    const { rows } = await pool.query(`
+      SELECT id, date, start_time, duration_minutes, label
+      FROM availability_slots
+      WHERE is_booked = FALSE AND date >= CURRENT_DATE
+      ORDER BY date ASC, start_time ASC
+    `);
+    const slots = rows.map((r) => ({
+      id: r.id,
+      date: r.date.toISOString().split('T')[0],
+      startTime: r.start_time,
+      durationMinutes: r.duration_minutes,
+      label: r.label || '',
+    }));
+    res.json(slots);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
 // POST /api/public/bookings
-// Submit a consultation booking request from the main site
 router.post('/bookings', requireCsrf, async (req, res) => {
-  const { name, email, phone, org, service, category, date, time, message } = req.body;
+  const { name, email, phone, org, service, category, date, time, message, slotId } = req.body;
 
   if (!name || typeof name !== 'string' || name.trim().length === 0) {
     return res.status(400).json({ error: 'name is required' });
@@ -40,8 +62,33 @@ router.post('/bookings', requireCsrf, async (req, res) => {
     return res.status(400).json({ error: 'Invalid service' });
   }
 
+  const client = await pool.connect();
   try {
-    const { rows } = await pool.query(
+    await client.query('BEGIN');
+
+    let bookingDate = date || null;
+    let bookingTime = (time || '').trim().slice(0, 50);
+
+    if (slotId) {
+      // Lock the slot row to prevent double-booking
+      const { rows: slotRows } = await client.query(
+        'SELECT id, date, start_time, is_booked FROM availability_slots WHERE id = $1 FOR UPDATE',
+        [slotId]
+      );
+      if (slotRows.length === 0) {
+        await client.query('ROLLBACK');
+        return res.status(404).json({ error: 'Slot not found' });
+      }
+      if (slotRows[0].is_booked) {
+        await client.query('ROLLBACK');
+        return res.status(409).json({ error: 'Slot already booked' });
+      }
+      // Use the slot's date/time for the booking
+      bookingDate = slotRows[0].date.toISOString().split('T')[0];
+      bookingTime = slotRows[0].start_time;
+    }
+
+    const { rows } = await client.query(
       `INSERT INTO bookings (name, email, phone, org, service, category, date, time, message)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
        RETURNING id`,
@@ -52,20 +99,32 @@ router.post('/bookings', requireCsrf, async (req, res) => {
         (org || '').trim().slice(0, 255),
         (service || '').trim().slice(0, 255),
         (category || '').trim().slice(0, 50),
-        date || null,
-        (time || '').trim().slice(0, 50),
+        bookingDate,
+        bookingTime,
         (message || '').trim().slice(0, 5000),
       ]
     );
-    res.status(201).json({ success: true, id: rows[0].id });
+    const bookingId = rows[0].id;
+
+    if (slotId) {
+      await client.query(
+        'UPDATE availability_slots SET is_booked = TRUE, booking_id = $1 WHERE id = $2',
+        [bookingId, slotId]
+      );
+    }
+
+    await client.query('COMMIT');
+    res.status(201).json({ success: true, id: bookingId });
   } catch (err) {
+    await client.query('ROLLBACK');
     console.error(err);
     res.status(500).json({ error: 'Failed to save booking' });
+  } finally {
+    client.release();
   }
 });
 
 // POST /api/public/contacts
-// Submit a contact/inquiry message from the main site
 router.post('/contacts', requireCsrf, async (req, res) => {
   const { name, email, phone, category, subject, message } = req.body;
 

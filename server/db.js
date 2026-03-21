@@ -39,6 +39,17 @@ async function initDb() {
       status       VARCHAR(50) DEFAULT 'new',
       submitted_at TIMESTAMP DEFAULT NOW()
     );
+
+    CREATE TABLE IF NOT EXISTS availability_slots (
+      id               SERIAL PRIMARY KEY,
+      date             DATE NOT NULL,
+      start_time       VARCHAR(10) NOT NULL,
+      duration_minutes INT NOT NULL DEFAULT 60,
+      label            VARCHAR(100),
+      is_booked        BOOLEAN DEFAULT FALSE,
+      booking_id       INT REFERENCES bookings(id) ON DELETE SET NULL,
+      created_at       TIMESTAMP DEFAULT NOW()
+    );
   `);
 
 }

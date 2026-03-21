@@ -125,6 +125,20 @@ const Icons = {
       <line x1="21" y1="21" x2="16.65" y2="16.65" />
     </svg>
   ),
+  clock: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+  ),
+  trash: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="3 6 5 6 21 6" />
+      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+      <path d="M10 11v6M14 11v6" />
+      <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+    </svg>
+  ),
 };
 
 // ─── Styles ───
@@ -1141,6 +1155,103 @@ body {
   .detail-card { padding: 20px; }
   .detail-name { font-size: 18px; }
 }
+
+/* ─── Availability Page ─── */
+.avail-form-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 28px;
+}
+.avail-form-card h3 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+.avail-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 140px 1fr auto;
+  gap: 12px;
+  align-items: flex-end;
+}
+.avail-form-row .form-group { margin-bottom: 0; }
+.avail-date-group {
+  margin-bottom: 28px;
+}
+.avail-date-header {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  padding: 8px 0;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.avail-slot-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  transition: border-color var(--transition);
+}
+.avail-slot-row:hover { border-color: var(--border-light); }
+.avail-slot-time {
+  font-weight: 600;
+  font-size: 14px;
+  min-width: 60px;
+}
+.avail-slot-duration {
+  font-size: 12px;
+  color: var(--text-muted);
+  min-width: 60px;
+}
+.avail-slot-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  flex: 1;
+  font-style: italic;
+}
+.avail-slot-booked-by {
+  font-size: 12px;
+  color: var(--text-secondary);
+  flex: 1;
+  cursor: pointer;
+}
+.avail-slot-booked-by:hover { color: var(--accent); text-decoration: underline; }
+.btn-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+.btn-delete:hover { background: var(--red-dim); color: var(--red); border-color: var(--red); }
+.avail-empty {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--text-muted);
+  font-size: 14px;
+  background: var(--bg-card);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+}
+.avail-empty p { margin-top: 8px; color: var(--text-muted); font-size: 13px; }
+@media (max-width: 768px) {
+  .avail-form-row { grid-template-columns: 1fr 1fr; }
+  .avail-form-row > *:last-child { grid-column: 1 / -1; }
+}
 `;
 
 // ─── Helpers ───
@@ -1151,6 +1262,18 @@ function statusColor(s) {
 
 function formatDate(d) {
   return new Date(d + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
+function formatDateLong(d) {
+  return new Date(d + "T00:00:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+}
+
+function formatTime(t) {
+  if (!t) return "";
+  const [h, m] = t.split(":").map(Number);
+  const ampm = h >= 12 ? "PM" : "AM";
+  const hour = h % 12 || 12;
+  return `${hour}:${String(m).padStart(2, "0")} ${ampm}`;
 }
 
 // ─── Components ───
@@ -1186,6 +1309,7 @@ function Sidebar({ page, setPage, bookings, contacts, isOpen, onClose, onLogout 
             { id: "dashboard", icon: Icons.dashboard, label: "Dashboard" },
             { id: "bookings", icon: Icons.bookings, label: "Bookings", badge: pendingCount },
             { id: "contacts", icon: Icons.inbox, label: "Inbox", badge: newCount },
+            { id: "availability", icon: Icons.clock, label: "Availability" },
             { id: "calendar", icon: Icons.calendar, label: "Calendar" },
           ].map((item) => (
             <div
@@ -1714,6 +1838,140 @@ function CalendarPage({ bookings, setPage, setSelectedBooking }) {
   );
 }
 
+// ─── Availability Page ───
+function AvailabilityPage({ slots, setSlots, addToast, setPage, setSelectedBooking }) {
+  const today = new Date().toISOString().split("T")[0];
+  const [form, setForm] = useState({ date: "", startTime: "", durationMinutes: 60, label: "" });
+  const [saving, setSaving] = useState(false);
+
+  const handleAdd = async () => {
+    if (!form.date || !form.startTime) {
+      addToast({ message: "Date and start time are required", type: "error" });
+      return;
+    }
+    setSaving(true);
+    try {
+      const created = await api.createSlot({
+        date: form.date,
+        startTime: form.startTime,
+        durationMinutes: Number(form.durationMinutes),
+        label: form.label,
+      });
+      const fresh = await api.getAvailability();
+      setSlots(fresh);
+      setForm({ date: form.date, startTime: "", durationMinutes: 60, label: "" });
+      addToast({ message: `Slot added — ${formatDate(form.date)} at ${formatTime(form.startTime)}` });
+    } catch {
+      addToast({ message: "Failed to add slot", type: "error" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await api.deleteSlot(id);
+      setSlots((prev) => prev.filter((s) => s.id !== id));
+      addToast({ message: "Slot removed" });
+    } catch (err) {
+      const msg = err?.message || "";
+      if (msg.includes("409") || msg.toLowerCase().includes("booked")) {
+        addToast({ message: "Cannot delete a booked slot", type: "error" });
+      } else {
+        addToast({ message: "Failed to delete slot", type: "error" });
+      }
+    }
+  };
+
+  // Group slots by date
+  const grouped = slots.reduce((acc, s) => {
+    (acc[s.date] = acc[s.date] || []).push(s);
+    return acc;
+  }, {});
+  const sortedDates = Object.keys(grouped).sort();
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>Availability</h2>
+        <p>Set your bookable time slots. Visitors on the main site will see and book these.</p>
+      </div>
+
+      {/* Add slot form */}
+      <div className="avail-form-card">
+        <h3>Add a Time Slot</h3>
+        <div className="avail-form-row">
+          <div className="form-group">
+            <label>Date</label>
+            <input type="date" min={today} value={form.date} onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))} />
+          </div>
+          <div className="form-group">
+            <label>Start Time</label>
+            <input type="time" value={form.startTime} onChange={(e) => setForm((f) => ({ ...f, startTime: e.target.value }))} />
+          </div>
+          <div className="form-group">
+            <label>Duration</label>
+            <select value={form.durationMinutes} onChange={(e) => setForm((f) => ({ ...f, durationMinutes: Number(e.target.value) }))}>
+              <option value={30}>30 min</option>
+              <option value={60}>60 min</option>
+              <option value={90}>90 min</option>
+            </select>
+          </div>
+          <div className="form-group">
+            <label>Label (optional)</label>
+            <input type="text" placeholder="e.g. Leadership only" maxLength={100} value={form.label} onChange={(e) => setForm((f) => ({ ...f, label: e.target.value }))} />
+          </div>
+          <button className="btn-primary" style={{ padding: "12px 20px", width: "auto" }} onClick={handleAdd} disabled={saving}>
+            {saving ? "Adding…" : "Add Slot"}
+          </button>
+        </div>
+      </div>
+
+      {/* Slot list */}
+      {sortedDates.length === 0 ? (
+        <div className="avail-empty">
+          <div style={{ fontSize: 32 }}>🗓</div>
+          <p>No slots yet — add your first available time above.</p>
+        </div>
+      ) : (
+        sortedDates.map((date) => (
+          <div key={date} className="avail-date-group">
+            <div className="avail-date-header">{formatDateLong(date)}</div>
+            {grouped[date].map((slot) => (
+              <div key={slot.id} className="avail-slot-row">
+                <span className="avail-slot-time">{formatTime(slot.startTime)}</span>
+                <span className="avail-slot-duration">{slot.durationMinutes} min</span>
+                <span className="avail-slot-label">{slot.label || ""}</span>
+                {slot.isBooked ? (
+                  <>
+                    <span className="status-badge status-approved" style={{ flexShrink: 0 }}>Booked</span>
+                    {slot.bookedBy && (
+                      <span
+                        className="avail-slot-booked-by"
+                        onClick={() => { setSelectedBooking(slot.bookingId); setPage("booking-detail"); }}
+                      >
+                        {slot.bookedBy}
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <span className="status-badge status-new" style={{ flexShrink: 0 }}>Available</span>
+                    <span style={{ flex: 1 }} />
+                    <button className="btn-delete" onClick={() => handleDelete(slot.id)} title="Delete slot">
+                      {Icons.trash}
+                    </button>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        ))
+      )}
+    </div>
+  );
+}
+
 // ─── Login Screen ───
 function LoginScreen({ onLogin }) {
   const [username, setUsername] = useState("");
@@ -1767,6 +2025,7 @@ export default function ArmvetDashboard() {
   const [page, setPage] = useState("dashboard");
   const [bookings, setBookings] = useState([]);
   const [contacts, setContacts] = useState([]);
+  const [slots, setSlots] = useState([]);
   const [selectedBookingId, setSelectedBooking] = useState(null);
   const [selectedContactId, setSelectedContact] = useState(null);
   const [toasts, setToasts] = useState([]);
@@ -1784,6 +2043,7 @@ export default function ArmvetDashboard() {
     if (!loggedIn) return;
     api.getBookings().then(setBookings).catch(() => {});
     api.getContacts().then(setContacts).catch(() => {});
+    api.getAvailability().then(setSlots).catch(() => {});
   }, [loggedIn]);
 
   const addToast = ({ message, type = "success" }) => {
@@ -1819,6 +2079,7 @@ export default function ArmvetDashboard() {
     setLoggedIn(false);
     setBookings([]);
     setContacts([]);
+    setSlots([]);
     setPage("dashboard");
   };
 
@@ -1846,6 +2107,8 @@ export default function ArmvetDashboard() {
     content = <ContactsPage contacts={contacts} setPage={setPage} setSelectedContact={setSelectedContact} searchTerm={contactSearchTerm} setSearchTerm={setContactSearchTerm} contactStatusFilter={contactStatusFilter} setContactStatusFilter={setContactStatusFilter} />;
   } else if (page === "contact-detail") {
     content = <ContactDetail contact={selectedContact} onBack={() => setPage("contacts")} onUpdateStatus={updateContactStatus} addToast={addToast} />;
+  } else if (page === "availability") {
+    content = <AvailabilityPage slots={slots} setSlots={setSlots} addToast={addToast} setPage={setPage} setSelectedBooking={setSelectedBooking} />;
   } else if (page === "calendar") {
     content = <CalendarPage bookings={bookings} setPage={setPage} setSelectedBooking={setSelectedBooking} />;
   }

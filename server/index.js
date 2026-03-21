@@ -56,10 +56,11 @@ async function start() {
   global.__JWT_SECRET__ = await getOrCreateJwtSecret();
 
   // ─── Routes ───
-  app.use('/api/auth',     authLimiter,   require('./routes/auth'));
-  app.use('/api/public',   publicLimiter, require('./routes/public'));
-  app.use('/api/bookings',                require('./routes/bookings'));
-  app.use('/api/contacts',                require('./routes/contacts'));
+  app.use('/api/auth',         authLimiter,   require('./routes/auth'));
+  app.use('/api/public',       publicLimiter, require('./routes/public'));
+  app.use('/api/bookings',                    require('./routes/bookings'));
+  app.use('/api/contacts',                    require('./routes/contacts'));
+  app.use('/api/availability',                require('./routes/availability'));
 
   // ─── Serve React SPA ───
   const clientDist = path.join(__dirname, '../client/dist');

@@ -48,5 +48,8 @@ export const api = {
   updateBookingStatus: (id, status) => request('PUT', `/bookings/${id}/status`, { status }),
   getContacts: () => request('GET', '/contacts'),
   updateContactStatus: (id, status) => request('PUT', `/contacts/${id}/status`, { status }),
+  getAvailability: () => request('GET', '/availability'),
+  createSlot: (slot) => request('POST', '/availability', slot),
+  deleteSlot: (id) => request('DELETE', `/availability/${id}`),
   hasToken: () => !!getToken(),
 };
