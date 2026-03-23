@@ -57,6 +57,8 @@ async function initDb() {
     CREATE UNIQUE INDEX IF NOT EXISTS avail_slots_date_time_unique
     ON availability_slots (date, start_time)
   `);
+
+  await seedDefaultConfig();
 }
 
 async function getOrCreateJwtSecret() {
@@ -73,4 +75,61 @@ async function getOrCreateJwtSecret() {
   return secret;
 }
 
-module.exports = { pool, initDb, getOrCreateJwtSecret };
+async function seedDefaultConfig() {
+  const defaults = [
+    ['company_name', 'Your Company'],
+    ['company_tagline', ''],
+    ['company_logo', ''],
+    ['support_email', 'support@example.com'],
+    ['company_website', ''],
+    ['company_phone', ''],
+    ['services', JSON.stringify([
+      'Leadership Development',
+      'Executive Coaching',
+      'Small Group Workshops',
+      'Individual Development',
+      'Organizational Culture Training',
+      'Federal HR Consulting',
+      'Workforce Planning',
+      'HR Modernization',
+      'Speaking Engagements',
+    ])],
+    ['categories', JSON.stringify(['Military', 'Federal', 'Corporate'])],
+    ['allowed_origins', JSON.stringify(['http://localhost:3000', 'http://localhost:5173'])],
+  ];
+  for (const [key, value] of defaults) {
+    await pool.query(
+      `INSERT INTO app_config (key, value) VALUES ($1, $2) ON CONFLICT (key) DO NOTHING`,
+      [key, value]
+    );
+  }
+}
+
+async function getConfig(key) {
+  const { rows } = await pool.query(
+    'SELECT value FROM app_config WHERE key = $1',
+    [key]
+  );
+  return rows.length > 0 ? rows[0].value : null;
+}
+
+async function setConfig(key, value) {
+  await pool.query(
+    `INSERT INTO app_config (key, value) VALUES ($1, $2)
+     ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`,
+    [key, value]
+  );
+}
+
+async function deleteConfig(key) {
+  await pool.query('DELETE FROM app_config WHERE key = $1', [key]);
+}
+
+async function getAllConfig() {
+  const { rows } = await pool.query('SELECT key, value FROM app_config');
+  const result = {};
+  for (const row of rows) result[row.key] = row.value;
+  return result;
+}
+
+module.exports = { pool, initDb, getOrCreateJwtSecret, seedDefaultConfig, getConfig, setConfig, deleteConfig, getAllConfig };

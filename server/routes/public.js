@@ -1,20 +1,17 @@
 const express = require('express');
-const { pool } = require('../db');
+const { pool, getConfig } = require('../db');
 const { generateCsrfToken, requireCsrf } = require('../middleware/csrf');
 const router = express.Router();
 
-const VALID_CATEGORIES = ['Military', 'Federal', 'Corporate'];
-const VALID_SERVICES = [
-  'Leadership Development',
-  'Executive Coaching',
-  'Small Group Workshops',
-  'Individual Development',
-  'Organizational Culture Training',
-  'Federal HR Consulting',
-  'Workforce Planning',
-  'HR Modernization',
-  'Speaking Engagements',
-];
+async function getValidCategories() {
+  const stored = await getConfig('categories');
+  return stored ? JSON.parse(stored) : ['Military', 'Federal', 'Corporate'];
+}
+
+async function getValidServices() {
+  const stored = await getConfig('services');
+  return stored ? JSON.parse(stored) : [];
+}
 
 // GET /api/public/csrf-token
 router.get('/csrf-token', (req, res) => {
@@ -55,10 +52,11 @@ router.post('/bookings', requireCsrf, async (req, res) => {
   if (!email || typeof email !== 'string' || !email.includes('@')) {
     return res.status(400).json({ error: 'A valid email is required' });
   }
-  if (category && !VALID_CATEGORIES.includes(category)) {
+  const [validCategories, validServices] = await Promise.all([getValidCategories(), getValidServices()]);
+  if (category && validCategories.length > 0 && !validCategories.includes(category)) {
     return res.status(400).json({ error: 'Invalid category' });
   }
-  if (service && !VALID_SERVICES.includes(service)) {
+  if (service && validServices.length > 0 && !validServices.includes(service)) {
     return res.status(400).json({ error: 'Invalid service' });
   }
 
@@ -137,7 +135,8 @@ router.post('/contacts', requireCsrf, async (req, res) => {
   if (!message || typeof message !== 'string' || message.trim().length === 0) {
     return res.status(400).json({ error: 'message is required' });
   }
-  if (category && !VALID_CATEGORIES.includes(category)) {
+  const validCategories = await getValidCategories();
+  if (category && validCategories.length > 0 && !validCategories.includes(category)) {
     return res.status(400).json({ error: 'Invalid category' });
   }
 
@@ -159,6 +158,29 @@ router.post('/contacts', requireCsrf, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to save message' });
+  }
+});
+
+// GET /api/public/config — public company info, services, categories
+router.get('/config', async (req, res) => {
+  try {
+    const [name, tagline, logo, services, categories] = await Promise.all([
+      getConfig('company_name'),
+      getConfig('company_tagline'),
+      getConfig('company_logo'),
+      getConfig('services'),
+      getConfig('categories'),
+    ]);
+    res.json({
+      company_name: name || 'Your Company',
+      company_tagline: tagline || '',
+      company_logo: logo || '',
+      services: JSON.parse(services || '[]'),
+      categories: JSON.parse(categories || '[]'),
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to load config' });
   }
 });
 

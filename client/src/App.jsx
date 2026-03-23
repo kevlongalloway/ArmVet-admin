@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { api } from "./api.js";
 
-const SERVICES = [
+const DEFAULT_SERVICES = [
   "Leadership Development",
   "Executive Coaching",
   "Small Group Workshops",
@@ -13,7 +13,7 @@ const SERVICES = [
   "Speaking Engagements",
 ];
 
-const CATEGORIES = ["Military", "Federal", "Corporate"];
+const DEFAULT_CATEGORIES = ["Military", "Federal", "Corporate"];
 
 // ─── Icons (inline SVG) ───
 const Icons = {
@@ -125,12 +125,6 @@ const Icons = {
       <line x1="21" y1="21" x2="16.65" y2="16.65" />
     </svg>
   ),
-  clock: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" />
-      <polyline points="12 6 12 12 16 14" />
-    </svg>
-  ),
   trash: (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="3 6 5 6 21 6" />
@@ -171,6 +165,52 @@ const Icons = {
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
       <polyline points="9 22 9 12 15 12 15 22" />
+    </svg>
+  ),
+  brush: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L3 14.67V21h6.33L20.84 9.39a5.5 5.5 0 0 0 0-7.78z" />
+    </svg>
+  ),
+  list: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" />
+      <line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" />
+    </svg>
+  ),
+  tag: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+      <line x1="7" y1="7" x2="7.01" y2="7" />
+    </svg>
+  ),
+  globe: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="2" y1="12" x2="22" y2="12" />
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    </svg>
+  ),
+  code: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" />
+    </svg>
+  ),
+  download: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="7 10 12 15 17 10" />
+      <line x1="12" y1="15" x2="12" y2="3" />
+    </svg>
+  ),
+  copy: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </svg>
+  ),
+  plus: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
     </svg>
   ),
   settings: (
@@ -1685,12 +1725,112 @@ body {
 .settings-info-label { color: var(--text-muted); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
 .settings-info-value { color: var(--text-primary); font-weight: 500; }
 
+/* ─── Setup Wizard ─── */
+.wizard-step-content { display: flex; flex-direction: column; gap: 18px; text-align: left; }
+.wizard-info-banner {
+  background: var(--accent-dim); border: 1px solid var(--accent-glow);
+  border-radius: 8px; padding: 12px 16px; font-size: 13px; color: var(--text-secondary); line-height: 1.6;
+}
+.wizard-list-editor { display: flex; flex-direction: column; gap: 10px; }
+.wizard-pills { display: flex; flex-wrap: wrap; gap: 8px; min-height: 36px; }
+.wizard-pill {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--accent-dim); border: 1px solid var(--accent-glow);
+  color: var(--text-primary); border-radius: 20px; padding: 4px 10px 4px 12px; font-size: 13px;
+}
+.wizard-pill-remove {
+  background: none; border: none; color: var(--text-muted); cursor: pointer;
+  display: flex; align-items: center; padding: 0; transition: color var(--transition);
+}
+.wizard-pill-remove:hover { color: var(--red); }
+.wizard-add-row { display: flex; gap: 8px; }
+.wizard-add-row .form-input { flex: 1; }
+.wizard-add-btn {
+  background: var(--accent); color: #0C0F14; border: none; border-radius: 8px;
+  padding: 10px 14px; font-size: 13px; font-weight: 700; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; white-space: nowrap; transition: opacity var(--transition); display: flex; align-items: center; gap: 6px;
+}
+.wizard-add-btn:hover { opacity: 0.85; }
+.wizard-logo-preview { margin-top: 12px; }
+.wizard-logo-preview img { max-width: 160px; max-height: 80px; border-radius: var(--radius); border: 1px solid var(--border); object-fit: contain; background: var(--bg-input); padding: 8px; }
+.wizard-review-section { background: var(--bg-input); border-radius: 8px; padding: 14px; margin-bottom: 8px; }
+.wizard-review-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.wizard-review-value { font-size: 14px; color: var(--text-primary); line-height: 1.5; }
+.wizard-skip-link { background: none; border: none; color: var(--text-muted); font-size: 12px; cursor: pointer; font-family: inherit; text-decoration: underline; margin-top: 8px; }
+.wizard-skip-link:hover { color: var(--text-secondary); }
+
+/* ─── Customize & Advanced Pages ─── */
+.page-actions { display: flex; justify-content: flex-end; margin-top: 6px; }
+.logo-preview-wrap { margin-top: 12px; display: flex; align-items: center; gap: 16px; }
+.logo-preview-wrap img { max-width: 160px; max-height: 80px; border-radius: var(--radius); border: 1px solid var(--border); object-fit: contain; background: var(--bg-input); padding: 8px; }
+.logo-remove-btn { background: none; border: 1px solid var(--border); color: var(--text-muted); font-size: 12px; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-family: inherit; transition: all var(--transition); }
+.logo-remove-btn:hover { border-color: var(--red); color: var(--red); }
+
+/* Allowed Origins page */
+.origins-info { background: var(--blue-dim); border: 1px solid var(--blue); border-radius: 8px; padding: 14px 16px; font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+.origins-info strong { color: var(--text-primary); }
+
+/* API Docs page */
+.api-docs-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 8px; }
+.api-docs-generated { font-size: 12px; color: var(--text-muted); }
+.api-docs-endpoint {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  margin-bottom: 12px; overflow: hidden;
+}
+.api-docs-endpoint-header {
+  display: flex; align-items: center; gap: 12px; padding: 16px 20px;
+  cursor: pointer; user-select: none;
+}
+.api-docs-endpoint-header:hover { background: var(--bg-card-hover); }
+.api-docs-method-badge {
+  font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px;
+  font-family: monospace; letter-spacing: 0.5px;
+}
+.badge-get { background: var(--green-dim); color: var(--green); }
+.badge-post { background: var(--blue-dim); color: var(--blue); }
+.badge-put { background: var(--orange-dim); color: var(--orange); }
+.badge-delete { background: var(--red-dim); color: var(--red); }
+.api-docs-path { font-family: monospace; font-size: 13px; color: var(--text-primary); }
+.api-docs-desc { font-size: 13px; color: var(--text-secondary); margin-left: auto; }
+.api-docs-endpoint-body { padding: 0 20px 20px; border-top: 1px solid var(--border-light); }
+.api-docs-code-block {
+  background: var(--bg-input); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px; font-family: monospace; font-size: 12px;
+  color: var(--text-secondary); overflow-x: auto; white-space: pre; line-height: 1.6; margin-top: 12px;
+}
+.api-docs-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.api-docs-tab {
+  background: var(--bg-input); border: 1px solid var(--border); color: var(--text-muted);
+  font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 6px;
+  cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all var(--transition);
+}
+.api-docs-tab.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+.api-docs-copy-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--bg-input); border: 1px solid var(--border); color: var(--text-muted);
+  font-size: 12px; padding: 6px 12px; border-radius: 6px; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; transition: all var(--transition); margin-top: 8px;
+}
+.api-docs-copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+.api-docs-dl-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--accent); color: #0C0F14; border: none; border-radius: 8px;
+  padding: 10px 18px; font-size: 13px; font-weight: 700; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; transition: opacity var(--transition);
+}
+.api-docs-dl-btn:hover { opacity: 0.88; }
+
+/* Sidebar Customize/Advanced sections */
+.sidebar-section-group { margin-top: 4px; }
+
 @media (max-width: 768px) {
   .avail-form-inline { grid-template-columns: 1fr; }
   .tutorial-card { padding: 32px 24px; }
   .tutorial-title { font-size: 19px; }
   .tutorial-body { font-size: 15px; }
   .theme-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .api-docs-header { flex-direction: column; align-items: flex-start; }
+  .api-docs-desc { margin-left: 0; }
 }
 `;
 
@@ -1746,41 +1886,53 @@ function Toast({ toasts }) {
   );
 }
 
-function Sidebar({ page, setPage, bookings, contacts, isOpen, onClose, onLogout, onShowTutorial }) {
+function Sidebar({ page, setPage, bookings, contacts, isOpen, onClose, onLogout, onShowTutorial, appConfig }) {
   const pendingCount = bookings.filter((b) => b.status === "pending").length;
   const newCount = contacts.filter((c) => c.status === "new").length;
+  const websiteUrl = appConfig?.company_website || 'https://ArmVet.onrender.com';
+  const logoSrc = appConfig?.company_logo;
+  const companyName = appConfig?.company_name || 'Armvet';
+
+  const navItem = (id, icon, label, badge) => (
+    <div key={id} className={`nav-item ${page === id ? "active" : ""}`} onClick={() => { setPage(id); onClose(); }}>
+      {icon}{label}{badge > 0 && <span className="nav-badge">{badge}</span>}
+    </div>
+  );
 
   return (
     <>
       <div className={`sidebar-overlay ${isOpen ? "show" : ""}`} onClick={onClose} />
       <aside className={`sidebar ${isOpen ? "open" : ""}`}>
         <div className="sidebar-logo">
-          <h1>Armvet</h1>
+          {logoSrc ? <img src={logoSrc} alt={companyName} style={{ maxHeight: 36, maxWidth: 140, objectFit: 'contain', marginBottom: 4 }} /> : <h1>{companyName}</h1>}
           <p>Admin Portal</p>
         </div>
         <div className="sidebar-label">Manage</div>
         <nav className="sidebar-nav">
-          {[
-            { id: "dashboard", icon: Icons.dashboard, label: "Dashboard" },
-            { id: "bookings", icon: Icons.bookings, label: "Bookings", badge: pendingCount },
-            { id: "contacts", icon: Icons.inbox, label: "Inbox", badge: newCount },
-            { id: "availability", icon: Icons.clock, label: "Availability" },
-            { id: "calendar", icon: Icons.calendar, label: "Calendar" },
-            { id: "settings", icon: Icons.settings, label: "Settings" },
-          ].map((item) => (
-            <div
-              key={item.id}
-              className={`nav-item ${page === item.id ? "active" : ""}`}
-              onClick={() => { setPage(item.id); onClose(); }}
-            >
-              {item.icon}
-              {item.label}
-              {item.badge > 0 && <span className="nav-badge">{item.badge}</span>}
-            </div>
-          ))}
+          {navItem("dashboard", Icons.dashboard, "Dashboard")}
+          {navItem("bookings", Icons.bookings, "Bookings", pendingCount)}
+          {navItem("contacts", Icons.inbox, "Inbox", newCount)}
+          {navItem("availability", Icons.clock, "Availability")}
+          {navItem("calendar", Icons.calendar, "Calendar")}
+        </nav>
+        <div className="sidebar-label" style={{ marginTop: 8 }}>Customize</div>
+        <nav className="sidebar-nav sidebar-section-group">
+          {navItem("customize-branding", Icons.brush, "Branding")}
+          {navItem("customize-services", Icons.list, "Services")}
+          {navItem("customize-categories", Icons.tag, "Categories")}
+          {navItem("customize-appearance", Icons.sun, "Appearance")}
+        </nav>
+        <div className="sidebar-label" style={{ marginTop: 8 }}>Advanced</div>
+        <nav className="sidebar-nav sidebar-section-group">
+          {navItem("advanced-origins", Icons.globe, "Allowed Origins")}
+          {navItem("advanced-docs", Icons.code, "API Docs")}
+        </nav>
+        <div className="sidebar-label" style={{ marginTop: 8 }}>Account</div>
+        <nav className="sidebar-nav sidebar-section-group">
+          {navItem("settings", Icons.settings, "Settings")}
         </nav>
         <div className="sidebar-visit-divider">
-          <a className="sidebar-visit-btn" href="https://ArmVet.onrender.com" target="_blank" rel="noopener noreferrer">
+          <a className="sidebar-visit-btn" href={websiteUrl} target="_blank" rel="noopener noreferrer">
             Visit Website
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
@@ -1896,7 +2048,8 @@ function DashboardPage({ bookings, contacts, setPage, setSelectedBooking, setSel
   );
 }
 
-function BookingsPage({ bookings, setPage, setSelectedBooking, searchTerm, setSearchTerm, statusFilter, setStatusFilter, categoryFilter, setCategoryFilter }) {
+function BookingsPage({ bookings, setPage, setSelectedBooking, searchTerm, setSearchTerm, statusFilter, setStatusFilter, categoryFilter, setCategoryFilter, categories }) {
+  const cats = categories || DEFAULT_CATEGORIES;
   const filtered = bookings.filter((b) => {
     const matchSearch = !searchTerm || b.name.toLowerCase().includes(searchTerm.toLowerCase()) || b.org.toLowerCase().includes(searchTerm.toLowerCase()) || b.service.toLowerCase().includes(searchTerm.toLowerCase());
     const matchStatus = statusFilter === "all" || b.status === statusFilter;
@@ -1925,7 +2078,7 @@ function BookingsPage({ bookings, setPage, setSelectedBooking, searchTerm, setSe
           ))}
         </div>
         <div className="filters">
-          {["all", ...CATEGORIES].map((c) => (
+          {["all", ...cats].map((c) => (
             <button key={c} className={`filter-chip ${categoryFilter === c ? "active" : ""}`} onClick={() => setCategoryFilter(c)}>
               {c === "all" ? "All Sectors" : c}
             </button>
@@ -2614,8 +2767,7 @@ const THEMES = [
   },
 ];
 
-function SettingsPage({ addToast }) {
-  const [theme, setTheme] = useTheme();
+function SettingsPage({ addToast, appConfig }) {
   const [currentPw, setCurrentPw] = useState('');
   const [newPw, setNewPw] = useState('');
   const [confirmPw, setConfirmPw] = useState('');
@@ -2641,37 +2793,13 @@ function SettingsPage({ addToast }) {
     }
   };
 
+  const supportEmail = appConfig?.support_email || 'support@armvet.com';
+
   return (
     <div>
       <div className="page-header">
         <h2>Settings</h2>
-        <p>Manage your account and appearance preferences</p>
-      </div>
-
-      {/* ── Appearance ── */}
-      <div className="settings-section">
-        <h3>Appearance</h3>
-        <p className="settings-desc">Choose how the dashboard looks. <strong>Auto</strong> follows your device's light or dark mode setting automatically.</p>
-        <div className="theme-grid">
-          {THEMES.map((t) => (
-            <div key={t.id} className={`theme-option${theme === t.id ? ' active' : ''}`} onClick={() => setTheme(t.id)}>
-              <div className="theme-swatch">
-                <div className="theme-swatch-header" style={{ background: t.swatch.header, borderBottom: `2px solid ${t.swatch.accent}` }}>
-                  <div className="theme-swatch-dot" style={{ background: t.swatch.accent }} />
-                  <div className="theme-swatch-dot" style={{ background: t.swatch.accent }} />
-                </div>
-                <div className="theme-swatch-body" style={{ background: t.swatch.content }}>
-                  <div className="theme-swatch-sidebar" style={{ background: t.swatch.sidebar }} />
-                  <div className="theme-swatch-content">
-                    <div className="theme-swatch-card" style={{ background: t.swatch.card }} />
-                    <div className="theme-swatch-card" style={{ background: t.swatch.card }} />
-                  </div>
-                </div>
-              </div>
-              <span className="theme-label">{t.label}</span>
-            </div>
-          ))}
-        </div>
+        <p>Manage your account preferences</p>
       </div>
 
       {/* ── Change Password ── */}
@@ -2710,8 +2838,544 @@ function SettingsPage({ addToast }) {
         </div>
         <div className="settings-info-row">
           <span className="settings-info-label">Support</span>
-          <a href="mailto:support@armvet.com" style={{ color: 'var(--accent)', fontSize: 14 }}>support@armvet.com</a>
+          <a href={`mailto:${supportEmail}`} style={{ color: 'var(--accent)', fontSize: 14 }}>{supportEmail}</a>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Reusable ListEditor ───
+function ListEditor({ items, onChange, placeholder, validateItem }) {
+  const [newItem, setNewItem] = useState('');
+
+  const handleAdd = () => {
+    const val = newItem.trim();
+    if (!val) return;
+    if (validateItem) {
+      const err = validateItem(val);
+      if (err) { alert(err); return; }
+    }
+    if (!items.includes(val)) onChange([...items, val]);
+    setNewItem('');
+  };
+
+  return (
+    <div className="wizard-list-editor">
+      <div className="wizard-pills">
+        {items.map((item) => (
+          <div key={item} className="wizard-pill">
+            <span>{item}</span>
+            <button className="wizard-pill-remove" onClick={() => onChange(items.filter(i => i !== item))}>
+              {Icons.x}
+            </button>
+          </div>
+        ))}
+        {items.length === 0 && <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>No items yet.</span>}
+      </div>
+      <div className="wizard-add-row">
+        <input
+          className="form-input"
+          placeholder={placeholder || 'Add item...'}
+          value={newItem}
+          onChange={(e) => setNewItem(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAdd())}
+        />
+        <button className="wizard-add-btn" onClick={handleAdd}>{Icons.plus} Add</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Setup Wizard ───
+const WIZARD_STEPS = ['Welcome', 'Logo', 'Services', 'Categories', 'Contact Info', 'Allowed Origins', 'Review & Finish'];
+
+function SetupWizard({ onComplete, onSkip, addToast }) {
+  const [step, setStep] = useState(0);
+  const [saving, setSaving] = useState(false);
+  const [data, setData] = useState({
+    company_name: 'Armvet',
+    company_tagline: '',
+    company_logo: '',
+    services: [...DEFAULT_SERVICES],
+    categories: [...DEFAULT_CATEGORIES],
+    support_email: '',
+    company_website: '',
+    company_phone: '',
+    allowed_origins: [],
+  });
+
+  const update = (key, val) => setData(d => ({ ...d, [key]: val }));
+
+  const handleLogoFile = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { addToast({ message: 'Logo must be under 2MB', type: 'error' }); return; }
+    const reader = new FileReader();
+    reader.onload = (ev) => update('company_logo', ev.target.result);
+    reader.readAsDataURL(file);
+  };
+
+  const handleFinish = async () => {
+    setSaving(true);
+    try {
+      await api.saveConfig({ ...data, setup_complete: '1' });
+      onComplete();
+    } catch {
+      addToast({ message: 'Failed to save setup. Please try again.', type: 'error' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const isLast = step === WIZARD_STEPS.length - 1;
+
+  let stepContent;
+  if (step === 0) {
+    stepContent = (
+      <div className="wizard-step-content">
+        <div className="wizard-info-banner">Welcome! Let's set up your admin portal in a few quick steps. You can always change these settings later under Customize in the sidebar.</div>
+        <div className="form-group">
+          <label className="form-label">Company / Organization Name</label>
+          <input className="form-input" value={data.company_name} onChange={(e) => update('company_name', e.target.value)} placeholder="e.g. Armvet" />
+        </div>
+        <div className="form-group">
+          <label className="form-label">Tagline (optional)</label>
+          <input className="form-input" value={data.company_tagline} onChange={(e) => update('company_tagline', e.target.value)} placeholder="e.g. Veteran-Led Leadership Solutions" />
+        </div>
+      </div>
+    );
+  } else if (step === 1) {
+    stepContent = (
+      <div className="wizard-step-content">
+        <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Upload your logo. It will appear in the admin sidebar. Max 2MB (PNG, JPG, SVG).</p>
+        <div className="form-group">
+          <label className="form-label">Logo File</label>
+          <input type="file" className="form-input" accept="image/*" onChange={handleLogoFile} />
+        </div>
+        {data.company_logo && (
+          <div className="wizard-logo-preview">
+            <img src={data.company_logo} alt="Logo preview" />
+          </div>
+        )}
+      </div>
+    );
+  } else if (step === 2) {
+    stepContent = (
+      <div className="wizard-step-content">
+        <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>These are the services you offer. They appear in booking forms for clients to choose from.</p>
+        <ListEditor items={data.services} onChange={(v) => update('services', v)} placeholder="Add a service..." />
+        {data.services.length === 0 && <div className="wizard-info-banner" style={{ marginTop: 8 }}>At least one service is recommended for booking forms.</div>}
+      </div>
+    );
+  } else if (step === 3) {
+    stepContent = (
+      <div className="wizard-step-content">
+        <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Categories group your clients (e.g. Military, Federal, Corporate). Used in booking and contact filters.</p>
+        <ListEditor items={data.categories} onChange={(v) => update('categories', v)} placeholder="Add a category..." />
+      </div>
+    );
+  } else if (step === 4) {
+    stepContent = (
+      <div className="wizard-step-content">
+        <div className="form-group">
+          <label className="form-label">Support Email</label>
+          <input className="form-input" type="email" value={data.support_email} onChange={(e) => update('support_email', e.target.value)} placeholder="e.g. support@armvet.com" />
+        </div>
+        <div className="form-group">
+          <label className="form-label">Website URL (optional)</label>
+          <input className="form-input" value={data.company_website} onChange={(e) => update('company_website', e.target.value)} placeholder="e.g. https://armvet.com" />
+        </div>
+        <div className="form-group">
+          <label className="form-label">Phone (optional)</label>
+          <input className="form-input" value={data.company_phone} onChange={(e) => update('company_phone', e.target.value)} placeholder="e.g. +1 (555) 000-0000" />
+        </div>
+      </div>
+    );
+  } else if (step === 5) {
+    stepContent = (
+      <div className="wizard-step-content">
+        <div className="origins-info">
+          <strong>CORS Allowed Origins</strong> — Add the domain(s) of your public website that will use the booking/contact API. Example: <code>https://armvet.onrender.com</code>. Changes take effect within 60 seconds.
+        </div>
+        <ListEditor
+          items={data.allowed_origins}
+          onChange={(v) => update('allowed_origins', v)}
+          placeholder="https://your-site.com"
+          validateItem={(val) => {
+            if (!/^https?:\/\/.+/.test(val)) return 'Must be a valid URL starting with http:// or https://';
+            return null;
+          }}
+        />
+      </div>
+    );
+  } else if (step === 6) {
+    stepContent = (
+      <div className="wizard-step-content">
+        <div className="wizard-review-section"><div className="wizard-review-label">Company</div><div className="wizard-review-value">{data.company_name}{data.company_tagline ? ` — ${data.company_tagline}` : ''}</div></div>
+        <div className="wizard-review-section"><div className="wizard-review-label">Services ({data.services.length})</div><div className="wizard-review-value">{data.services.join(', ') || 'None'}</div></div>
+        <div className="wizard-review-section"><div className="wizard-review-label">Categories ({data.categories.length})</div><div className="wizard-review-value">{data.categories.join(', ') || 'None'}</div></div>
+        <div className="wizard-review-section"><div className="wizard-review-label">Contact</div><div className="wizard-review-value">{data.support_email || 'Not set'}{data.company_website ? ` · ${data.company_website}` : ''}</div></div>
+        <div className="wizard-review-section"><div className="wizard-review-label">Allowed Origins ({data.allowed_origins.length})</div><div className="wizard-review-value">{data.allowed_origins.join(', ') || 'None'}</div></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="tutorial-overlay">
+      <div className="tutorial-card" style={{ maxWidth: 560, width: '100%' }}>
+        <div className="tutorial-step-num">Step {step + 1} of {WIZARD_STEPS.length} — {WIZARD_STEPS[step]}</div>
+        <div className="tutorial-title" style={{ marginBottom: 20, textAlign: 'left' }}>
+          {step === 0 ? `Welcome to ${data.company_name || 'Your Portal'}` : WIZARD_STEPS[step]}
+        </div>
+        {stepContent}
+        <div className="tutorial-dots" style={{ marginTop: 24 }}>
+          {WIZARD_STEPS.map((_, i) => (
+            <div key={i} className={`tutorial-dot${i === step ? ' active' : ''}`} />
+          ))}
+        </div>
+        <div className="tutorial-btn-row">
+          <div style={{ display: 'flex', gap: 10, width: '100%' }}>
+            {step > 0 && (
+              <button className="tutorial-next" style={{ background: 'var(--bg-input)', color: 'var(--text-primary)', border: '1px solid var(--border)', flex: '0 0 auto', width: 'auto', padding: '14px 20px' }} onClick={() => setStep(s => s - 1)}>
+                ← Back
+              </button>
+            )}
+            <button className="tutorial-next" style={{ flex: 1 }} onClick={isLast ? handleFinish : () => setStep(s => s + 1)} disabled={saving}>
+              {isLast ? (saving ? 'Saving...' : 'Finish Setup →') : 'Next →'}
+            </button>
+          </div>
+          <button className="wizard-skip-link" onClick={onSkip}>Skip setup for now</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Customize: Appearance Page ───
+function AppearancePage({ addToast }) {
+  const [theme, setTheme] = useTheme();
+  return (
+    <div>
+      <div className="page-header">
+        <h2>Appearance</h2>
+        <p>Choose how the dashboard looks</p>
+      </div>
+      <div className="settings-section">
+        <h3>Theme</h3>
+        <p className="settings-desc">Choose how the dashboard looks. <strong>Auto</strong> follows your device's light or dark mode setting automatically.</p>
+        <div className="theme-grid">
+          {THEMES.map((t) => (
+            <div key={t.id} className={`theme-option${theme === t.id ? ' active' : ''}`} onClick={() => setTheme(t.id)}>
+              <div className="theme-swatch">
+                <div className="theme-swatch-header" style={{ background: t.swatch.header, borderBottom: `2px solid ${t.swatch.accent}` }}>
+                  <div className="theme-swatch-dot" style={{ background: t.swatch.accent }} />
+                  <div className="theme-swatch-dot" style={{ background: t.swatch.accent }} />
+                </div>
+                <div className="theme-swatch-body" style={{ background: t.swatch.content }}>
+                  <div className="theme-swatch-sidebar" style={{ background: t.swatch.sidebar }} />
+                  <div className="theme-swatch-content">
+                    <div className="theme-swatch-card" style={{ background: t.swatch.card }} />
+                    <div className="theme-swatch-card" style={{ background: t.swatch.card }} />
+                  </div>
+                </div>
+              </div>
+              <span className="theme-label">{t.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Customize: Branding Page ───
+function BrandingPage({ appConfig, setAppConfig, addToast }) {
+  const [name, setName] = useState(appConfig?.company_name || '');
+  const [tagline, setTagline] = useState(appConfig?.company_tagline || '');
+  const [logo, setLogo] = useState(appConfig?.company_logo || '');
+  const [saving, setSaving] = useState(false);
+
+  const handleLogoFile = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { addToast({ message: 'Logo must be under 2MB', type: 'error' }); return; }
+    const reader = new FileReader();
+    reader.onload = (ev) => setLogo(ev.target.result);
+    reader.readAsDataURL(file);
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await api.saveConfig({ company_name: name, company_tagline: tagline, company_logo: logo });
+      setAppConfig(c => ({ ...c, company_name: name, company_tagline: tagline, company_logo: logo }));
+      addToast({ message: 'Branding saved' });
+    } catch {
+      addToast({ message: 'Failed to save branding', type: 'error' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>Branding</h2>
+        <p>Set your company name, tagline, and logo</p>
+      </div>
+      <div className="settings-section">
+        <div className="settings-form">
+          <div className="form-group">
+            <label className="form-label">Company Name</label>
+            <input className="form-input" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Armvet" />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Tagline</label>
+            <input className="form-input" value={tagline} onChange={(e) => setTagline(e.target.value)} placeholder="e.g. Veteran-Led Leadership Solutions" />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Logo (max 2MB)</label>
+            <input type="file" className="form-input" accept="image/*" onChange={handleLogoFile} />
+            {logo && (
+              <div className="logo-preview-wrap">
+                <img src={logo} alt="Logo preview" />
+                <button className="logo-remove-btn" onClick={() => setLogo('')}>Remove</button>
+              </div>
+            )}
+          </div>
+          <button className="btn-primary" onClick={handleSave} disabled={saving}>
+            {saving ? 'Saving...' : 'Save Branding'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Customize: Services Page ───
+function ServicesPage({ appConfig, setAppConfig, addToast }) {
+  const [services, setServices] = useState(appConfig?.services || DEFAULT_SERVICES);
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await api.saveConfig({ services });
+      setAppConfig(c => ({ ...c, services }));
+      addToast({ message: 'Services saved' });
+    } catch {
+      addToast({ message: 'Failed to save services', type: 'error' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>Services</h2>
+        <p>Manage the services available for booking requests</p>
+      </div>
+      <div className="settings-section">
+        {services.length === 0 && <div className="wizard-info-banner" style={{ marginBottom: 16 }}>At least one service is recommended for booking forms to work correctly.</div>}
+        <ListEditor items={services} onChange={setServices} placeholder="Add a service..." />
+        <div className="page-actions" style={{ marginTop: 20 }}>
+          <button className="btn-primary" onClick={handleSave} disabled={saving}>
+            {saving ? 'Saving...' : 'Save Services'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Customize: Categories Page ───
+function CategoriesPage({ appConfig, setAppConfig, addToast }) {
+  const [categories, setCategories] = useState(appConfig?.categories || DEFAULT_CATEGORIES);
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await api.saveConfig({ categories });
+      setAppConfig(c => ({ ...c, categories }));
+      addToast({ message: 'Categories saved' });
+    } catch {
+      addToast({ message: 'Failed to save categories', type: 'error' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>Categories</h2>
+        <p>Manage the client sector categories (e.g. Military, Federal, Corporate)</p>
+      </div>
+      <div className="settings-section">
+        <ListEditor items={categories} onChange={setCategories} placeholder="Add a category..." />
+        <div className="page-actions" style={{ marginTop: 20 }}>
+          <button className="btn-primary" onClick={handleSave} disabled={saving}>
+            {saving ? 'Saving...' : 'Save Categories'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Advanced: Allowed Origins Page ───
+function AllowedOriginsPage({ appConfig, setAppConfig, addToast }) {
+  const [origins, setOrigins] = useState(appConfig?.allowed_origins || []);
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await api.saveConfig({ allowed_origins: origins });
+      setAppConfig(c => ({ ...c, allowed_origins: origins }));
+      addToast({ message: 'Allowed origins saved. Changes take effect within 60 seconds.' });
+    } catch {
+      addToast({ message: 'Failed to save origins', type: 'error' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>Allowed Origins</h2>
+        <p>Control which domains can access the public API</p>
+      </div>
+      <div className="settings-section">
+        <div className="origins-info">
+          <strong>CORS Allowed Origins</strong> — Add the domain(s) of your public website that will call the booking/contact API. Example: <code>https://armvet.onrender.com</code>. The dev origins (<code>localhost:3000</code>, <code>localhost:5173</code>) are always allowed. Changes take effect within 60 seconds — no restart needed.
+        </div>
+        <ListEditor
+          items={origins}
+          onChange={setOrigins}
+          placeholder="https://your-site.com"
+          validateItem={(val) => {
+            if (!/^https?:\/\/.+/.test(val)) return 'Must be a valid URL starting with http:// or https://';
+            return null;
+          }}
+        />
+        <div className="page-actions" style={{ marginTop: 20 }}>
+          <button className="btn-primary" onClick={handleSave} disabled={saving}>
+            {saving ? 'Saving...' : 'Save Origins'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Advanced: API Docs Page ───
+function ApiDocsPage({ addToast }) {
+  const [docs, setDocs] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('js');
+  const [expandedEndpoint, setExpandedEndpoint] = useState(null);
+
+  useEffect(() => {
+    api.getDocs()
+      .then(setDocs)
+      .catch(() => addToast({ message: 'Failed to load API docs', type: 'error' }))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text).then(
+      () => addToast({ message: 'Copied to clipboard' }),
+      () => addToast({ message: 'Copy failed', type: 'error' })
+    );
+  };
+
+  const downloadJson = () => {
+    if (!docs) return;
+    const blob = new Blob([JSON.stringify(docs, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'api-docs.json'; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  if (loading) return <div className="page-header"><h2>API Documentation</h2><p>Loading...</p></div>;
+  if (!docs) return <div className="page-header"><h2>API Documentation</h2><p style={{ color: 'var(--red)' }}>Failed to load documentation.</p></div>;
+
+  const methodClass = (m) => `api-docs-method-badge badge-${m.toLowerCase()}`;
+
+  return (
+    <div>
+      <div className="page-header">
+        <div className="api-docs-header">
+          <div>
+            <h2>API Documentation</h2>
+            <p className="api-docs-generated">Generated {new Date(docs.generatedAt).toLocaleString()}</p>
+          </div>
+          <button className="api-docs-dl-btn" onClick={downloadJson}>
+            {Icons.download} Download JSON
+          </button>
+        </div>
+      </div>
+
+      {/* Endpoints */}
+      <div className="settings-section">
+        <h3>Endpoints</h3>
+        <p className="settings-desc">Base URL: <code>{docs.baseUrl}</code></p>
+        {docs.endpoints.map((ep, i) => (
+          <div key={i} className="api-docs-endpoint">
+            <div className="api-docs-endpoint-header" onClick={() => setExpandedEndpoint(expandedEndpoint === i ? null : i)}>
+              <span className={methodClass(ep.method)}>{ep.method}</span>
+              <span className="api-docs-path">{ep.path}</span>
+              <span className="api-docs-desc">{ep.description}</span>
+            </div>
+            {expandedEndpoint === i && (
+              <div className="api-docs-endpoint-body">
+                <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 12 }}><strong>Auth:</strong> {ep.auth}</p>
+                {ep.request && (
+                  <>
+                    <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 12, fontWeight: 700 }}>REQUEST BODY</p>
+                    <pre className="api-docs-code-block">{JSON.stringify(ep.request, null, 2)}</pre>
+                  </>
+                )}
+                {ep.response && (
+                  <>
+                    <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 12, fontWeight: 700 }}>RESPONSE</p>
+                    <pre className="api-docs-code-block">{JSON.stringify(ep.response, null, 2)}</pre>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Code Examples */}
+      <div className="settings-section">
+        <h3>Code Examples</h3>
+        <div className="api-docs-tabs">
+          {[
+            { id: 'js', label: 'JavaScript' },
+            { id: 'contactFormHTML', label: 'Contact Form HTML' },
+            { id: 'bookingFormHTML', label: 'Booking Form HTML' },
+          ].map((tab) => (
+            <button key={tab.id} className={`api-docs-tab${activeTab === tab.id ? ' active' : ''}`} onClick={() => setActiveTab(tab.id)}>
+              {tab.label}
+            </button>
+          ))}
+        </div>
+        <pre className="api-docs-code-block">
+          {activeTab === 'js' ? docs.examples.jsSnippet : activeTab === 'contactFormHTML' ? docs.examples.contactFormHTML : docs.examples.bookingFormHTML}
+        </pre>
+        <button className="api-docs-copy-btn" onClick={() => copyToClipboard(
+          activeTab === 'js' ? docs.examples.jsSnippet : activeTab === 'contactFormHTML' ? docs.examples.contactFormHTML : docs.examples.bookingFormHTML
+        )}>
+          {Icons.copy} Copy
+        </button>
       </div>
     </div>
   );
@@ -2805,7 +3469,7 @@ function LoginScreen({ onLogin }) {
     setError("");
     try {
       const data = await api.login(username, password);
-      onLogin(data.tutorialComplete === false);
+      onLogin(data.tutorialComplete === false, data.setupComplete === true);
     } catch {
       setError("Invalid credentials. Please try again.");
     } finally {
@@ -2843,6 +3507,8 @@ function LoginScreen({ onLogin }) {
 export default function ArmvetDashboard() {
   const [loggedIn, setLoggedIn] = useState(api.hasToken());
   const [showTutorial, setShowTutorial] = useState(false);
+  const [showSetupWizard, setShowSetupWizard] = useState(false);
+  const [appConfig, setAppConfig] = useState(null);
   const [page, setPage] = useState("dashboard");
   const [bookings, setBookings] = useState([]);
   const [contacts, setContacts] = useState([]);
@@ -2865,6 +3531,7 @@ export default function ArmvetDashboard() {
     api.getBookings().then(setBookings).catch(() => {});
     api.getContacts().then(setContacts).catch(() => {});
     api.getAvailability().then(setSlots).catch(() => {});
+    api.getAdminConfig().then(setAppConfig).catch(() => {});
   }, [loggedIn]);
 
   const addToast = ({ message, type = "success" }) => {
@@ -2919,6 +3586,8 @@ export default function ArmvetDashboard() {
     api.logout();
     setLoggedIn(false);
     setShowTutorial(false);
+    setShowSetupWizard(false);
+    setAppConfig(null);
     setBookings([]);
     setContacts([]);
     setSlots([]);
@@ -2932,7 +3601,14 @@ export default function ArmvetDashboard() {
     return (
       <>
         <style>{CSS}</style>
-        <LoginScreen onLogin={(showTut) => { setLoggedIn(true); setShowTutorial(!!showTut); }} />
+        <LoginScreen onLogin={(showTut, isSetupComplete) => {
+          setLoggedIn(true);
+          if (!isSetupComplete) {
+            setShowSetupWizard(true);
+          } else if (showTut) {
+            setShowTutorial(true);
+          }
+        }} />
       </>
     );
   }
@@ -2942,7 +3618,7 @@ export default function ArmvetDashboard() {
   if (page === "dashboard") {
     content = <DashboardPage bookings={bookings} contacts={contacts} setPage={setPage} setSelectedBooking={setSelectedBooking} setSelectedContact={setSelectedContact} />;
   } else if (page === "bookings") {
-    content = <BookingsPage bookings={bookings} setPage={setPage} setSelectedBooking={setSelectedBooking} searchTerm={searchTerm} setSearchTerm={setSearchTerm} statusFilter={statusFilter} setStatusFilter={setStatusFilter} categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter} />;
+    content = <BookingsPage bookings={bookings} setPage={setPage} setSelectedBooking={setSelectedBooking} searchTerm={searchTerm} setSearchTerm={setSearchTerm} statusFilter={statusFilter} setStatusFilter={setStatusFilter} categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter} categories={appConfig?.categories} />;
   } else if (page === "booking-detail") {
     content = <BookingDetail booking={selectedBooking} onBack={() => setPage("bookings")} onUpdateStatus={updateBookingStatus} onAddToCalendar={addToCalendar} onDelete={deleteBooking} addToast={addToast} />;
   } else if (page === "contacts") {
@@ -2954,23 +3630,47 @@ export default function ArmvetDashboard() {
   } else if (page === "calendar") {
     content = <CalendarPage bookings={bookings} setPage={setPage} setSelectedBooking={setSelectedBooking} />;
   } else if (page === "settings") {
-    content = <SettingsPage addToast={addToast} />;
+    content = <SettingsPage addToast={addToast} appConfig={appConfig} />;
+  } else if (page === "customize-branding") {
+    content = <BrandingPage appConfig={appConfig} setAppConfig={setAppConfig} addToast={addToast} />;
+  } else if (page === "customize-services") {
+    content = <ServicesPage appConfig={appConfig} setAppConfig={setAppConfig} addToast={addToast} />;
+  } else if (page === "customize-categories") {
+    content = <CategoriesPage appConfig={appConfig} setAppConfig={setAppConfig} addToast={addToast} />;
+  } else if (page === "customize-appearance") {
+    content = <AppearancePage addToast={addToast} />;
+  } else if (page === "advanced-origins") {
+    content = <AllowedOriginsPage appConfig={appConfig} setAppConfig={setAppConfig} addToast={addToast} />;
+  } else if (page === "advanced-docs") {
+    content = <ApiDocsPage addToast={addToast} />;
   }
+
+  const mobileTitle = appConfig?.company_name || 'Armvet';
 
   return (
     <>
       <style>{CSS}</style>
       <div className="app-layout">
         <div className="mobile-header">
-          <h1>Armvet</h1>
+          <h1>{mobileTitle}</h1>
           <button className="mobile-menu-btn" onClick={() => setSidebarOpen(true)}>{Icons.menu}</button>
         </div>
-        <Sidebar page={page} setPage={setPage} bookings={bookings} contacts={contacts} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} onLogout={handleLogout} onShowTutorial={() => setShowTutorial(true)} />
+        <Sidebar page={page} setPage={setPage} bookings={bookings} contacts={contacts} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} onLogout={handleLogout} onShowTutorial={() => setShowTutorial(true)} appConfig={appConfig} />
         <main className="main-content">
           {content}
         </main>
         <Toast toasts={toasts} />
-        {showTutorial && <TutorialOverlay onDone={() => setShowTutorial(false)} />}
+        {showSetupWizard && (
+          <SetupWizard
+            onComplete={() => {
+              setShowSetupWizard(false);
+              api.getAdminConfig().then(setAppConfig).catch(() => {});
+            }}
+            onSkip={() => setShowSetupWizard(false)}
+            addToast={addToast}
+          />
+        )}
+        {!showSetupWizard && showTutorial && <TutorialOverlay onDone={() => setShowTutorial(false)} />}
       </div>
     </>
   );

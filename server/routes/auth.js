@@ -53,7 +53,10 @@ router.post('/login', async (req, res) => {
   const tutRow = await pool.query("SELECT value FROM app_config WHERE key = 'tutorial_complete'");
   const tutorialComplete = tutRow.rows.length > 0 && tutRow.rows[0].value === '1';
 
-  res.json({ token, tutorialComplete });
+  const setupRow = await pool.query("SELECT value FROM app_config WHERE key = 'setup_complete'");
+  const setupComplete = setupRow.rows.length > 0 && setupRow.rows[0].value === '1';
+
+  res.json({ token, tutorialComplete, setupComplete });
 });
 
 // POST /api/auth/change-password

@@ -4,7 +4,7 @@ const path = require('path');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const { initDb, getOrCreateJwtSecret } = require('./db');
+const { initDb, getOrCreateJwtSecret, getConfig } = require('./db');
 
 const app = express();
 
@@ -14,20 +14,23 @@ app.use(helmet({
 }));
 
 // ─── CORS ───
-const ALLOWED_ORIGINS = [
-  'https://armvet.onrender.com',
-  'https://armvet-admin.onrender.com',
-  'http://localhost:3000',
-  'http://localhost:5173',
-];
+// Dev origins always allowed; production origins managed via admin config
+const DEV_ORIGINS = ['http://localhost:3000', 'http://localhost:5173'];
 
 app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (server-to-server, curl, etc.)
-    if (!origin || ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
-    callback(new Error(`CORS: origin ${origin} not allowed`));
+  origin: async (origin, callback) => {
+    if (!origin) return callback(null, true); // server-to-server / curl
+    try {
+      const stored = await getConfig('allowed_origins');
+      const dbOrigins = stored ? JSON.parse(stored) : [];
+      const allAllowed = [...new Set([...DEV_ORIGINS, ...dbOrigins])];
+      if (allAllowed.includes(origin)) return callback(null, true);
+      callback(new Error(`CORS: origin ${origin} not allowed`));
+    } catch {
+      callback(new Error('CORS configuration error'));
+    }
   },
-  methods: ['GET', 'POST', 'PUT'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
   credentials: false,
 }));
@@ -61,6 +64,8 @@ async function start() {
   app.use('/api/bookings',                    require('./routes/bookings'));
   app.use('/api/contacts',                    require('./routes/contacts'));
   app.use('/api/availability',                require('./routes/availability'));
+  // Admin config routes (larger body limit for logo uploads)
+  app.use('/api/admin',        express.json({ limit: '3mb' }), require('./routes/config'));
 
   // ─── Serve React SPA ───
   const clientDist = path.join(__dirname, '../client/dist');

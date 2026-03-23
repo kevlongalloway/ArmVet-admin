@@ -58,4 +58,7 @@ export const api = {
   deleteBooking: (id) => request('DELETE', `/bookings/${id}`),
   deleteContact: (id) => request('DELETE', `/contacts/${id}`),
   hasToken: () => !!getToken(),
+  getAdminConfig: () => request('GET', '/admin/config'),
+  saveConfig: (updates) => request('PUT', '/admin/config', updates),
+  getDocs: () => request('GET', '/admin/docs'),
 };
