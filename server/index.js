@@ -69,8 +69,17 @@ async function start() {
 
   // ─── Serve React SPA ───
   const clientDist = path.join(__dirname, '../client/dist');
-  app.use(express.static(clientDist));
+  // Cache JS/CSS assets long-term (they have content hashes in filenames)
+  app.use(express.static(clientDist, {
+    setHeaders(res, filePath) {
+      if (filePath.endsWith('.html')) {
+        // Never cache HTML so the browser always gets the latest index.html
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      }
+    },
+  }));
   app.get('*', (req, res) => {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.sendFile(path.join(clientDist, 'index.html'));
   });
 
