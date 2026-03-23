@@ -61,4 +61,5 @@ export const api = {
   getAdminConfig: () => request('GET', '/admin/config'),
   saveConfig: (updates) => request('PUT', '/admin/config', updates),
   getDocs: () => request('GET', '/admin/docs'),
+  resetSetup: () => request('DELETE', '/admin/config/setup_complete'),
 };

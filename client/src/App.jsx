@@ -307,27 +307,73 @@ const CSS = `
   }
 }
 
-/* ─── Theme: Alpha Psi Phi (Deep Purple & Gold) ─── */
-[data-theme="alpha-psi-phi"] {
-  --bg-primary: #0F0720;
-  --bg-secondary: #180B33;
-  --bg-card: #1F1040;
-  --bg-card-hover: #281554;
-  --bg-input: #180B33;
-  --border: #3D1F72;
-  --border-light: #2B1558;
-  --text-primary: #F0E8FF;
-  --text-secondary: #B89FD8;
-  --text-muted: #7B5FA0;
-  --accent: #D4AF37;
-  --accent-dim: rgba(212,175,55,0.15);
-  --accent-glow: rgba(212,175,55,0.32);
+/* ─── Theme: Forest (Deep Green & Sage) ─── */
+[data-theme="forest"] {
+  --bg-primary: #0D1510;
+  --bg-secondary: #111C14;
+  --bg-card: #172019;
+  --bg-card-hover: #1E2B20;
+  --bg-input: #111C14;
+  --border: #2A3D2C;
+  --border-light: #1F2E21;
+  --text-primary: #E8F0E9;
+  --text-secondary: #9DB89F;
+  --text-muted: #5E7A60;
+  --accent: #7EC87A;
+  --accent-dim: rgba(126,200,122,0.13);
+  --accent-glow: rgba(126,200,122,0.28);
+  --green: #4ADE80; --green-dim: rgba(74,222,128,0.12);
+  --red: #F87171; --red-dim: rgba(248,113,113,0.12);
+  --blue: #67C4E0; --blue-dim: rgba(103,196,224,0.15);
+  --orange: #FBBF24; --orange-dim: rgba(251,191,36,0.12);
+  --purple: #C084FC; --purple-dim: rgba(192,132,252,0.15);
+  --shadow: 0 2px 16px rgba(0,0,0,0.45);
+}
+
+/* ─── Theme: Ocean (Slate Blue & Teal) ─── */
+[data-theme="ocean"] {
+  --bg-primary: #0A1628;
+  --bg-secondary: #0E1E36;
+  --bg-card: #132743;
+  --bg-card-hover: #1A3255;
+  --bg-input: #0E1E36;
+  --border: #1E3A5F;
+  --border-light: #162D4A;
+  --text-primary: #E2EDF8;
+  --text-secondary: #8BADC8;
+  --text-muted: #4E718F;
+  --accent: #38BDF8;
+  --accent-dim: rgba(56,189,248,0.13);
+  --accent-glow: rgba(56,189,248,0.28);
   --green: #34D399; --green-dim: rgba(52,211,153,0.12);
   --red: #F87171; --red-dim: rgba(248,113,113,0.12);
   --blue: #818CF8; --blue-dim: rgba(129,140,248,0.15);
   --orange: #FBBF24; --orange-dim: rgba(251,191,36,0.12);
   --purple: #C084FC; --purple-dim: rgba(192,132,252,0.15);
   --shadow: 0 2px 16px rgba(0,0,0,0.5);
+}
+
+/* ─── Theme: Sand (Warm Tan & Terracotta) ─── */
+[data-theme="sand"] {
+  --bg-primary: #FAF7F2;
+  --bg-secondary: #F2EDE4;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #F7F3EE;
+  --bg-input: #FFFFFF;
+  --border: #DDD5C8;
+  --border-light: #EAE4DB;
+  --text-primary: #2D2018;
+  --text-secondary: #6B5244;
+  --text-muted: #A08878;
+  --accent: #C06030;
+  --accent-dim: rgba(192,96,48,0.1);
+  --accent-glow: rgba(192,96,48,0.22);
+  --green: #2D8A5E; --green-dim: rgba(45,138,94,0.12);
+  --red: #C0392B; --red-dim: rgba(192,57,43,0.12);
+  --blue: #2A6EBB; --blue-dim: rgba(42,110,187,0.12);
+  --orange: #D97706; --orange-dim: rgba(217,119,6,0.12);
+  --purple: #7C3AED; --purple-dim: rgba(124,58,237,0.12);
+  --shadow: 0 2px 16px rgba(0,0,0,0.08);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1828,6 +1874,58 @@ body {
 /* Sidebar Customize/Advanced sections */
 .sidebar-section-group { margin-top: 4px; }
 
+/* Danger Zone */
+.danger-zone-card {
+  border: 1px solid #e53e3e55;
+  border-radius: 10px;
+  overflow: hidden;
+  max-width: 560px;
+}
+.danger-zone-header {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 20px;
+  background: rgba(229,62,62,0.07);
+  border-bottom: 1px solid #e53e3e33;
+}
+.danger-zone-header strong { display: block; font-size: 14px; color: #e53e3e; margin-bottom: 6px; }
+.danger-zone-header p { font-size: 13px; color: var(--text-secondary); margin: 0; line-height: 1.5; }
+.danger-zone-confirm {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.danger-zone-confirm label { font-size: 13px; color: var(--text-secondary); }
+.danger-zone-confirm label code { background: var(--bg-tertiary); padding: 1px 6px; border-radius: 4px; font-size: 12px; letter-spacing: 0.5px; color: var(--text-primary); }
+.danger-zone-input {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: var(--text-primary);
+  font-family: monospace;
+  letter-spacing: 1px;
+  transition: border-color 0.2s;
+  outline: none;
+}
+.danger-zone-input:focus { border-color: #e53e3e88; }
+.btn-danger {
+  background: #e53e3e;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  align-self: flex-start;
+}
+.btn-danger:disabled { opacity: 0.35; cursor: not-allowed; }
+
 @media (max-width: 768px) {
   .avail-form-inline { grid-template-columns: 1fr; }
   .tutorial-card { padding: 32px 24px; }
@@ -1894,9 +1992,9 @@ function Toast({ toasts }) {
 function Sidebar({ page, setPage, bookings, contacts, isOpen, onClose, onLogout, onShowTutorial, appConfig }) {
   const pendingCount = bookings.filter((b) => b.status === "pending").length;
   const newCount = contacts.filter((c) => c.status === "new").length;
-  const websiteUrl = appConfig?.company_website || 'https://ArmVet.onrender.com';
+  const websiteUrl = appConfig?.company_website || '#';
   const logoSrc = appConfig?.company_logo;
-  const companyName = appConfig?.company_name || 'Armvet';
+  const companyName = appConfig?.company_name || 'Admin';
 
   const navItem = (id, icon, label, badge) => (
     <div key={id} className={`nav-item ${page === id ? "active" : ""}`} onClick={() => { setPage(id); onClose(); }}>
@@ -1932,6 +2030,7 @@ function Sidebar({ page, setPage, bookings, contacts, isOpen, onClose, onLogout,
           <nav className="sidebar-nav sidebar-section-group">
             {navItem("advanced-origins", Icons.globe, "Allowed Origins")}
             {navItem("advanced-docs", Icons.code, "API Docs")}
+            {navItem("advanced-reset", Icons.settings, "Reset Setup")}
           </nav>
           <div className="sidebar-label" style={{ marginTop: 8 }}>Account</div>
           <nav className="sidebar-nav sidebar-section-group">
@@ -2768,9 +2867,19 @@ const THEMES = [
     swatch: { header: '#FFFFFF', sidebar: '#FFFFFF', content: '#F0F2F7', card: '#FFFFFF', accent: '#A8862A' },
   },
   {
-    id: 'alpha-psi-phi',
-    label: 'Alpha Ψ Φ',
-    swatch: { header: '#180B33', sidebar: '#180B33', content: '#0F0720', card: '#1F1040', accent: '#D4AF37' },
+    id: 'forest',
+    label: 'Forest',
+    swatch: { header: '#111C14', sidebar: '#111C14', content: '#0D1510', card: '#172019', accent: '#7EC87A' },
+  },
+  {
+    id: 'ocean',
+    label: 'Ocean',
+    swatch: { header: '#0E1E36', sidebar: '#0E1E36', content: '#0A1628', card: '#132743', accent: '#38BDF8' },
+  },
+  {
+    id: 'sand',
+    label: 'Sand',
+    swatch: { header: '#F2EDE4', sidebar: '#F2EDE4', content: '#FAF7F2', card: '#FFFFFF', accent: '#C06030' },
   },
 ];
 
@@ -2800,7 +2909,7 @@ function SettingsPage({ addToast, appConfig }) {
     }
   };
 
-  const supportEmail = appConfig?.support_email || 'support@armvet.com';
+  const supportEmail = appConfig?.support_email || 'support@example.com';
 
   return (
     <div>
@@ -2837,7 +2946,7 @@ function SettingsPage({ addToast, appConfig }) {
         <h3>About</h3>
         <div className="settings-info-row">
           <span className="settings-info-label">Platform</span>
-          <span className="settings-info-value">Armvet Admin Portal</span>
+          <span className="settings-info-value">Admin Portal</span>
         </div>
         <div className="settings-info-row">
           <span className="settings-info-label">Version</span>
@@ -2901,7 +3010,7 @@ function SetupWizard({ onComplete, onSkip, addToast }) {
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
   const [data, setData] = useState({
-    company_name: 'Armvet',
+    company_name: '',
     company_tagline: '',
     company_logo: '',
     services: [...DEFAULT_SERVICES],
@@ -2944,7 +3053,7 @@ function SetupWizard({ onComplete, onSkip, addToast }) {
         <div className="wizard-info-banner">Welcome! Let's set up your admin portal in a few quick steps. You can always change these settings later under Customize in the sidebar.</div>
         <div className="form-group">
           <label className="form-label">Company / Organization Name</label>
-          <input className="form-input" value={data.company_name} onChange={(e) => update('company_name', e.target.value)} placeholder="e.g. Armvet" />
+          <input className="form-input" value={data.company_name} onChange={(e) => update('company_name', e.target.value)} placeholder="e.g. Acme Corp" />
         </div>
         <div className="form-group">
           <label className="form-label">Tagline (optional)</label>
@@ -2987,11 +3096,11 @@ function SetupWizard({ onComplete, onSkip, addToast }) {
       <div className="wizard-step-content">
         <div className="form-group">
           <label className="form-label">Support Email</label>
-          <input className="form-input" type="email" value={data.support_email} onChange={(e) => update('support_email', e.target.value)} placeholder="e.g. support@armvet.com" />
+          <input className="form-input" type="email" value={data.support_email} onChange={(e) => update('support_email', e.target.value)} placeholder="e.g. support@yourcompany.com" />
         </div>
         <div className="form-group">
           <label className="form-label">Website URL (optional)</label>
-          <input className="form-input" value={data.company_website} onChange={(e) => update('company_website', e.target.value)} placeholder="e.g. https://armvet.com" />
+          <input className="form-input" value={data.company_website} onChange={(e) => update('company_website', e.target.value)} placeholder="e.g. https://yourcompany.com" />
         </div>
         <div className="form-group">
           <label className="form-label">Phone (optional)</label>
@@ -3003,7 +3112,7 @@ function SetupWizard({ onComplete, onSkip, addToast }) {
     stepContent = (
       <div className="wizard-step-content">
         <div className="origins-info">
-          <strong>CORS Allowed Origins</strong> — Add the domain(s) of your public website that will use the booking/contact API. Example: <code>https://armvet.onrender.com</code>. Changes take effect within 60 seconds.
+          <strong>CORS Allowed Origins</strong> — Add the domain(s) of your public website that will use the booking/contact API. Example: <code>https://yoursite.com</code>. Changes take effect within 60 seconds.
         </div>
         <ListEditor
           items={data.allowed_origins}
@@ -3135,7 +3244,7 @@ function BrandingPage({ appConfig, setAppConfig, addToast }) {
         <div className="settings-form">
           <div className="form-group">
             <label className="form-label">Company Name</label>
-            <input className="form-input" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Armvet" />
+            <input className="form-input" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Acme Corp" />
           </div>
           <div className="form-group">
             <label className="form-label">Tagline</label>
@@ -3233,6 +3342,72 @@ function CategoriesPage({ appConfig, setAppConfig, addToast }) {
   );
 }
 
+// ─── Advanced: Reset Setup Page ───
+const RESET_CONFIRM_PHRASE = 'RESET SETUP';
+
+function ResetSetupPage({ addToast, onResetComplete }) {
+  const [input, setInput] = useState('');
+  const [resetting, setResetting] = useState(false);
+
+  const confirmed = input === RESET_CONFIRM_PHRASE;
+
+  const handleReset = async () => {
+    if (!confirmed) return;
+    setResetting(true);
+    try {
+      await api.resetSetup();
+      addToast({ message: 'Setup reset. The wizard will appear on next login.' });
+      onResetComplete();
+    } catch {
+      addToast({ message: 'Failed to reset setup', type: 'error' });
+    } finally {
+      setResetting(false);
+    }
+  };
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>Reset Setup Wizard</h2>
+        <p>Restart the first-run setup wizard</p>
+      </div>
+      <div className="danger-zone-card">
+        <div className="danger-zone-header">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#e53e3e', flexShrink: 0, marginTop: 1 }}>
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <div>
+            <strong>Danger Zone</strong>
+            <p>This will erase the setup completion record and show the setup wizard the next time any admin logs in. Your data (bookings, contacts, services, branding) will <strong>not</strong> be deleted — only the "setup complete" flag is cleared.</p>
+          </div>
+        </div>
+        <div className="danger-zone-confirm">
+          <label>
+            To confirm, type <code>{RESET_CONFIRM_PHRASE}</code> below:
+          </label>
+          <input
+            className="danger-zone-input"
+            type="text"
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            placeholder={RESET_CONFIRM_PHRASE}
+            autoComplete="off"
+            spellCheck={false}
+          />
+          <button
+            className="btn-danger"
+            disabled={!confirmed || resetting}
+            onClick={handleReset}
+          >
+            {resetting ? 'Resetting...' : 'Reset Setup Wizard'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Advanced: Allowed Origins Page ───
 function AllowedOriginsPage({ appConfig, setAppConfig, addToast }) {
   const [origins, setOrigins] = useState(appConfig?.allowed_origins || []);
@@ -3259,7 +3434,7 @@ function AllowedOriginsPage({ appConfig, setAppConfig, addToast }) {
       </div>
       <div className="settings-section">
         <div className="origins-info">
-          <strong>CORS Allowed Origins</strong> — Add the domain(s) of your public website that will call the booking/contact API. Example: <code>https://armvet.onrender.com</code>. The dev origins (<code>localhost:3000</code>, <code>localhost:5173</code>) are always allowed. Changes take effect within 60 seconds — no restart needed.
+          <strong>CORS Allowed Origins</strong> — Add the domain(s) of your public website that will call the booking/contact API. Example: <code>https://yoursite.com</code>. The dev origins (<code>localhost:3000</code>, <code>localhost:5173</code>) are always allowed. Changes take effect within 60 seconds — no restart needed.
         </div>
         <ListEditor
           items={origins}
@@ -3488,7 +3663,7 @@ function LoginScreen({ onLogin }) {
     <div className="login-page">
       <div className="login-box">
         <div className="login-logo">
-          <h1>Armvet</h1>
+          <h1>Admin</h1>
           <p>Admin Portal</p>
         </div>
         <div className="login-card">
@@ -3650,9 +3825,11 @@ export default function ArmvetDashboard() {
     content = <AllowedOriginsPage appConfig={appConfig} setAppConfig={setAppConfig} addToast={addToast} />;
   } else if (page === "advanced-docs") {
     content = <ApiDocsPage addToast={addToast} />;
+  } else if (page === "advanced-reset") {
+    content = <ResetSetupPage addToast={addToast} onResetComplete={() => { setShowSetupWizard(true); setPage("dashboard"); }} />;
   }
 
-  const mobileTitle = appConfig?.company_name || 'Armvet';
+  const mobileTitle = appConfig?.company_name || 'Admin';
 
   return (
     <>
