@@ -17,23 +17,44 @@ app.use(helmet({
 // Dev origins always allowed; production origins managed via admin config
 const DEV_ORIGINS = ['http://localhost:3000', 'http://localhost:5173'];
 
-app.use(cors({
-  origin: async (origin, callback) => {
-    if (!origin) return callback(null, true); // server-to-server / curl
-    try {
-      const stored = await getConfig('allowed_origins');
-      const dbOrigins = stored ? JSON.parse(stored) : [];
-      const allAllowed = [...new Set([...DEV_ORIGINS, ...dbOrigins])];
-      if (allAllowed.includes(origin)) return callback(null, true);
-      callback(new Error(`CORS: origin ${origin} not allowed`));
-    } catch {
-      callback(new Error('CORS configuration error'));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
-  credentials: false,
-}));
+// Custom CORS middleware: same-origin requests are always allowed (Vite adds
+// `crossorigin` to module scripts which causes the browser to send an Origin
+// header even for same-host fetches — the `cors` package never sees `req` so
+// we need our own middleware wrapper to handle this case).
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  const host = req.headers.host; // e.g. "armvet.onrender.com" or "localhost:3000"
+
+  // No Origin header — server-to-server or curl, always allow
+  if (!origin) return next();
+
+  // Same-origin — allow unconditionally (covers production domain automatically)
+  if (origin === `https://${host}` || origin === `http://${host}`) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-CSRF-Token');
+    if (req.method === 'OPTIONS') return res.sendStatus(204);
+    return next();
+  }
+
+  // Cross-origin — check DEV_ORIGINS + DB allowed list
+  cors({
+    origin: async (o, cb) => {
+      if (DEV_ORIGINS.includes(o)) return cb(null, true);
+      try {
+        const stored = await getConfig('allowed_origins');
+        const dbOrigins = stored ? JSON.parse(stored) : [];
+        if (dbOrigins.includes(o)) return cb(null, true);
+        cb(new Error(`CORS: origin ${o} not allowed`));
+      } catch {
+        cb(new Error('CORS configuration error'));
+      }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
+    credentials: false,
+  })(req, res, next);
+});
 
 app.use(express.json({ limit: '16kb' }));
 
