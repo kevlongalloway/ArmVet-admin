@@ -628,7 +628,12 @@ body {
 }
 
 .sidebar-nav {
+}
+
+.sidebar-scroll-area {
   flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .nav-item {
@@ -1907,38 +1912,40 @@ function Sidebar({ page, setPage, bookings, contacts, isOpen, onClose, onLogout,
           {logoSrc ? <img src={logoSrc} alt={companyName} style={{ maxHeight: 36, maxWidth: 140, objectFit: 'contain', marginBottom: 4 }} /> : <h1>{companyName}</h1>}
           <p>Admin Portal</p>
         </div>
-        <div className="sidebar-label">Manage</div>
-        <nav className="sidebar-nav">
-          {navItem("dashboard", Icons.dashboard, "Dashboard")}
-          {navItem("bookings", Icons.bookings, "Bookings", pendingCount)}
-          {navItem("contacts", Icons.inbox, "Inbox", newCount)}
-          {navItem("availability", Icons.clock, "Availability")}
-          {navItem("calendar", Icons.calendar, "Calendar")}
-        </nav>
-        <div className="sidebar-label" style={{ marginTop: 8 }}>Customize</div>
-        <nav className="sidebar-nav sidebar-section-group">
-          {navItem("customize-branding", Icons.brush, "Branding")}
-          {navItem("customize-services", Icons.list, "Services")}
-          {navItem("customize-categories", Icons.tag, "Categories")}
-          {navItem("customize-appearance", Icons.sun, "Appearance")}
-        </nav>
-        <div className="sidebar-label" style={{ marginTop: 8 }}>Advanced</div>
-        <nav className="sidebar-nav sidebar-section-group">
-          {navItem("advanced-origins", Icons.globe, "Allowed Origins")}
-          {navItem("advanced-docs", Icons.code, "API Docs")}
-        </nav>
-        <div className="sidebar-label" style={{ marginTop: 8 }}>Account</div>
-        <nav className="sidebar-nav sidebar-section-group">
-          {navItem("settings", Icons.settings, "Settings")}
-        </nav>
-        <div className="sidebar-visit-divider">
-          <a className="sidebar-visit-btn" href={websiteUrl} target="_blank" rel="noopener noreferrer">
-            Visit Website
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-              <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
-            </svg>
-          </a>
+        <div className="sidebar-scroll-area">
+          <div className="sidebar-label">Manage</div>
+          <nav className="sidebar-nav">
+            {navItem("dashboard", Icons.dashboard, "Dashboard")}
+            {navItem("bookings", Icons.bookings, "Bookings", pendingCount)}
+            {navItem("contacts", Icons.inbox, "Inbox", newCount)}
+            {navItem("availability", Icons.clock, "Availability")}
+            {navItem("calendar", Icons.calendar, "Calendar")}
+          </nav>
+          <div className="sidebar-label" style={{ marginTop: 8 }}>Customize</div>
+          <nav className="sidebar-nav sidebar-section-group">
+            {navItem("customize-branding", Icons.brush, "Branding")}
+            {navItem("customize-services", Icons.list, "Services")}
+            {navItem("customize-categories", Icons.tag, "Categories")}
+            {navItem("customize-appearance", Icons.sun, "Appearance")}
+          </nav>
+          <div className="sidebar-label" style={{ marginTop: 8 }}>Advanced</div>
+          <nav className="sidebar-nav sidebar-section-group">
+            {navItem("advanced-origins", Icons.globe, "Allowed Origins")}
+            {navItem("advanced-docs", Icons.code, "API Docs")}
+          </nav>
+          <div className="sidebar-label" style={{ marginTop: 8 }}>Account</div>
+          <nav className="sidebar-nav sidebar-section-group">
+            {navItem("settings", Icons.settings, "Settings")}
+          </nav>
+          <div className="sidebar-visit-divider">
+            <a className="sidebar-visit-btn" href={websiteUrl} target="_blank" rel="noopener noreferrer">
+              Visit Website
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+              </svg>
+            </a>
+          </div>
         </div>
         <div className="sidebar-footer">
           <button className="sidebar-tutorial-btn" onClick={() => { onShowTutorial(); onClose(); }}>
