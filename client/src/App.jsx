@@ -228,6 +228,63 @@ const Icons = {
       <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
     </svg>
   ),
+  pipeline: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="3" width="5" height="18" rx="1"/><rect x="9.5" y="3" width="5" height="13" rx="1"/><rect x="17" y="3" width="5" height="8" rx="1"/>
+    </svg>
+  ),
+  deals: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6"/>
+    </svg>
+  ),
+  tasks: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+    </svg>
+  ),
+  analytics: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+      <line x1="2" y1="20" x2="22" y2="20"/>
+    </svg>
+  ),
+  bell: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+    </svg>
+  ),
+  activity: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+    </svg>
+  ),
+  fields: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+      <line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="12" y2="17"/>
+    </svg>
+  ),
+  scoring: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+    </svg>
+  ),
+  convertDeal: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6"/>
+    </svg>
+  ),
+  checkCircle: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+    </svg>
+  ),
+  circle: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <circle cx="12" cy="12" r="10"/>
+    </svg>
+  ),
 };
 
 // ─── Styles ───
@@ -1926,6 +1983,188 @@ body {
 }
 .btn-danger:disabled { opacity: 0.35; cursor: not-allowed; }
 
+/* ─── CRM: Analytics ─── */
+.analytics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+.chart-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+.chart-card h4 { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+.chart-empty { color: var(--text-muted); font-size: 13px; text-align: center; padding: 24px 0; }
+.analytics-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.analytics-table th { text-align: left; padding: 6px 8px; color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); }
+.analytics-table td { padding: 8px 8px; border-bottom: 1px solid var(--border-light); color: var(--text-secondary); }
+.analytics-table td:first-child { color: var(--text-primary); font-weight: 500; }
+.analytics-pct-bar { background: var(--bg-primary); border-radius: 4px; height: 6px; flex: 1; overflow: hidden; }
+.analytics-pct-fill { background: var(--accent); border-radius: 4px; height: 100%; }
+
+/* ─── CRM: Pipeline ─── */
+.pipeline-board { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 16px; align-items: flex-start; }
+.pipeline-col { flex: 0 0 260px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.pipeline-col-header { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.pipeline-col-title { font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.pipeline-col-meta { font-size: 11px; color: var(--text-muted); }
+.pipeline-col-body { padding: 10px; min-height: 80px; }
+.pipeline-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 8px; cursor: pointer; transition: border-color 0.2s, transform 0.15s; }
+.pipeline-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+.pipeline-card-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+.pipeline-card-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.pipeline-card-value { font-size: 13px; font-weight: 700; color: var(--accent); }
+.pipeline-card-sub { font-size: 11px; color: var(--text-muted); }
+.pipeline-card-stage-btns { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
+.pipeline-stage-btn { font-size: 10px; padding: 2px 8px; border-radius: 10px; border: 1px solid var(--border); background: none; color: var(--text-muted); cursor: pointer; font-family: inherit; transition: all 0.15s; }
+.pipeline-stage-btn:hover { border-color: var(--accent); color: var(--accent); }
+.pipeline-add-btn { width: 100%; background: none; border: 1px dashed var(--border); border-radius: 8px; color: var(--text-muted); padding: 8px; font-size: 12px; font-family: inherit; cursor: pointer; margin-top: 4px; transition: all 0.15s; }
+.pipeline-add-btn:hover { border-color: var(--accent); color: var(--accent); }
+.pipeline-empty { color: var(--text-muted); font-size: 12px; text-align: center; padding: 16px 8px; }
+
+/* ─── CRM: Deals ─── */
+.deal-list-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--border-light); cursor: pointer; transition: background 0.15s; }
+.deal-list-row:hover { background: var(--bg-card-hover); }
+.deal-list-title { font-size: 14px; font-weight: 600; color: var(--text-primary); flex: 1; min-width: 0; }
+.deal-list-sub { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.deal-status-badge { font-size: 11px; font-weight: 700; padding: 2px 10px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+.deal-status-open { background: var(--blue-dim); color: var(--blue); }
+.deal-status-won { background: var(--green-dim); color: var(--green); }
+.deal-status-lost { background: rgba(248,113,113,0.12); color: var(--red); }
+.deal-detail-layout { display: grid; grid-template-columns: 1fr 1.4fr; gap: 24px; align-items: flex-start; }
+.deal-meta-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+.deal-meta-row { display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px; }
+.deal-meta-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600; }
+.deal-meta-value { font-size: 14px; color: var(--text-primary); }
+.stage-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; margin: 2px; }
+.stage-chip.active { border-color: currentColor; }
+.prob-row { display: flex; align-items: center; gap: 10px; }
+.prob-bar { flex: 1; height: 8px; background: var(--bg-primary); border-radius: 4px; overflow: hidden; }
+.prob-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.3s; }
+
+/* ─── CRM: Activity Timeline ─── */
+.activity-timeline { display: flex; flex-direction: column; gap: 0; }
+.activity-entry { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border-light); }
+.activity-entry:last-child { border-bottom: none; }
+.activity-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; margin-top: 2px; }
+.activity-icon-note { background: var(--blue-dim); color: var(--blue); }
+.activity-icon-call { background: var(--green-dim); color: var(--green); }
+.activity-icon-email { background: var(--accent-dim); color: var(--accent); }
+.activity-icon-meeting { background: var(--purple-dim); color: var(--purple); }
+.activity-icon-status_change { background: var(--orange-dim); color: var(--orange); }
+.activity-content { flex: 1; min-width: 0; }
+.activity-type { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+.activity-text { font-size: 13px; color: var(--text-secondary); margin-top: 2px; line-height: 1.5; word-break: break-word; }
+.activity-time { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+.activity-delete { background: none; border: none; cursor: pointer; color: var(--text-muted); opacity: 0; padding: 2px; transition: opacity 0.15s; }
+.activity-entry:hover .activity-delete { opacity: 1; }
+.activity-add-form { display: flex; gap: 8px; margin-top: 12px; align-items: flex-end; flex-wrap: wrap; }
+.activity-type-select { background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 13px; color: var(--text-primary); font-family: inherit; cursor: pointer; }
+.activity-textarea { background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 13px; color: var(--text-primary); font-family: inherit; resize: none; flex: 1; min-width: 200px; }
+.activity-textarea:focus { outline: none; border-color: var(--accent); }
+
+/* ─── CRM: Tags ─── */
+.tag-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; cursor: default; }
+.tag-chip-remove { background: none; border: none; cursor: pointer; padding: 0 0 0 2px; line-height: 1; color: inherit; opacity: 0.6; font-size: 13px; }
+.tag-chip-remove:hover { opacity: 1; }
+.tags-add-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; align-items: center; }
+.tag-add-btn { font-size: 11px; padding: 3px 10px; border-radius: 10px; border: 1px dashed var(--border); background: none; color: var(--text-muted); cursor: pointer; font-family: inherit; transition: all 0.15s; }
+.tag-add-btn:hover { border-color: var(--accent); color: var(--accent); }
+.tag-create-input { background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px; font-size: 12px; color: var(--text-primary); font-family: inherit; width: 120px; }
+.tag-create-input:focus { outline: none; border-color: var(--accent); }
+
+/* ─── CRM: Lead Score ─── */
+.lead-score-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 10px; font-size: 12px; font-weight: 700; }
+.lead-score-hot { background: var(--green-dim); color: var(--green); }
+.lead-score-warm { background: var(--orange-dim); color: var(--orange); }
+.lead-score-cold { background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border); }
+
+/* ─── CRM: Tasks ─── */
+.tasks-group-header { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); padding: 16px 0 8px; }
+.tasks-group-header.overdue { color: var(--red); }
+.tasks-group-header.today { color: var(--orange); }
+.task-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border-light); }
+.task-checkbox { width: 18px; height: 18px; border-radius: 5px; border: 2px solid var(--border); background: none; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.task-checkbox.done { background: var(--accent); border-color: var(--accent); }
+.task-title { flex: 1; font-size: 14px; color: var(--text-primary); }
+.task-title.done { text-decoration: line-through; color: var(--text-muted); }
+.task-entity-link { font-size: 11px; color: var(--accent); cursor: pointer; }
+.task-due { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+.task-due.overdue { color: var(--red); font-weight: 600; }
+.task-delete-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); opacity: 0; padding: 2px; transition: opacity 0.15s; }
+.task-row:hover .task-delete-btn { opacity: 1; }
+.task-add-form { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; margin-top: 16px; padding: 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; }
+.task-entity-select { background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 13px; color: var(--text-primary); font-family: inherit; }
+
+/* ─── Customize: Pipeline Stages ─── */
+.stage-editor-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border-light); }
+.stage-color-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+.stage-color-picker { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.stage-color-swatch { width: 18px; height: 18px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: border-color 0.15s; }
+.stage-color-swatch.selected { border-color: var(--text-primary); }
+
+/* ─── Customize: Lead Scoring ─── */
+.scoring-rule-row { display: flex; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--border-light); flex-wrap: wrap; }
+.scoring-rule-row select, .scoring-rule-row input { background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 13px; color: var(--text-primary); font-family: inherit; }
+.scoring-threshold-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; }
+.scoring-preview { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; font-size: 13px; margin-top: 12px; }
+
+/* ─── Dashboard CRM widgets ─── */
+.dash-crm-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+.dash-widget { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+.dash-widget h3 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 14px; }
+.dash-task-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border-light); font-size: 13px; }
+.dash-task-item:last-child { border-bottom: none; }
+.dash-activity-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border-light); font-size: 13px; }
+.dash-activity-item:last-child { border-bottom: none; }
+.dash-pipeline-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 4px; }
+.dash-pipeline-pill { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; font-size: 12px; }
+
+/* ─── Modal ─── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 300; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.modal-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 28px; max-width: 480px; width: 100%; }
+.modal-box h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.modal-box p { font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+/* ─── Customize: Custom Fields ─── */
+.field-editor-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border-light); }
+.field-type-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px; background: var(--bg-secondary); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid var(--border); }
+
+/* ─── Customize: Notifications ─── */
+.notif-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--border-light); }
+.notif-row:last-child { border-bottom: none; }
+.notif-label { font-size: 14px; color: var(--text-primary); font-weight: 500; }
+.notif-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.toggle-switch { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-track { position: absolute; inset: 0; background: var(--border); border-radius: 11px; cursor: pointer; transition: background 0.2s; }
+.toggle-track:before { content: ''; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; background: white; border-radius: 50%; transition: transform 0.2s; }
+.toggle-switch input:checked + .toggle-track { background: var(--accent); }
+.toggle-switch input:checked + .toggle-track:before { transform: translateX(18px); }
+
+/* ─── Deal form / quick form ─── */
+.quick-form { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+.quick-form h3 { font-size: 14px; font-weight: 700; margin-bottom: 16px; color: var(--text-primary); }
+.quick-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.quick-form-actions { display: flex; gap: 8px; margin-top: 16px; }
+
+/* ─── Analytics: KPI row ─── */
+.kpi-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+.kpi-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 8px; }
+.kpi-value { font-size: 28px; font-weight: 800; color: var(--text-primary); line-height: 1; }
+.kpi-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+/* ─── Pipeline: Add deal form inline ─── */
+.pipeline-new-form { padding: 10px; background: var(--bg-primary); border-top: 1px solid var(--border); }
+.pipeline-new-form input { width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 13px; color: var(--text-primary); font-family: inherit; margin-bottom: 6px; box-sizing: border-box; }
+.pipeline-new-form input:focus { outline: none; border-color: var(--accent); }
+.pipeline-new-form-btns { display: flex; gap: 6px; }
+
+/* ─── Deal detail tabs ─── */
+.detail-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+.detail-tab { background: none; border: none; cursor: pointer; padding: 10px 16px; font-size: 13px; font-weight: 600; color: var(--text-muted); border-bottom: 2px solid transparent; font-family: inherit; transition: color 0.15s; }
+.detail-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.detail-tab:hover:not(.active) { color: var(--text-primary); }
+
+/* ─── Probability slider ─── */
+.prob-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 3px; background: var(--bg-primary); outline: none; }
+.prob-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; }
+
 @media (max-width: 768px) {
   .avail-form-inline { grid-template-columns: 1fr; }
   .tutorial-card { padding: 32px 24px; }
@@ -1934,6 +2173,14 @@ body {
   .theme-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .api-docs-header { flex-direction: column; align-items: flex-start; }
   .api-docs-desc { margin-left: 0; }
+  .analytics-grid { grid-template-columns: 1fr 1fr; }
+  .chart-grid { grid-template-columns: 1fr; }
+  .deal-detail-layout { grid-template-columns: 1fr; }
+  .dash-crm-row { grid-template-columns: 1fr; }
+  .pipeline-board { flex-direction: column; }
+  .pipeline-col { flex: none; width: 100%; }
+  .quick-form-grid { grid-template-columns: 1fr; }
+  .analytics-grid { grid-template-columns: 1fr 1fr; }
 }
 `;
 
@@ -1972,6 +2219,268 @@ function formatTime(t) {
   const ampm = h >= 12 ? "PM" : "AM";
   const hour = h % 12 || 12;
   return `${hour}:${String(m).padStart(2, "0")} ${ampm}`;
+}
+
+function formatCurrency(v) {
+  const n = parseFloat(v) || 0;
+  return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+
+function timeAgo(dateStr) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  return `${d}d ago`;
+}
+
+function computeLeadScore(entity, rules) {
+  if (!rules || !rules.length) return 0;
+  let score = 0;
+  for (const rule of rules) {
+    const val = String(entity[rule.field] || '').toLowerCase();
+    const ruleVal = String(rule.value || '').toLowerCase();
+    if (rule.operator === 'equals' && val === ruleVal) score += Number(rule.points) || 0;
+    if (rule.operator === 'contains' && val.includes(ruleVal)) score += Number(rule.points) || 0;
+  }
+  return Math.max(0, Math.min(100, score));
+}
+
+function LeadScoreBadge({ entity, appConfig }) {
+  const rules = appConfig?.lead_scoring_rules?.rules || [];
+  const thresholds = appConfig?.lead_scoring_rules?.thresholds || { hot: 70, warm: 40 };
+  const score = computeLeadScore(entity, rules);
+  if (!rules.length) return null;
+  const cls = score >= thresholds.hot ? 'hot' : score >= thresholds.warm ? 'warm' : 'cold';
+  const label = cls === 'hot' ? '🔥 Hot' : cls === 'warm' ? '◆ Warm' : '· Cold';
+  return <span className={`lead-score-badge lead-score-${cls}`}>{label} {score}%</span>;
+}
+
+// ─── SVG Charts ───
+function BarChart({ data, valueKey, labelKey, color = 'var(--accent)' }) {
+  if (!data || !data.length) return <div className="chart-empty">No data yet</div>;
+  const max = Math.max(...data.map(d => d[valueKey]), 1);
+  const H = 100, W = 300;
+  const barW = Math.max(8, (W / data.length) - 6);
+  return (
+    <svg viewBox={`0 0 ${W} ${H + 22}`} style={{ width: '100%' }}>
+      {data.map((d, i) => {
+        const bH = Math.max(2, (d[valueKey] / max) * H);
+        const x = (W / data.length) * i + (W / data.length - barW) / 2;
+        return (
+          <g key={i}>
+            <rect x={x} y={H - bH} width={barW} height={bH} fill={color} rx={3} opacity={0.85} />
+            <text x={x + barW / 2} y={H + 14} textAnchor="middle" fontSize={9} fill="var(--text-muted)">{d[labelKey]}</text>
+            {d[valueKey] > 0 && <text x={x + barW / 2} y={H - bH - 3} textAnchor="middle" fontSize={9} fill="var(--text-secondary)">{d[valueKey]}</text>}
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+function HBarChart({ data, valueKey, labelKey, color = 'var(--accent)' }) {
+  if (!data || !data.length) return <div className="chart-empty">No data yet</div>;
+  const max = Math.max(...data.map(d => d[valueKey]), 1);
+  const ROW_H = 28;
+  const W = 280, LABEL_W = 100;
+  return (
+    <svg viewBox={`0 0 ${W} ${data.length * ROW_H}`} style={{ width: '100%' }}>
+      {data.map((d, i) => {
+        const bW = Math.max(2, ((d[valueKey] / max) * (W - LABEL_W - 30)));
+        const y = i * ROW_H;
+        return (
+          <g key={i}>
+            <text x={LABEL_W - 4} y={y + ROW_H / 2 + 4} textAnchor="end" fontSize={10} fill="var(--text-secondary)">{String(d[labelKey]).substring(0, 16)}</text>
+            <rect x={LABEL_W} y={y + 6} width={bW} height={ROW_H - 12} fill={color} rx={3} opacity={0.85} />
+            <text x={LABEL_W + bW + 4} y={y + ROW_H / 2 + 4} fontSize={10} fill="var(--text-muted)">{d[valueKey]}</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+function DonutChart({ data, colors }) {
+  if (!data || !data.length) return <div className="chart-empty">No data yet</div>;
+  const total = data.reduce((s, d) => s + d.value, 0);
+  if (total === 0) return <div className="chart-empty">No data yet</div>;
+  const R = 50, CX = 70, CY = 60, stroke = 22;
+  const circ = 2 * Math.PI * R;
+  let offset = 0;
+  return (
+    <svg viewBox="0 0 200 120" style={{ width: '100%' }}>
+      {data.map((d, i) => {
+        const frac = d.value / total;
+        const dash = frac * circ;
+        const seg = (
+          <circle key={i} cx={CX} cy={CY} r={R} fill="none"
+            stroke={colors[i % colors.length]} strokeWidth={stroke}
+            strokeDasharray={`${dash} ${circ - dash}`}
+            strokeDashoffset={-offset} transform={`rotate(-90 ${CX} ${CY})`} />
+        );
+        offset += dash;
+        return seg;
+      })}
+      <text x={CX} y={CY + 5} textAnchor="middle" fontSize={14} fontWeight="700" fill="var(--text-primary)">{total}</text>
+      <g>
+        {data.map((d, i) => (
+          <g key={i}>
+            <rect x={130} y={i * 18 + 8} width={10} height={10} rx={2} fill={colors[i % colors.length]} />
+            <text x={144} y={i * 18 + 17} fontSize={10} fill="var(--text-secondary)">{d.label} ({d.value})</text>
+          </g>
+        ))}
+      </g>
+    </svg>
+  );
+}
+
+// ─── Activity Timeline ───
+function ActivityTimeline({ entityType, entityId, addToast }) {
+  const [entries, setEntries] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [newType, setNewType] = useState('note');
+  const [newContent, setNewContent] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    api.getActivity(entityType, entityId)
+      .then(setEntries)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [entityType, entityId]);
+
+  const add = async () => {
+    if (!newContent.trim()) return;
+    setSaving(true);
+    try {
+      const entry = await api.addActivity({ entity_type: entityType, entity_id: entityId, type: newType, content: newContent.trim() });
+      setEntries(prev => [entry, ...prev]);
+      setNewContent('');
+    } catch { addToast({ message: 'Failed to add note', type: 'error' }); }
+    finally { setSaving(false); }
+  };
+
+  const remove = async (id) => {
+    try {
+      await api.deleteActivity(id);
+      setEntries(prev => prev.filter(e => e.id !== id));
+    } catch { addToast({ message: 'Failed to delete', type: 'error' }); }
+  };
+
+  const typeIcon = { note: '📝', call: '📞', email: '✉️', meeting: '🤝', status_change: '🔄' };
+
+  return (
+    <div>
+      <div className="activity-add-form">
+        <select className="activity-type-select" value={newType} onChange={e => setNewType(e.target.value)}>
+          <option value="note">Note</option>
+          <option value="call">Call</option>
+          <option value="email">Email</option>
+          <option value="meeting">Meeting</option>
+        </select>
+        <textarea className="activity-textarea" rows={2} placeholder="Add a note..." value={newContent} onChange={e => setNewContent(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) add(); }} />
+        <button className="btn-primary" onClick={add} disabled={saving || !newContent.trim()} style={{ alignSelf: 'flex-end', padding: '8px 14px', fontSize: 13 }}>
+          {saving ? '...' : 'Add'}
+        </button>
+      </div>
+      {loading && <div style={{ color: 'var(--text-muted)', fontSize: 13, padding: '12px 0' }}>Loading…</div>}
+      {!loading && !entries.length && <div style={{ color: 'var(--text-muted)', fontSize: 13, padding: '12px 0' }}>No activity yet. Add a note above.</div>}
+      <div className="activity-timeline" style={{ marginTop: 12 }}>
+        {entries.map(e => (
+          <div key={e.id} className="activity-entry">
+            <div className={`activity-icon activity-icon-${e.type}`}>{typeIcon[e.type] || '📝'}</div>
+            <div className="activity-content">
+              <div className="activity-type">{e.type}</div>
+              <div className="activity-text">{e.content}</div>
+              <div className="activity-time">{timeAgo(e.createdAt)}</div>
+            </div>
+            <button className="activity-delete" onClick={() => remove(e.id)} title="Delete">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Tag Editor ───
+function TagEditor({ entityType, entityId, addToast }) {
+  const [allTags, setAllTags] = useState([]);
+  const [entityTags, setEntityTags] = useState([]);
+  const [showCreate, setShowCreate] = useState(false);
+  const [newTagName, setNewTagName] = useState('');
+  const [newTagColor, setNewTagColor] = useState('#6B7280');
+
+  const TAG_COLORS = ['#6B7280','#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899','#14B8A6'];
+
+  useEffect(() => {
+    Promise.all([api.getTags(), api.getEntityTags(entityType, entityId)])
+      .then(([all, et]) => { setAllTags(all); setEntityTags(et); })
+      .catch(() => {});
+  }, [entityType, entityId]);
+
+  const addTag = async (tag) => {
+    if (entityTags.find(t => t.id === tag.id)) return;
+    try {
+      await api.addEntityTag({ entity_type: entityType, entity_id: entityId, tag_id: tag.id });
+      setEntityTags(prev => [...prev, tag]);
+    } catch { addToast({ message: 'Failed to add tag', type: 'error' }); }
+  };
+
+  const removeTag = async (tagId) => {
+    try {
+      await api.removeEntityTag({ entity_type: entityType, entity_id: entityId, tag_id: tagId });
+      setEntityTags(prev => prev.filter(t => t.id !== tagId));
+    } catch { addToast({ message: 'Failed to remove tag', type: 'error' }); }
+  };
+
+  const createAndAdd = async () => {
+    if (!newTagName.trim()) return;
+    try {
+      const tag = await api.createTag({ name: newTagName.trim(), color: newTagColor });
+      setAllTags(prev => [...prev.filter(t => t.id !== tag.id), tag]);
+      await addTag(tag);
+      setNewTagName(''); setShowCreate(false);
+    } catch { addToast({ message: 'Failed to create tag', type: 'error' }); }
+  };
+
+  const unassigned = allTags.filter(t => !entityTags.find(et => et.id === t.id));
+
+  return (
+    <div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+        {entityTags.map(t => (
+          <span key={t.id} className="tag-chip" style={{ background: t.color + '22', color: t.color }}>
+            {t.name}
+            <button className="tag-chip-remove" onClick={() => removeTag(t.id)}>×</button>
+          </span>
+        ))}
+      </div>
+      <div className="tags-add-row">
+        {unassigned.map(t => (
+          <button key={t.id} className="tag-add-btn" onClick={() => addTag(t)} style={{ borderColor: t.color + '66', color: t.color }}>+ {t.name}</button>
+        ))}
+        {!showCreate && <button className="tag-add-btn" onClick={() => setShowCreate(true)}>+ New Tag</button>}
+        {showCreate && (
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+            <input className="tag-create-input" placeholder="Tag name" value={newTagName} onChange={e => setNewTagName(e.target.value)} onKeyDown={e => e.key === 'Enter' && createAndAdd()} autoFocus />
+            <div style={{ display: 'flex', gap: 4 }}>
+              {TAG_COLORS.map(c => (
+                <button key={c} onClick={() => setNewTagColor(c)} style={{ width: 16, height: 16, borderRadius: '50%', background: c, border: newTagColor === c ? '2px solid var(--text-primary)' : '2px solid transparent', cursor: 'pointer' }} />
+              ))}
+            </div>
+            <button className="btn-primary" onClick={createAndAdd} style={{ padding: '5px 12px', fontSize: 12 }}>Create</button>
+            <button className="btn-secondary" onClick={() => setShowCreate(false)} style={{ padding: '5px 12px', fontSize: 12 }}>Cancel</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 // ─── Components ───
@@ -2019,11 +2528,22 @@ function Sidebar({ page, setPage, bookings, contacts, isOpen, onClose, onLogout,
             {navItem("availability", Icons.clock, "Availability")}
             {navItem("calendar", Icons.calendar, "Calendar")}
           </nav>
+          <div className="sidebar-label" style={{ marginTop: 8 }}>CRM</div>
+          <nav className="sidebar-nav sidebar-section-group">
+            {navItem("pipeline", Icons.pipeline, "Pipeline")}
+            {navItem("deals", Icons.deals, "Deals")}
+            {navItem("tasks", Icons.tasks, "Tasks")}
+            {navItem("analytics", Icons.analytics, "Analytics")}
+          </nav>
           <div className="sidebar-label" style={{ marginTop: 8 }}>Customize</div>
           <nav className="sidebar-nav sidebar-section-group">
             {navItem("customize-branding", Icons.brush, "Branding")}
             {navItem("customize-services", Icons.list, "Services")}
             {navItem("customize-categories", Icons.tag, "Categories")}
+            {navItem("customize-stages", Icons.pipeline, "Pipeline Stages")}
+            {navItem("customize-fields", Icons.fields, "Custom Fields")}
+            {navItem("customize-scoring", Icons.scoring, "Lead Scoring")}
+            {navItem("customize-notifications", Icons.bell, "Notifications")}
             {navItem("customize-appearance", Icons.sun, "Appearance")}
           </nav>
           <div className="sidebar-label" style={{ marginTop: 8 }}>Advanced</div>
@@ -2219,8 +2739,15 @@ function BookingsPage({ bookings, setPage, setSelectedBooking, searchTerm, setSe
   );
 }
 
-function BookingDetail({ booking, onBack, onUpdateStatus, onAddToCalendar, onDelete, addToast }) {
+function BookingDetail({ booking, onBack, onUpdateStatus, onAddToCalendar, onDelete, addToast, appConfig, setPage, setSelectedDeal, deals }) {
   if (!booking) return null;
+  const [showDealModal, setShowDealModal] = useState(false);
+  const [dealTitle, setDealTitle] = useState(booking.name);
+  const [dealValue, setDealValue] = useState('');
+  const [dealStage, setDealStage] = useState((appConfig?.pipeline_stages?.[0]?.id) || 'new');
+  const [activeTab, setActiveTab] = useState('details');
+
+  const stages = appConfig?.pipeline_stages || [];
 
   const handleStatusChange = (newStatus) => {
     onUpdateStatus(booking.id, newStatus);
@@ -2233,6 +2760,16 @@ function BookingDetail({ booking, onBack, onUpdateStatus, onAddToCalendar, onDel
     onBack();
   };
 
+  const handleConvertToDeal = async () => {
+    try {
+      const deal = await api.createDeal({ title: dealTitle, booking_id: booking.id, stage_id: dealStage, value: parseFloat(dealValue) || 0 });
+      addToast({ message: `Deal "${deal.title}" created` });
+      setShowDealModal(false);
+      if (setSelectedDeal) setSelectedDeal(deal.id);
+      if (setPage) setPage('deal-detail');
+    } catch { addToast({ message: 'Failed to create deal', type: 'error' }); }
+  };
+
   return (
     <div className="detail-view">
       <button className="detail-back" onClick={onBack}>{Icons.back} Back to Bookings</button>
@@ -2242,89 +2779,80 @@ function BookingDetail({ booking, onBack, onUpdateStatus, onAddToCalendar, onDel
             <div className="detail-name">{booking.name}</div>
             <div className="detail-org">{booking.org}</div>
           </div>
-          <span className={`status-badge status-${booking.status}`}>{booking.status === "on-calendar" ? "On Calendar" : booking.status}</span>
-        </div>
-
-        <div className="detail-grid">
-          <div className="detail-field">
-            <label>Service Requested</label>
-            <span>{booking.service}</span>
-          </div>
-          <div className="detail-field">
-            <label>Sector</label>
-            <span className={`tag tag-${booking.category.toLowerCase()}`}>{booking.category}</span>
-          </div>
-          <div className="detail-field">
-            <label>Consultation Date</label>
-            <span>{formatDate(booking.date)} at {booking.time}</span>
-          </div>
-          <div className="detail-field">
-            <label>Submitted</label>
-            <span>{formatDate(booking.submittedAt)}</span>
-          </div>
-          <div className="detail-field">
-            <label>Email</label>
-            <a href={`mailto:${booking.email}`}>{booking.email}</a>
-          </div>
-          <div className="detail-field">
-            <label>Phone</label>
-            <a href={`tel:${booking.phone}`}>{booking.phone}</a>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+            <LeadScoreBadge entity={booking} appConfig={appConfig} />
+            <span className={`status-badge status-${booking.status}`}>{booking.status === "on-calendar" ? "On Calendar" : booking.status}</span>
           </div>
         </div>
 
-        <div className="detail-message">
-          <label>Message</label>
-          <p>{booking.message}</p>
-        </div>
-
-        <div className="detail-status-select">
-          <label>Status:</label>
-          <select value={booking.status} onChange={(e) => handleStatusChange(e.target.value)}>
-            <option value="pending">Pending</option>
-            <option value="approved">Approved</option>
-            <option value="declined">Declined</option>
-            <option value="on-calendar">On Calendar</option>
-            <option value="archived">Archived</option>
-          </select>
-        </div>
-
-        <div className="detail-actions">
-          {booking.status === "pending" && (
-            <>
-              <button className="btn-action btn-approve" onClick={() => handleStatusChange("approved")}>
-                {Icons.check} Approve
-              </button>
-              <button className="btn-action btn-decline" onClick={() => handleStatusChange("declined")}>
-                {Icons.x} Decline
-              </button>
-            </>
-          )}
-          {booking.status === "approved" && (
-            <button className="btn-action btn-calendar" onClick={() => { onAddToCalendar(booking.id); addToast({ message: `Added to calendar — ${booking.name}, ${formatDate(booking.date)}`, type: "info" }); }}>
-              {Icons.calendarPlus} Add to Calendar
+        <div style={{ display: 'flex', gap: 8, marginBottom: 16, borderBottom: '1px solid var(--border)', paddingBottom: 0 }}>
+          {['details', 'activity', 'tags'].map(t => (
+            <button key={t} onClick={() => setActiveTab(t)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px 14px', fontSize: 13, fontWeight: 600, color: activeTab === t ? 'var(--accent)' : 'var(--text-muted)', borderBottom: activeTab === t ? '2px solid var(--accent)' : '2px solid transparent', fontFamily: 'inherit', textTransform: 'capitalize' }}>
+              {t}
             </button>
-          )}
-          {booking.status === "on-calendar" && (
-            <span style={{ fontSize: 13, color: "var(--purple)", display: "flex", alignItems: "center", gap: 6 }}>
-              {Icons.check} On your calendar
-            </span>
-          )}
-          <a href={`mailto:${booking.email}`} className="btn-action" style={{ background: "var(--accent-dim)", color: "var(--accent)", textDecoration: "none" }}>
-            {Icons.mail} Email Client
-          </a>
-          <a href={`tel:${booking.phone}`} className="btn-action" style={{ background: "rgba(255,255,255,0.06)", color: "var(--text-secondary)", textDecoration: "none" }}>
-            {Icons.phone} Call
-          </a>
-          {booking.status !== "archived" && (
-            <button className="btn-action btn-archive" onClick={() => handleStatusChange("archived")}>
-              {Icons.archive} Archive
-            </button>
-          )}
-          <button className="btn-action btn-delete" onClick={handleDelete}>
-            {Icons.trash} Delete
-          </button>
+          ))}
         </div>
+
+        {activeTab === 'details' && <>
+          <div className="detail-grid">
+            <div className="detail-field"><label>Service Requested</label><span>{booking.service}</span></div>
+            <div className="detail-field"><label>Sector</label><span className={`tag tag-${booking.category.toLowerCase()}`}>{booking.category}</span></div>
+            <div className="detail-field"><label>Consultation Date</label><span>{formatDate(booking.date)} at {booking.time}</span></div>
+            <div className="detail-field"><label>Submitted</label><span>{formatDate(booking.submittedAt)}</span></div>
+            <div className="detail-field"><label>Email</label><a href={`mailto:${booking.email}`}>{booking.email}</a></div>
+            <div className="detail-field"><label>Phone</label><a href={`tel:${booking.phone}`}>{booking.phone}</a></div>
+          </div>
+          <div className="detail-message"><label>Message</label><p>{booking.message}</p></div>
+          <div className="detail-status-select">
+            <label>Status:</label>
+            <select value={booking.status} onChange={(e) => handleStatusChange(e.target.value)}>
+              <option value="pending">Pending</option><option value="approved">Approved</option>
+              <option value="declined">Declined</option><option value="on-calendar">On Calendar</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
+          <div className="detail-actions">
+            {booking.status === "pending" && (<>
+              <button className="btn-action btn-approve" onClick={() => handleStatusChange("approved")}>{Icons.check} Approve</button>
+              <button className="btn-action btn-decline" onClick={() => handleStatusChange("declined")}>{Icons.x} Decline</button>
+            </>)}
+            {booking.status === "approved" && (
+              <button className="btn-action btn-calendar" onClick={() => { onAddToCalendar(booking.id); addToast({ message: `Added to calendar — ${booking.name}, ${formatDate(booking.date)}`, type: "info" }); }}>
+                {Icons.calendarPlus} Add to Calendar
+              </button>
+            )}
+            {booking.status === "on-calendar" && <span style={{ fontSize: 13, color: "var(--purple)", display: "flex", alignItems: "center", gap: 6 }}>{Icons.check} On your calendar</span>}
+            <a href={`mailto:${booking.email}`} className="btn-action" style={{ background: "var(--accent-dim)", color: "var(--accent)", textDecoration: "none" }}>{Icons.mail} Email Client</a>
+            <a href={`tel:${booking.phone}`} className="btn-action" style={{ background: "rgba(255,255,255,0.06)", color: "var(--text-secondary)", textDecoration: "none" }}>{Icons.phone} Call</a>
+            <button className="btn-action" style={{ background: 'var(--green-dim)', color: 'var(--green)' }} onClick={() => setShowDealModal(true)}>{Icons.convertDeal} Convert to Deal</button>
+            {booking.status !== "archived" && <button className="btn-action btn-archive" onClick={() => handleStatusChange("archived")}>{Icons.archive} Archive</button>}
+            <button className="btn-action btn-delete" onClick={handleDelete}>{Icons.trash} Delete</button>
+          </div>
+        </>}
+
+        {activeTab === 'activity' && <ActivityTimeline entityType="booking" entityId={booking.id} addToast={addToast} />}
+        {activeTab === 'tags' && <TagEditor entityType="booking" entityId={booking.id} addToast={addToast} />}
       </div>
+
+      {showDealModal && (
+        <div className="modal-overlay" onClick={() => setShowDealModal(false)}>
+          <div className="modal-box" onClick={e => e.stopPropagation()}>
+            <h3>Convert to Deal</h3>
+            <p>Create a deal in your pipeline linked to this booking.</p>
+            <div className="form-group"><label className="form-label">Deal Title</label><input className="form-input" value={dealTitle} onChange={e => setDealTitle(e.target.value)} /></div>
+            <div className="form-group"><label className="form-label">Deal Value ($)</label><input className="form-input" type="number" value={dealValue} onChange={e => setDealValue(e.target.value)} placeholder="0" /></div>
+            <div className="form-group"><label className="form-label">Stage</label>
+              <select className="form-input" value={dealStage} onChange={e => setDealStage(e.target.value)}>
+                {stages.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+              </select>
+            </div>
+            <div className="modal-actions">
+              <button className="btn-secondary" onClick={() => setShowDealModal(false)}>Cancel</button>
+              <button className="btn-primary" onClick={handleConvertToDeal}>Create Deal</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -2385,8 +2913,14 @@ function ContactsPage({ contacts, setPage, setSelectedContact, searchTerm, setSe
   );
 }
 
-function ContactDetail({ contact, onBack, onUpdateStatus, onDelete, addToast }) {
+function ContactDetail({ contact, onBack, onUpdateStatus, onDelete, addToast, appConfig, setPage, setSelectedDeal }) {
   if (!contact) return null;
+  const [showDealModal, setShowDealModal] = useState(false);
+  const [dealTitle, setDealTitle] = useState(contact.name);
+  const [dealValue, setDealValue] = useState('');
+  const [dealStage, setDealStage] = useState((appConfig?.pipeline_stages?.[0]?.id) || 'new');
+  const [activeTab, setActiveTab] = useState('details');
+  const stages = appConfig?.pipeline_stages || [];
 
   const handleStatusChange = (newStatus) => {
     onUpdateStatus(contact.id, newStatus);
@@ -2399,6 +2933,16 @@ function ContactDetail({ contact, onBack, onUpdateStatus, onDelete, addToast }) 
     onBack();
   };
 
+  const handleConvertToDeal = async () => {
+    try {
+      const deal = await api.createDeal({ title: dealTitle, contact_id: contact.id, stage_id: dealStage, value: parseFloat(dealValue) || 0 });
+      addToast({ message: `Deal "${deal.title}" created` });
+      setShowDealModal(false);
+      if (setSelectedDeal) setSelectedDeal(deal.id);
+      if (setPage) setPage('deal-detail');
+    } catch { addToast({ message: 'Failed to create deal', type: 'error' }); }
+  };
+
   return (
     <div className="detail-view">
       <button className="detail-back" onClick={onBack}>{Icons.back} Back to Inbox</button>
@@ -2408,64 +2952,67 @@ function ContactDetail({ contact, onBack, onUpdateStatus, onDelete, addToast }) 
             <div className="detail-name">{contact.name}</div>
             <div className="detail-org">{contact.subject}</div>
           </div>
-          <span className={`status-badge status-${contact.status}`}>{contact.status}</span>
-        </div>
-
-        <div className="detail-grid">
-          <div className="detail-field">
-            <label>Sector</label>
-            <span className={`tag tag-${contact.category.toLowerCase()}`}>{contact.category}</span>
-          </div>
-          <div className="detail-field">
-            <label>Received</label>
-            <span>{formatDate(contact.submittedAt)}</span>
-          </div>
-          <div className="detail-field">
-            <label>Email</label>
-            <a href={`mailto:${contact.email}`}>{contact.email}</a>
-          </div>
-          <div className="detail-field">
-            <label>Phone</label>
-            <a href={`tel:${contact.phone}`}>{contact.phone}</a>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+            <LeadScoreBadge entity={contact} appConfig={appConfig} />
+            <span className={`status-badge status-${contact.status}`}>{contact.status}</span>
           </div>
         </div>
 
-        <div className="detail-message">
-          <label>Message</label>
-          <p>{contact.message}</p>
-        </div>
-
-        <div className="detail-status-select">
-          <label>Status:</label>
-          <select value={contact.status} onChange={(e) => handleStatusChange(e.target.value)}>
-            <option value="new">New</option>
-            <option value="replied">Replied</option>
-            <option value="archived">Archived</option>
-          </select>
-        </div>
-
-        <div className="detail-actions">
-          {contact.status === "new" && (
-            <button className="btn-action btn-approve" onClick={() => handleStatusChange("replied")}>
-              {Icons.check} Mark as Replied
+        <div style={{ display: 'flex', gap: 8, marginBottom: 16, borderBottom: '1px solid var(--border)', paddingBottom: 0 }}>
+          {['details', 'activity', 'tags'].map(t => (
+            <button key={t} onClick={() => setActiveTab(t)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px 14px', fontSize: 13, fontWeight: 600, color: activeTab === t ? 'var(--accent)' : 'var(--text-muted)', borderBottom: activeTab === t ? '2px solid var(--accent)' : '2px solid transparent', fontFamily: 'inherit', textTransform: 'capitalize' }}>
+              {t}
             </button>
-          )}
-          <a href={`mailto:${contact.email}`} className="btn-action" style={{ background: "var(--accent-dim)", color: "var(--accent)", textDecoration: "none" }}>
-            {Icons.mail} Email Client
-          </a>
-          <a href={`tel:${contact.phone}`} className="btn-action" style={{ background: "rgba(255,255,255,0.06)", color: "var(--text-secondary)", textDecoration: "none" }}>
-            {Icons.phone} Call
-          </a>
-          {contact.status !== "archived" && (
-            <button className="btn-action btn-archive" onClick={() => handleStatusChange("archived")}>
-              {Icons.archive} Archive
-            </button>
-          )}
-          <button className="btn-action btn-delete" onClick={handleDelete}>
-            {Icons.trash} Delete
-          </button>
+          ))}
         </div>
+
+        {activeTab === 'details' && <>
+          <div className="detail-grid">
+            <div className="detail-field"><label>Sector</label><span className={`tag tag-${contact.category.toLowerCase()}`}>{contact.category}</span></div>
+            <div className="detail-field"><label>Received</label><span>{formatDate(contact.submittedAt)}</span></div>
+            <div className="detail-field"><label>Email</label><a href={`mailto:${contact.email}`}>{contact.email}</a></div>
+            <div className="detail-field"><label>Phone</label><a href={`tel:${contact.phone}`}>{contact.phone}</a></div>
+          </div>
+          <div className="detail-message"><label>Message</label><p>{contact.message}</p></div>
+          <div className="detail-status-select">
+            <label>Status:</label>
+            <select value={contact.status} onChange={(e) => handleStatusChange(e.target.value)}>
+              <option value="new">New</option><option value="replied">Replied</option><option value="archived">Archived</option>
+            </select>
+          </div>
+          <div className="detail-actions">
+            {contact.status === "new" && <button className="btn-action btn-approve" onClick={() => handleStatusChange("replied")}>{Icons.check} Mark as Replied</button>}
+            <a href={`mailto:${contact.email}`} className="btn-action" style={{ background: "var(--accent-dim)", color: "var(--accent)", textDecoration: "none" }}>{Icons.mail} Email Client</a>
+            <a href={`tel:${contact.phone}`} className="btn-action" style={{ background: "rgba(255,255,255,0.06)", color: "var(--text-secondary)", textDecoration: "none" }}>{Icons.phone} Call</a>
+            <button className="btn-action" style={{ background: 'var(--green-dim)', color: 'var(--green)' }} onClick={() => setShowDealModal(true)}>{Icons.convertDeal} Convert to Deal</button>
+            {contact.status !== "archived" && <button className="btn-action btn-archive" onClick={() => handleStatusChange("archived")}>{Icons.archive} Archive</button>}
+            <button className="btn-action btn-delete" onClick={handleDelete}>{Icons.trash} Delete</button>
+          </div>
+        </>}
+
+        {activeTab === 'activity' && <ActivityTimeline entityType="contact" entityId={contact.id} addToast={addToast} />}
+        {activeTab === 'tags' && <TagEditor entityType="contact" entityId={contact.id} addToast={addToast} />}
       </div>
+
+      {showDealModal && (
+        <div className="modal-overlay" onClick={() => setShowDealModal(false)}>
+          <div className="modal-box" onClick={e => e.stopPropagation()}>
+            <h3>Convert to Deal</h3>
+            <p>Create a deal linked to this contact.</p>
+            <div className="form-group"><label className="form-label">Deal Title</label><input className="form-input" value={dealTitle} onChange={e => setDealTitle(e.target.value)} /></div>
+            <div className="form-group"><label className="form-label">Deal Value ($)</label><input className="form-input" type="number" value={dealValue} onChange={e => setDealValue(e.target.value)} placeholder="0" /></div>
+            <div className="form-group"><label className="form-label">Stage</label>
+              <select className="form-input" value={dealStage} onChange={e => setDealStage(e.target.value)}>
+                {stages.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+              </select>
+            </div>
+            <div className="modal-actions">
+              <button className="btn-secondary" onClick={() => setShowDealModal(false)}>Cancel</button>
+              <button className="btn-primary" onClick={handleConvertToDeal}>Create Deal</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

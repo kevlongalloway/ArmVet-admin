@@ -85,6 +85,14 @@ async function start() {
   app.use('/api/bookings',                    require('./routes/bookings'));
   app.use('/api/contacts',                    require('./routes/contacts'));
   app.use('/api/availability',                require('./routes/availability'));
+  // CRM routes
+  const { tagsRouter, entityTagsRouter } = require('./routes/tags');
+  app.use('/api/deals',       express.json(), require('./routes/deals'));
+  app.use('/api/activity',    express.json(), require('./routes/activity'));
+  app.use('/api/tasks',       express.json(), require('./routes/tasks'));
+  app.use('/api/tags',        express.json(), tagsRouter);
+  app.use('/api/entity-tags', express.json(), entityTagsRouter);
+  app.use('/api/analytics',                   require('./routes/analytics'));
   // Admin config routes (larger body limit for logo uploads)
   app.use('/api/admin',        express.json({ limit: '3mb' }), require('./routes/config'));
 

@@ -190,6 +190,11 @@ router.get('/config', requireAuth, async (req, res) => {
       services: JSON.parse(all.services || '[]'),
       categories: JSON.parse(all.categories || '[]'),
       allowed_origins: JSON.parse(all.allowed_origins || '[]'),
+      pipeline_stages: JSON.parse(all.pipeline_stages || '[]'),
+      custom_fields_bookings: JSON.parse(all.custom_fields_bookings || '[]'),
+      custom_fields_contacts: JSON.parse(all.custom_fields_contacts || '[]'),
+      lead_scoring_rules: JSON.parse(all.lead_scoring_rules || '{"rules":[],"thresholds":{"hot":70,"warm":40}}'),
+      email_notifications_config: JSON.parse(all.email_notifications_config || '{}'),
     });
   } catch (err) {
     console.error(err);
@@ -203,6 +208,8 @@ router.put('/config', requireAuth, async (req, res) => {
     'setup_complete', 'company_name', 'company_tagline', 'company_logo',
     'support_email', 'company_website', 'company_phone',
     'services', 'categories', 'allowed_origins',
+    'pipeline_stages', 'custom_fields_bookings', 'custom_fields_contacts',
+    'lead_scoring_rules', 'email_notifications_config',
   ];
   try {
     for (const [key, value] of Object.entries(req.body)) {

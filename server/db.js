@@ -58,6 +58,59 @@ async function initDb() {
     ON availability_slots (date, start_time)
   `);
 
+  // CRM tables
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS deals (
+      id          SERIAL PRIMARY KEY,
+      title       VARCHAR(255) NOT NULL,
+      contact_id  INT REFERENCES contacts(id) ON DELETE SET NULL,
+      booking_id  INT REFERENCES bookings(id) ON DELETE SET NULL,
+      stage_id    VARCHAR(100) NOT NULL DEFAULT 'new',
+      value       DECIMAL(12,2) DEFAULT 0,
+      probability INT DEFAULT 0,
+      close_date  DATE,
+      status      VARCHAR(50) DEFAULT 'open',
+      created_at  TIMESTAMP DEFAULT NOW(),
+      updated_at  TIMESTAMP DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS activity_log (
+      id          SERIAL PRIMARY KEY,
+      entity_type VARCHAR(50) NOT NULL,
+      entity_id   INT NOT NULL,
+      type        VARCHAR(50) DEFAULT 'note',
+      content     TEXT,
+      created_at  TIMESTAMP DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS tasks (
+      id          SERIAL PRIMARY KEY,
+      title       VARCHAR(255) NOT NULL,
+      entity_type VARCHAR(50),
+      entity_id   INT,
+      due_date    DATE,
+      completed   BOOLEAN DEFAULT FALSE,
+      created_at  TIMESTAMP DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS tags (
+      id    SERIAL PRIMARY KEY,
+      name  VARCHAR(100) NOT NULL UNIQUE,
+      color VARCHAR(20) DEFAULT '#6B7280'
+    );
+
+    CREATE TABLE IF NOT EXISTS entity_tags (
+      entity_type  VARCHAR(50) NOT NULL,
+      entity_id    INT NOT NULL,
+      tag_id       INT REFERENCES tags(id) ON DELETE CASCADE,
+      PRIMARY KEY (entity_type, entity_id, tag_id)
+    );
+  `);
+
+  // Add score column to existing tables (safe on existing DBs)
+  await pool.query(`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS score INT DEFAULT 0`);
+  await pool.query(`ALTER TABLE contacts ADD COLUMN IF NOT EXISTS score INT DEFAULT 0`);
+
   await seedDefaultConfig();
 }
 
@@ -96,6 +149,21 @@ async function seedDefaultConfig() {
     ])],
     ['categories', JSON.stringify(['Military', 'Federal', 'Corporate'])],
     ['allowed_origins', JSON.stringify(['http://localhost:3000', 'http://localhost:5173'])],
+    ['pipeline_stages', JSON.stringify([
+      { id: 'new', name: 'New', color: '#6B7280' },
+      { id: 'qualified', name: 'Qualified', color: '#3B82F6' },
+      { id: 'proposal', name: 'Proposal Sent', color: '#F59E0B' },
+      { id: 'negotiation', name: 'Negotiation', color: '#8B5CF6' },
+      { id: 'won', name: 'Won', color: '#10B981' },
+      { id: 'lost', name: 'Lost', color: '#EF4444' },
+    ])],
+    ['custom_fields_bookings', JSON.stringify([])],
+    ['custom_fields_contacts', JSON.stringify([])],
+    ['lead_scoring_rules', JSON.stringify({ rules: [], thresholds: { hot: 70, warm: 40 } })],
+    ['email_notifications_config', JSON.stringify({
+      smtp_host: '', smtp_port: 587, smtp_user: '', smtp_pass: '',
+      from_address: '', notify_new_booking: false, notify_new_contact: false, notify_task_due: false,
+    })],
   ];
   for (const [key, value] of defaults) {
     await pool.query(

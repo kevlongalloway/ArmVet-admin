@@ -62,4 +62,27 @@ export const api = {
   saveConfig: (updates) => request('PUT', '/admin/config', updates),
   getDocs: () => request('GET', '/admin/docs'),
   resetSetup: () => request('DELETE', '/admin/config/setup_complete'),
+  // Deals
+  getDeals: () => request('GET', '/deals'),
+  createDeal: (data) => request('POST', '/deals', data),
+  updateDeal: (id, data) => request('PUT', `/deals/${id}`, data),
+  deleteDeal: (id) => request('DELETE', `/deals/${id}`),
+  // Activity
+  getActivity: (type, id) => request('GET', `/activity?entity_type=${type}&entity_id=${id}`),
+  addActivity: (data) => request('POST', '/activity', data),
+  deleteActivity: (id) => request('DELETE', `/activity/${id}`),
+  // Tasks
+  getTasks: () => request('GET', '/tasks'),
+  createTask: (data) => request('POST', '/tasks', data),
+  updateTask: (id, data) => request('PUT', `/tasks/${id}`, data),
+  deleteTask: (id) => request('DELETE', `/tasks/${id}`),
+  // Tags
+  getTags: () => request('GET', '/tags'),
+  createTag: (data) => request('POST', '/tags', data),
+  deleteTag: (id) => request('DELETE', `/tags/${id}`),
+  getEntityTags: (type, id) => request('GET', `/entity-tags?entity_type=${type}&entity_id=${id}`),
+  addEntityTag: (data) => request('POST', '/entity-tags', data),
+  removeEntityTag: (data) => request('POST', '/entity-tags/remove', data),
+  // Analytics
+  getAnalytics: () => request('GET', '/analytics'),
 };
