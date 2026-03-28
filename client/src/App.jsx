@@ -3202,6 +3202,201 @@ function TasksPage({ deals, contacts, bookings, addToast }) {
   );
 }
 
+// ─── Customize: Lead Scoring Page ───
+function LeadScoringPage({ appConfig, setAppConfig, addToast }) {
+  const LEAD_FIELDS = ['category', 'service', 'status', 'org'];
+  const OPERATORS   = ['equals', 'contains'];
+
+  const [rules, setRules]           = useState(() => appConfig?.lead_scoring_rules?.rules      || []);
+  const [thresholds, setThresholds] = useState(() => appConfig?.lead_scoring_rules?.thresholds || { hot: 70, warm: 40 });
+  const [saving, setSaving]         = useState(false);
+
+  const addRule    = () => setRules(prev => [...prev, { id: 'rule_' + Date.now(), field: 'category', operator: 'equals', value: '', points: 10 }]);
+  const updateRule = (id, key, val) => setRules(prev => prev.map(r => r.id === id ? { ...r, [key]: val } : r));
+  const removeRule = (id) => setRules(prev => prev.filter(r => r.id !== id));
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await api.saveConfig({ lead_scoring_rules: { rules, thresholds } });
+      setAppConfig(c => ({ ...c, lead_scoring_rules: { rules, thresholds } }));
+      addToast({ message: 'Lead scoring rules saved' });
+    } catch {
+      addToast({ message: 'Failed to save rules', type: 'error' });
+    } finally { setSaving(false); }
+  };
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>Lead Scoring</h2>
+        <p>Automatically score bookings and contacts based on their attributes. Scores appear as Hot / Warm / Cold badges.</p>
+      </div>
+
+      <div className="settings-section">
+        <h3>Scoring Rules</h3>
+        <p className="settings-desc">Each matching rule adds points to a lead. Scores are capped at 100.</p>
+
+        {rules.length === 0 && (
+          <div style={{ color: 'var(--text-muted)', fontSize: 13, padding: '8px 0 12px' }}>No rules yet — add one below.</div>
+        )}
+
+        {rules.map(rule => (
+          <div key={rule.id} className="scoring-rule-row">
+            <span style={{ fontSize: 12, color: 'var(--text-muted)', flexShrink: 0 }}>If</span>
+            <select value={rule.field} onChange={e => updateRule(rule.id, 'field', e.target.value)}>
+              {LEAD_FIELDS.map(f => <option key={f} value={f}>{f}</option>)}
+            </select>
+            <select value={rule.operator} onChange={e => updateRule(rule.id, 'operator', e.target.value)}>
+              {OPERATORS.map(o => <option key={o} value={o}>{o}</option>)}
+            </select>
+            <input
+              placeholder="value"
+              value={rule.value}
+              onChange={e => updateRule(rule.id, 'value', e.target.value)}
+              style={{ width: 130 }}
+            />
+            <span style={{ fontSize: 12, color: 'var(--text-muted)', flexShrink: 0 }}>→ add</span>
+            <input
+              type="number"
+              placeholder="pts"
+              value={rule.points}
+              onChange={e => updateRule(rule.id, 'points', e.target.value)}
+              style={{ width: 64 }}
+            />
+            <span style={{ fontSize: 12, color: 'var(--text-muted)', flexShrink: 0 }}>pts</span>
+            <button
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '2px 4px' }}
+              onClick={() => removeRule(rule.id)}
+            >{Icons.trash}</button>
+          </div>
+        ))}
+
+        <button className="btn-secondary" style={{ marginTop: 10 }} onClick={addRule}>{Icons.plus} Add Rule</button>
+      </div>
+
+      <div className="settings-section" style={{ marginTop: 20 }}>
+        <h3>Score Thresholds</h3>
+        <p className="settings-desc">Set the minimum score required for each tier.</p>
+
+        <div className="scoring-threshold-row">
+          <span style={{ fontSize: 13, color: 'var(--text-secondary)', minWidth: 90 }}>🔥 Hot ≥</span>
+          <input type="number" className="form-input" style={{ width: 80 }} min={0} max={100}
+            value={thresholds.hot} onChange={e => setThresholds(t => ({ ...t, hot: Number(e.target.value) }))} />
+          <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>points</span>
+        </div>
+        <div className="scoring-threshold-row">
+          <span style={{ fontSize: 13, color: 'var(--text-secondary)', minWidth: 90 }}>◆ Warm ≥</span>
+          <input type="number" className="form-input" style={{ width: 80 }} min={0} max={100}
+            value={thresholds.warm} onChange={e => setThresholds(t => ({ ...t, warm: Number(e.target.value) }))} />
+          <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>points</span>
+        </div>
+
+        <div className="scoring-preview">
+          Score ≥ {thresholds.hot} → 🔥 Hot &nbsp;·&nbsp; Score ≥ {thresholds.warm} → ◆ Warm &nbsp;·&nbsp; Below → · Cold
+        </div>
+
+        <div className="page-actions" style={{ marginTop: 20 }}>
+          <button className="btn-primary" onClick={handleSave} disabled={saving}>{saving ? 'Saving…' : 'Save Rules'}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Customize: Custom Fields Page ───
+function CustomFieldsPage({ appConfig, setAppConfig, addToast }) {
+  const FIELD_TYPES = ['text', 'number', 'date', 'select'];
+  const [section, setSection]               = useState('bookings');
+  const [bookingFields, setBookingFields]   = useState(() => appConfig?.custom_fields_bookings || []);
+  const [contactFields, setContactFields]   = useState(() => appConfig?.custom_fields_contacts || []);
+  const [newName, setNewName]               = useState('');
+  const [newType, setNewType]               = useState('text');
+  const [saving, setSaving]                 = useState(false);
+
+  const fields    = section === 'bookings' ? bookingFields : contactFields;
+  const setFields = section === 'bookings' ? setBookingFields : setContactFields;
+
+  const addField = () => {
+    const name = newName.trim();
+    if (!name) return;
+    if (fields.find(f => f.name.toLowerCase() === name.toLowerCase())) {
+      addToast({ message: 'A field with that name already exists', type: 'error' });
+      return;
+    }
+    setFields(prev => [...prev, { id: 'field_' + Date.now(), name, type: newType }]);
+    setNewName('');
+  };
+
+  const removeField = (id) => setFields(prev => prev.filter(f => f.id !== id));
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await api.saveConfig({ custom_fields_bookings: bookingFields, custom_fields_contacts: contactFields });
+      setAppConfig(c => ({ ...c, custom_fields_bookings: bookingFields, custom_fields_contacts: contactFields }));
+      addToast({ message: 'Custom fields saved' });
+    } catch {
+      addToast({ message: 'Failed to save fields', type: 'error' });
+    } finally { setSaving(false); }
+  };
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>Custom Fields</h2>
+        <p>Add extra data fields to bookings and contacts for your team to fill in.</p>
+      </div>
+
+      <div className="settings-section">
+        <div className="filters" style={{ marginBottom: 20 }}>
+          {['bookings', 'contacts'].map(s => (
+            <button key={s} className={`filter-chip ${section === s ? 'active' : ''}`} onClick={() => setSection(s)}>
+              {s.charAt(0).toUpperCase() + s.slice(1)}
+            </button>
+          ))}
+        </div>
+
+        {fields.length === 0 && (
+          <div style={{ color: 'var(--text-muted)', fontSize: 13, padding: '8px 0 12px' }}>
+            No custom fields for {section} yet.
+          </div>
+        )}
+
+        {fields.map(field => (
+          <div key={field.id} className="field-editor-row">
+            <span style={{ flex: 1, fontSize: 14, color: 'var(--text-primary)', fontWeight: 500 }}>{field.name}</span>
+            <span className="field-type-badge">{field.type}</span>
+            <button
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '2px 4px' }}
+              onClick={() => removeField(field.id)}
+            >{Icons.trash}</button>
+          </div>
+        ))}
+
+        <div style={{ display: 'flex', gap: 10, marginTop: 16, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+          <div className="form-group" style={{ flex: '2 1 160px', marginBottom: 0 }}>
+            <label className="form-label">Field Name</label>
+            <input className="form-input" placeholder="e.g. Budget" value={newName}
+              onChange={e => setNewName(e.target.value)} onKeyDown={e => e.key === 'Enter' && addField()} />
+          </div>
+          <div className="form-group" style={{ flex: '1 1 100px', marginBottom: 0 }}>
+            <label className="form-label">Type</label>
+            <select className="form-input" value={newType} onChange={e => setNewType(e.target.value)}>
+              {FIELD_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
+          </div>
+          <button className="btn-secondary" onClick={addField} style={{ flexShrink: 0 }}>{Icons.plus} Add</button>
+        </div>
+
+        <div className="page-actions" style={{ marginTop: 20 }}>
+          <button className="btn-primary" onClick={handleSave} disabled={saving}>{saving ? 'Saving…' : 'Save Fields'}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Customize: Pipeline Stages Page ───
 const STAGE_COLORS = ['#6B7280','#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899','#14B8A6','#F97316'];
 
@@ -3579,7 +3774,7 @@ function BookingsPage({ bookings, setPage, setSelectedBooking, searchTerm, setSe
   );
 }
 
-function BookingDetail({ booking, onBack, onUpdateStatus, onAddToCalendar, onDelete, addToast, appConfig, setPage, setSelectedDeal, deals }) {
+function BookingDetail({ booking, onBack, onUpdateStatus, onAddToCalendar, onDelete, addToast, appConfig, setPage, setSelectedDeal, setDeals, deals }) {
   if (!booking) return null;
   const [showDealModal, setShowDealModal] = useState(false);
   const [dealTitle, setDealTitle] = useState(booking.name);
@@ -3605,6 +3800,7 @@ function BookingDetail({ booking, onBack, onUpdateStatus, onAddToCalendar, onDel
       const deal = await api.createDeal({ title: dealTitle, booking_id: booking.id, stage_id: dealStage, value: parseFloat(dealValue) || 0 });
       addToast({ message: `Deal "${deal.title}" created` });
       setShowDealModal(false);
+      if (setDeals) setDeals(prev => [deal, ...prev]);
       if (setSelectedDeal) setSelectedDeal(deal.id);
       if (setPage) setPage('deal-detail');
     } catch { addToast({ message: 'Failed to create deal', type: 'error' }); }
@@ -3753,7 +3949,7 @@ function ContactsPage({ contacts, setPage, setSelectedContact, searchTerm, setSe
   );
 }
 
-function ContactDetail({ contact, onBack, onUpdateStatus, onDelete, addToast, appConfig, setPage, setSelectedDeal }) {
+function ContactDetail({ contact, onBack, onUpdateStatus, onDelete, addToast, appConfig, setPage, setSelectedDeal, setDeals }) {
   if (!contact) return null;
   const [showDealModal, setShowDealModal] = useState(false);
   const [dealTitle, setDealTitle] = useState(contact.name);
@@ -3778,6 +3974,7 @@ function ContactDetail({ contact, onBack, onUpdateStatus, onDelete, addToast, ap
       const deal = await api.createDeal({ title: dealTitle, contact_id: contact.id, stage_id: dealStage, value: parseFloat(dealValue) || 0 });
       addToast({ message: `Deal "${deal.title}" created` });
       setShowDealModal(false);
+      if (setDeals) setDeals(prev => [deal, ...prev]);
       if (setSelectedDeal) setSelectedDeal(deal.id);
       if (setPage) setPage('deal-detail');
     } catch { addToast({ message: 'Failed to create deal', type: 'error' }); }
@@ -5193,11 +5390,11 @@ export default function ArmvetDashboard() {
   } else if (page === "bookings") {
     content = <BookingsPage bookings={bookings} setPage={setPage} setSelectedBooking={setSelectedBooking} searchTerm={searchTerm} setSearchTerm={setSearchTerm} statusFilter={statusFilter} setStatusFilter={setStatusFilter} categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter} categories={appConfig?.categories} />;
   } else if (page === "booking-detail") {
-    content = <BookingDetail booking={selectedBooking} onBack={() => setPage("bookings")} onUpdateStatus={updateBookingStatus} onAddToCalendar={addToCalendar} onDelete={deleteBooking} addToast={addToast} />;
+    content = <BookingDetail booking={selectedBooking} onBack={() => setPage("bookings")} onUpdateStatus={updateBookingStatus} onAddToCalendar={addToCalendar} onDelete={deleteBooking} addToast={addToast} appConfig={appConfig} setPage={setPage} setSelectedDeal={setSelectedDeal} setDeals={setDeals} deals={deals} />;
   } else if (page === "contacts") {
     content = <ContactsPage contacts={contacts} setPage={setPage} setSelectedContact={setSelectedContact} searchTerm={contactSearchTerm} setSearchTerm={setContactSearchTerm} contactStatusFilter={contactStatusFilter} setContactStatusFilter={setContactStatusFilter} />;
   } else if (page === "contact-detail") {
-    content = <ContactDetail contact={selectedContact} onBack={() => setPage("contacts")} onUpdateStatus={updateContactStatus} onDelete={deleteContact} addToast={addToast} />;
+    content = <ContactDetail contact={selectedContact} onBack={() => setPage("contacts")} onUpdateStatus={updateContactStatus} onDelete={deleteContact} addToast={addToast} appConfig={appConfig} setPage={setPage} setSelectedDeal={setSelectedDeal} setDeals={setDeals} />;
   } else if (page === "availability") {
     content = <AvailabilityPage slots={slots} setSlots={setSlots} addToast={addToast} setPage={setPage} setSelectedBooking={setSelectedBooking} />;
   } else if (page === "calendar") {
@@ -5214,6 +5411,10 @@ export default function ArmvetDashboard() {
     content = <AnalyticsPage appConfig={appConfig} />;
   } else if (page === "customize-stages") {
     content = <PipelineStagesPage appConfig={appConfig} setAppConfig={setAppConfig} addToast={addToast} />;
+  } else if (page === "customize-scoring") {
+    content = <LeadScoringPage appConfig={appConfig} setAppConfig={setAppConfig} addToast={addToast} />;
+  } else if (page === "customize-fields") {
+    content = <CustomFieldsPage appConfig={appConfig} setAppConfig={setAppConfig} addToast={addToast} />;
   } else if (page === "customize-appearance") {
     content = <AppearancePage addToast={addToast} />;
   } else if (page === "advanced-origins") {
