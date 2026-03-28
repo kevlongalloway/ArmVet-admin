@@ -2753,6 +2753,455 @@ function AnalyticsPage({ appConfig }) {
   );
 }
 
+// ─── CRM: Deals Page ───
+function DealsPage({ deals, setDeals, appConfig, setPage, setSelectedDeal, addToast }) {
+  const stages = appConfig?.pipeline_stages || DEFAULT_PIPELINE_STAGES;
+  const [statusFilter, setStatusFilter] = useState('open');
+  const [search, setSearch] = useState('');
+  const [showForm, setShowForm] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [newValue, setNewValue] = useState('');
+  const [newStage, setNewStage] = useState(stages[0]?.id || 'new');
+
+  const filtered = deals.filter(d => {
+    const matchStatus = statusFilter === 'all' || d.status === statusFilter;
+    const matchSearch = !search ||
+      d.title.toLowerCase().includes(search.toLowerCase()) ||
+      (d.contactName || '').toLowerCase().includes(search.toLowerCase());
+    return matchStatus && matchSearch;
+  });
+
+  const createDeal = async () => {
+    const title = newTitle.trim();
+    if (!title) return;
+    try {
+      const deal = await api.createDeal({ title, stage_id: newStage, value: parseFloat(newValue) || 0 });
+      setDeals(prev => [deal, ...prev]);
+      setNewTitle(''); setNewValue(''); setNewStage(stages[0]?.id || 'new'); setShowForm(false);
+      addToast({ message: `Deal "${deal.title}" created` });
+    } catch { addToast({ message: 'Failed to create deal', type: 'error' }); }
+  };
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>Deals</h2>
+        <p>All deals across your pipeline</p>
+      </div>
+
+      <div style={{ display: 'flex', gap: 10, marginBottom: 16, alignItems: 'center' }}>
+        <div className="search-bar" style={{ flex: 1, marginBottom: 0 }}>
+          <span className="search-icon">{Icons.search}</span>
+          <input placeholder="Search deals or contacts…" value={search} onChange={e => setSearch(e.target.value)} />
+        </div>
+        <button className="btn-primary" onClick={() => setShowForm(v => !v)} style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+          {Icons.plus} New Deal
+        </button>
+      </div>
+
+      {showForm && (
+        <div className="quick-form">
+          <h3>New Deal</h3>
+          <div className="quick-form-grid">
+            <div className="form-group">
+              <label className="form-label">Title</label>
+              <input className="form-input" value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="Deal name" autoFocus onKeyDown={e => e.key === 'Enter' && createDeal()} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Value ($)</label>
+              <input className="form-input" type="number" value={newValue} onChange={e => setNewValue(e.target.value)} placeholder="0" />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Stage</label>
+              <select className="form-input" value={newStage} onChange={e => setNewStage(e.target.value)}>
+                {stages.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+              </select>
+            </div>
+          </div>
+          <div className="quick-form-actions">
+            <button className="btn-primary" onClick={createDeal}>Create Deal</button>
+            <button className="btn-secondary" onClick={() => setShowForm(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      <div className="section-header" style={{ marginBottom: 0 }}>
+        <div className="filters">
+          {['all', 'open', 'won', 'lost'].map(s => (
+            <button key={s} className={`filter-chip ${statusFilter === s ? 'active' : ''}`} onClick={() => setStatusFilter(s)}>
+              {s === 'all' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
+            </button>
+          ))}
+        </div>
+        <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{filtered.length} deal{filtered.length !== 1 ? 's' : ''}</span>
+      </div>
+
+      <div className="settings-section" style={{ padding: 0, marginTop: 12 }}>
+        {filtered.length === 0 ? (
+          <div className="empty-state"><p>No deals found.</p></div>
+        ) : filtered.map(deal => {
+          const stage = stages.find(s => s.id === deal.stageId);
+          return (
+            <div key={deal.id} className="deal-list-row" onClick={() => { setSelectedDeal(deal.id); setPage('deal-detail'); }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="deal-list-title">{deal.title}</div>
+                <div className="deal-list-sub">
+                  {deal.contactName || deal.bookingName || 'No contact linked'}
+                  {deal.closeDate ? ` · Close ${formatDate(deal.closeDate.split('T')[0])}` : ''}
+                </div>
+              </div>
+              {stage && (
+                <span style={{ fontSize: 11, padding: '2px 10px', borderRadius: 10, background: stage.color + '22', color: stage.color, fontWeight: 700, whiteSpace: 'nowrap', flexShrink: 0 }}>
+                  {stage.name}
+                </span>
+              )}
+              <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--accent)', whiteSpace: 'nowrap', flexShrink: 0 }}>{formatCurrency(deal.value)}</span>
+              <span className={`deal-status-badge deal-status-${deal.status}`}>{deal.status}</span>
+              <span className="card-chevron">{Icons.chevronRight}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── CRM: Deal Detail Page ───
+function DealDetailPage({ dealId, deals, setDeals, appConfig, setPage, addToast }) {
+  const deal = deals.find(d => d.id === dealId);
+  const stages = appConfig?.pipeline_stages || DEFAULT_PIPELINE_STAGES;
+  const [activeTab, setActiveTab] = useState('details');
+  const [editing, setEditing] = useState(false);
+  const [title, setTitle] = useState('');
+  const [value, setValue] = useState('');
+  const [stageId, setStageId] = useState('');
+  const [probability, setProbability] = useState(0);
+  const [closeDate, setCloseDate] = useState('');
+  const [status, setStatus] = useState('open');
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (deal) {
+      setTitle(deal.title);
+      setValue(String(deal.value || ''));
+      setStageId(deal.stageId || stages[0]?.id || '');
+      setProbability(deal.probability || 0);
+      setCloseDate(deal.closeDate ? deal.closeDate.split('T')[0] : '');
+      setStatus(deal.status || 'open');
+    }
+  }, [deal?.id]);
+
+  if (!deal) return (
+    <div>
+      <button className="detail-back" onClick={() => setPage('deals')}>{Icons.back} Back to Deals</button>
+      <div className="empty-state"><p>Deal not found.</p></div>
+    </div>
+  );
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const updated = await api.updateDeal(deal.id, {
+        title, value: parseFloat(value) || 0,
+        stage_id: stageId, probability, close_date: closeDate || null, status,
+      });
+      setDeals(prev => prev.map(d => d.id === deal.id ? { ...d, ...updated } : d));
+      setEditing(false);
+      addToast({ message: 'Deal updated' });
+    } catch { addToast({ message: 'Failed to update deal', type: 'error' }); }
+    finally { setSaving(false); }
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm(`Delete deal "${deal.title}"? This cannot be undone.`)) return;
+    try {
+      await api.deleteDeal(deal.id);
+      setDeals(prev => prev.filter(d => d.id !== deal.id));
+      setPage('deals');
+      addToast({ message: 'Deal deleted' });
+    } catch { addToast({ message: 'Failed to delete deal', type: 'error' }); }
+  };
+
+  const patchStage = async (sid) => {
+    try {
+      const updated = await api.updateDeal(deal.id, { stage_id: sid });
+      setDeals(prev => prev.map(d => d.id === deal.id ? { ...d, ...updated } : d));
+    } catch { addToast({ message: 'Failed to update stage', type: 'error' }); }
+  };
+
+  const patchStatus = async (s) => {
+    try {
+      const updated = await api.updateDeal(deal.id, { status: s });
+      setDeals(prev => prev.map(d => d.id === deal.id ? { ...d, ...updated } : d));
+    } catch { addToast({ message: 'Failed to update status', type: 'error' }); }
+  };
+
+  const stage = stages.find(s => s.id === deal.stageId);
+
+  return (
+    <div className="detail-view">
+      <button className="detail-back" onClick={() => setPage('deals')}>{Icons.back} Back to Deals</button>
+      <div className="detail-card">
+        <div className="detail-header">
+          <div>
+            <div className="detail-name">{deal.title}</div>
+            <div className="detail-org">{deal.contactName || deal.bookingName || ''}</div>
+          </div>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+            {stage && <span style={{ fontSize: 12, padding: '3px 12px', borderRadius: 10, background: stage.color + '22', color: stage.color, fontWeight: 700 }}>{stage.name}</span>}
+            <span className={`deal-status-badge deal-status-${deal.status}`}>{deal.status}</span>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: 8, marginBottom: 20, borderBottom: '1px solid var(--border)', paddingBottom: 0 }}>
+          {['details', 'activity', 'tags'].map(t => (
+            <button key={t} onClick={() => setActiveTab(t)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px 14px', fontSize: 13, fontWeight: 600, color: activeTab === t ? 'var(--accent)' : 'var(--text-muted)', borderBottom: activeTab === t ? '2px solid var(--accent)' : '2px solid transparent', fontFamily: 'inherit', textTransform: 'capitalize' }}>
+              {t}
+            </button>
+          ))}
+        </div>
+
+        {activeTab === 'details' && (
+          editing ? (
+            <div>
+              <div className="quick-form-grid">
+                <div className="form-group"><label className="form-label">Title</label><input className="form-input" value={title} onChange={e => setTitle(e.target.value)} autoFocus /></div>
+                <div className="form-group"><label className="form-label">Value ($)</label><input className="form-input" type="number" value={value} onChange={e => setValue(e.target.value)} /></div>
+                <div className="form-group"><label className="form-label">Stage</label>
+                  <select className="form-input" value={stageId} onChange={e => setStageId(e.target.value)}>
+                    {stages.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                  </select>
+                </div>
+                <div className="form-group"><label className="form-label">Status</label>
+                  <select className="form-input" value={status} onChange={e => setStatus(e.target.value)}>
+                    <option value="open">Open</option>
+                    <option value="won">Won</option>
+                    <option value="lost">Lost</option>
+                  </select>
+                </div>
+                <div className="form-group"><label className="form-label">Probability — {probability}%</label><input className="prob-slider" type="range" min={0} max={100} value={probability} onChange={e => setProbability(Number(e.target.value))} /></div>
+                <div className="form-group"><label className="form-label">Close Date</label><input className="form-input" type="date" value={closeDate} onChange={e => setCloseDate(e.target.value)} /></div>
+              </div>
+              <div className="detail-actions">
+                <button className="btn-primary" onClick={handleSave} disabled={saving}>{saving ? 'Saving…' : 'Save'}</button>
+                <button className="btn-secondary" onClick={() => setEditing(false)}>Cancel</button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="deal-detail-layout">
+                <div className="deal-meta-section">
+                  <div className="deal-meta-row">
+                    <div className="deal-meta-label">Value</div>
+                    <div className="deal-meta-value" style={{ fontSize: 24, fontWeight: 800, color: 'var(--accent)' }}>{formatCurrency(deal.value)}</div>
+                  </div>
+                  <div className="deal-meta-row">
+                    <div className="deal-meta-label">Probability</div>
+                    <div className="prob-row">
+                      <div className="prob-bar"><div className="prob-fill" style={{ width: `${deal.probability || 0}%` }} /></div>
+                      <span style={{ fontSize: 13, color: 'var(--text-secondary)', minWidth: 35 }}>{deal.probability || 0}%</span>
+                    </div>
+                  </div>
+                  <div className="deal-meta-row"><div className="deal-meta-label">Close Date</div><div className="deal-meta-value">{deal.closeDate ? formatDate(deal.closeDate.split('T')[0]) : '—'}</div></div>
+                  {deal.contactName && <div className="deal-meta-row"><div className="deal-meta-label">Contact</div><div className="deal-meta-value">{deal.contactName}</div></div>}
+                  {deal.bookingName && <div className="deal-meta-row"><div className="deal-meta-label">Booking</div><div className="deal-meta-value">{deal.bookingName}</div></div>}
+                  <div className="deal-meta-row"><div className="deal-meta-label">Created</div><div className="deal-meta-value" style={{ fontSize: 12, color: 'var(--text-muted)' }}>{deal.createdAt ? new Date(deal.createdAt).toLocaleDateString() : '—'}</div></div>
+                </div>
+                <div>
+                  <div className="deal-meta-section" style={{ marginBottom: 16 }}>
+                    <div className="deal-meta-label" style={{ marginBottom: 10 }}>Stage</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                      {stages.map(s => (
+                        <span key={s.id} className={`stage-chip${deal.stageId === s.id ? ' active' : ''}`} style={{ background: s.color + '22', color: s.color, cursor: 'pointer' }} onClick={() => patchStage(s.id)}>
+                          {s.name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="deal-meta-section">
+                    <div className="deal-meta-label" style={{ marginBottom: 10 }}>Status</div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      {['open', 'won', 'lost'].map(s => (
+                        <button key={s} onClick={() => patchStatus(s)} style={{ padding: '6px 16px', borderRadius: 8, border: `2px solid ${deal.status === s ? 'var(--accent)' : 'var(--border)'}`, background: deal.status === s ? 'var(--accent-dim)' : 'none', color: deal.status === s ? 'var(--accent)' : 'var(--text-muted)', cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: 'inherit', textTransform: 'capitalize', transition: 'all 0.15s' }}>
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="detail-actions" style={{ marginTop: 16 }}>
+                <button className="btn-action" style={{ background: 'var(--accent-dim)', color: 'var(--accent)' }} onClick={() => setEditing(true)}>{Icons.brush} Edit</button>
+                <button className="btn-action btn-delete" onClick={handleDelete}>{Icons.trash} Delete</button>
+              </div>
+            </>
+          )
+        )}
+
+        {activeTab === 'activity' && <ActivityTimeline entityType="deal" entityId={deal.id} addToast={addToast} />}
+        {activeTab === 'tags' && <TagEditor entityType="deal" entityId={deal.id} addToast={addToast} />}
+      </div>
+    </div>
+  );
+}
+
+// ─── CRM: Tasks Page ───
+function TasksPage({ deals, contacts, bookings, addToast }) {
+  const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [newTitle, setNewTitle] = useState('');
+  const [newDueDate, setNewDueDate] = useState('');
+  const [newEntityType, setNewEntityType] = useState('');
+  const [newEntityId, setNewEntityId] = useState('');
+
+  const today = new Date().toISOString().split('T')[0];
+
+  useEffect(() => {
+    api.getTasks().then(setTasks).catch(() => {}).finally(() => setLoading(false));
+  }, []);
+
+  const toggle = async (task) => {
+    try {
+      const updated = await api.updateTask(task.id, { completed: !task.completed });
+      setTasks(prev => prev.map(t => t.id === task.id ? { ...t, completed: updated.completed } : t));
+    } catch { addToast({ message: 'Failed to update task', type: 'error' }); }
+  };
+
+  const remove = async (id) => {
+    try {
+      await api.deleteTask(id);
+      setTasks(prev => prev.filter(t => t.id !== id));
+    } catch { addToast({ message: 'Failed to delete task', type: 'error' }); }
+  };
+
+  const createTask = async () => {
+    const title = newTitle.trim();
+    if (!title) return;
+    try {
+      const task = await api.createTask({
+        title,
+        due_date: newDueDate || null,
+        entity_type: newEntityType || null,
+        entity_id: newEntityId ? Number(newEntityId) : null,
+      });
+      setTasks(prev => [...prev, task]);
+      setNewTitle(''); setNewDueDate(''); setNewEntityType(''); setNewEntityId('');
+      addToast({ message: 'Task created' });
+    } catch { addToast({ message: 'Failed to create task', type: 'error' }); }
+  };
+
+  const getEntityLabel = (task) => {
+    if (!task.entityType || !task.entityId) return null;
+    if (task.entityType === 'deal')    return (deals.find(d => d.id === task.entityId)?.title)    ? `Deal: ${deals.find(d => d.id === task.entityId).title}` : null;
+    if (task.entityType === 'contact') return (contacts.find(c => c.id === task.entityId)?.name)  ? `Contact: ${contacts.find(c => c.id === task.entityId).name}` : null;
+    if (task.entityType === 'booking') return (bookings.find(b => b.id === task.entityId)?.name)  ? `Booking: ${bookings.find(b => b.id === task.entityId).name}` : null;
+    return null;
+  };
+
+  const dueOf = (t) => t.dueDate ? t.dueDate.split('T')[0] : null;
+
+  const groups = [
+    { key: 'overdue',  label: 'Overdue',    cls: 'overdue', items: tasks.filter(t => !t.completed && dueOf(t) && dueOf(t) < today) },
+    { key: 'today',    label: 'Due Today',  cls: 'today',   items: tasks.filter(t => !t.completed && dueOf(t) === today) },
+    { key: 'upcoming', label: 'Upcoming',   cls: '',        items: tasks.filter(t => !t.completed && (!dueOf(t) || dueOf(t) > today)) },
+    { key: 'done',     label: 'Completed',  cls: '',        items: tasks.filter(t => t.completed) },
+  ];
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>Tasks</h2>
+        <p>Follow-up tasks and to-dos linked to your deals and contacts</p>
+      </div>
+
+      {/* Add task form */}
+      <div className="quick-form">
+        <h3>Add Task</h3>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+          <div className="form-group" style={{ flex: '2 1 200px', marginBottom: 0 }}>
+            <label className="form-label">Task</label>
+            <input className="form-input" placeholder="e.g. Follow up with client" value={newTitle} onChange={e => setNewTitle(e.target.value)} onKeyDown={e => e.key === 'Enter' && createTask()} autoFocus />
+          </div>
+          <div className="form-group" style={{ flex: '1 1 130px', marginBottom: 0 }}>
+            <label className="form-label">Due Date</label>
+            <input className="form-input" type="date" value={newDueDate} onChange={e => setNewDueDate(e.target.value)} />
+          </div>
+          <div className="form-group" style={{ flex: '1 1 120px', marginBottom: 0 }}>
+            <label className="form-label">Link to</label>
+            <select className="form-input" value={newEntityType} onChange={e => { setNewEntityType(e.target.value); setNewEntityId(''); }}>
+              <option value="">None</option>
+              <option value="deal">Deal</option>
+              <option value="contact">Contact</option>
+              <option value="booking">Booking</option>
+            </select>
+          </div>
+          {newEntityType === 'deal' && (
+            <div className="form-group" style={{ flex: '1 1 160px', marginBottom: 0 }}>
+              <label className="form-label">Deal</label>
+              <select className="form-input" value={newEntityId} onChange={e => setNewEntityId(e.target.value)}>
+                <option value="">Select…</option>
+                {deals.map(d => <option key={d.id} value={d.id}>{d.title}</option>)}
+              </select>
+            </div>
+          )}
+          {newEntityType === 'contact' && (
+            <div className="form-group" style={{ flex: '1 1 160px', marginBottom: 0 }}>
+              <label className="form-label">Contact</label>
+              <select className="form-input" value={newEntityId} onChange={e => setNewEntityId(e.target.value)}>
+                <option value="">Select…</option>
+                {contacts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+          )}
+          {newEntityType === 'booking' && (
+            <div className="form-group" style={{ flex: '1 1 160px', marginBottom: 0 }}>
+              <label className="form-label">Booking</label>
+              <select className="form-input" value={newEntityId} onChange={e => setNewEntityId(e.target.value)}>
+                <option value="">Select…</option>
+                {bookings.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+              </select>
+            </div>
+          )}
+          <button className="btn-primary" onClick={createTask} disabled={!newTitle.trim()} style={{ alignSelf: 'flex-end', flexShrink: 0 }}>Add</button>
+        </div>
+      </div>
+
+      {loading && <div style={{ color: 'var(--text-muted)', fontSize: 13, padding: '20px 0' }}>Loading tasks…</div>}
+
+      {!loading && tasks.length === 0 && (
+        <div className="empty-state"><p>No tasks yet. Add one above.</p></div>
+      )}
+
+      {!loading && groups.map(group => group.items.length > 0 && (
+        <div key={group.key}>
+          <div className={`tasks-group-header${group.cls ? ` ${group.cls}` : ''}`}>
+            {group.label} <span style={{ fontWeight: 400 }}>({group.items.length})</span>
+          </div>
+          {group.items.map(task => {
+            const isOverdue = !task.completed && dueOf(task) && dueOf(task) < today;
+            const entityLabel = getEntityLabel(task);
+            return (
+              <div key={task.id} className="task-row">
+                <button className={`task-checkbox${task.completed ? ' done' : ''}`} onClick={() => toggle(task)}>
+                  {task.completed && Icons.check}
+                </button>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className={`task-title${task.completed ? ' done' : ''}`}>{task.title}</div>
+                  {entityLabel && <div className="task-entity-link">{entityLabel}</div>}
+                </div>
+                {dueOf(task) && (
+                  <span className={`task-due${isOverdue ? ' overdue' : ''}`}>{formatDate(dueOf(task))}</span>
+                )}
+                <button className="task-delete-btn" onClick={() => remove(task.id)} title="Delete">{Icons.trash}</button>
+              </div>
+            );
+          })}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ─── Customize: Pipeline Stages Page ───
 const STAGE_COLORS = ['#6B7280','#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899','#14B8A6','#F97316'];
 
@@ -4775,23 +5224,12 @@ export default function ArmvetDashboard() {
     content = <ResetSetupPage addToast={addToast} onResetComplete={() => { setShowSetupWizard(true); setPage("dashboard"); }} />;
   } else if (page === "pipeline") {
     content = <PipelinePage deals={deals} setDeals={setDeals} appConfig={appConfig} setPage={setPage} setSelectedDeal={setSelectedDeal} addToast={addToast} />;
+  } else if (page === "deals") {
+    content = <DealsPage deals={deals} setDeals={setDeals} appConfig={appConfig} setPage={setPage} setSelectedDeal={setSelectedDeal} addToast={addToast} />;
   } else if (page === "deal-detail") {
-    const deal = deals.find(d => d.id === selectedDealId);
-    content = deal ? (
-      <div className="detail-view">
-        <button className="detail-back" onClick={() => setPage("pipeline")}>{Icons.back} Back to Pipeline</button>
-        <div className="detail-card">
-          <div className="detail-header">
-            <div>
-              <div className="detail-name">{deal.title}</div>
-              <div className="detail-org">{deal.contactName || deal.bookingName || ''}</div>
-            </div>
-            <span style={{ fontSize: 22, fontWeight: 800, color: 'var(--accent)' }}>{formatCurrency(deal.value)}</span>
-          </div>
-          <ActivityTimeline entityType="deal" entityId={deal.id} addToast={addToast} />
-        </div>
-      </div>
-    ) : <div className="empty-state"><p>Deal not found.</p></div>;
+    content = <DealDetailPage dealId={selectedDealId} deals={deals} setDeals={setDeals} appConfig={appConfig} setPage={setPage} addToast={addToast} />;
+  } else if (page === "tasks") {
+    content = <TasksPage deals={deals} contacts={contacts} bookings={bookings} addToast={addToast} />;
   }
 
   const mobileTitle = appConfig?.company_name || 'Admin';
