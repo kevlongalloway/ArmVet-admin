@@ -3397,6 +3397,128 @@ function CustomFieldsPage({ appConfig, setAppConfig, addToast }) {
   );
 }
 
+// ─── Customize: Notifications Page ───
+function NotificationsPage({ appConfig, setAppConfig, addToast }) {
+  const defaults = {
+    smtp_host: '', smtp_port: 587, smtp_user: '', smtp_pass: '',
+    from_address: '', notify_new_booking: false, notify_new_contact: false, notify_task_due: false,
+  };
+  const [cfg, setCfg] = useState(() => ({ ...defaults, ...(appConfig?.email_notifications_config || {}) }));
+  const [saving, setSaving] = useState(false);
+  const [showPass, setShowPass] = useState(false);
+
+  const update = (key, val) => setCfg(c => ({ ...c, [key]: val }));
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await api.saveConfig({ email_notifications_config: cfg });
+      setAppConfig(c => ({ ...c, email_notifications_config: cfg }));
+      addToast({ message: 'Notification settings saved' });
+    } catch {
+      addToast({ message: 'Failed to save settings', type: 'error' });
+    } finally { setSaving(false); }
+  };
+
+  const Toggle = ({ k, label, sub }) => (
+    <div className="notif-row">
+      <div>
+        <div className="notif-label">{label}</div>
+        {sub && <div className="notif-sub">{sub}</div>}
+      </div>
+      <label className="toggle-switch">
+        <input type="checkbox" checked={!!cfg[k]} onChange={e => update(k, e.target.checked)} />
+        <span className="toggle-track" />
+      </label>
+    </div>
+  );
+
+  const smtpConfigured = cfg.smtp_host && cfg.smtp_user && cfg.from_address;
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>Notifications</h2>
+        <p>Configure outgoing email alerts for key events</p>
+      </div>
+
+      <div className="settings-section">
+        <h3>SMTP Settings</h3>
+        <p className="settings-desc">
+          Provide your outgoing mail server details. Gmail users: use an App Password with <code style={{ background: 'var(--bg-tertiary, var(--bg-secondary))', padding: '1px 5px', borderRadius: 4, fontSize: 12 }}>smtp.gmail.com</code> on port 587.
+        </p>
+        <div className="settings-form">
+          <div className="form-group">
+            <label className="form-label">SMTP Host</label>
+            <input className="form-input" value={cfg.smtp_host} onChange={e => update('smtp_host', e.target.value)} placeholder="e.g. smtp.gmail.com" />
+          </div>
+          <div className="form-group">
+            <label className="form-label">SMTP Port</label>
+            <input className="form-input" type="number" value={cfg.smtp_port} onChange={e => update('smtp_port', Number(e.target.value))} style={{ maxWidth: 120 }} />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Username</label>
+            <input className="form-input" value={cfg.smtp_user} onChange={e => update('smtp_user', e.target.value)} placeholder="your@email.com" autoComplete="off" />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Password / App Password</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                className="form-input"
+                type={showPass ? 'text' : 'password'}
+                value={cfg.smtp_pass}
+                onChange={e => update('smtp_pass', e.target.value)}
+                placeholder="••••••••"
+                autoComplete="new-password"
+                style={{ paddingRight: 44 }}
+              />
+              <button
+                onClick={() => setShowPass(v => !v)}
+                style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 12, padding: 0 }}
+              >
+                {showPass ? 'Hide' : 'Show'}
+              </button>
+            </div>
+          </div>
+          <div className="form-group">
+            <label className="form-label">From Address</label>
+            <input className="form-input" value={cfg.from_address} onChange={e => update('from_address', e.target.value)} placeholder="no-reply@yourcompany.com" />
+          </div>
+        </div>
+
+        {!smtpConfigured && (
+          <div style={{ marginTop: 12, padding: '10px 14px', background: 'var(--orange-dim)', border: '1px solid var(--orange)', borderRadius: 8, fontSize: 13, color: 'var(--orange)' }}>
+            Complete SMTP host, username, and from address to enable email triggers.
+          </div>
+        )}
+      </div>
+
+      <div className="settings-section" style={{ marginTop: 20 }}>
+        <h3>Email Triggers</h3>
+        <p className="settings-desc">Choose which events send an email notification to your support address.</p>
+        <Toggle
+          k="notify_new_booking"
+          label="New Booking Request"
+          sub="Send an email when a visitor submits a consultation request"
+        />
+        <Toggle
+          k="notify_new_contact"
+          label="New Contact Message"
+          sub="Send an email when someone submits the website contact form"
+        />
+        <Toggle
+          k="notify_task_due"
+          label="Daily Task Reminder"
+          sub="Send a morning digest of tasks due today"
+        />
+        <div className="page-actions" style={{ marginTop: 20 }}>
+          <button className="btn-primary" onClick={handleSave} disabled={saving}>{saving ? 'Saving…' : 'Save Settings'}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Customize: Pipeline Stages Page ───
 const STAGE_COLORS = ['#6B7280','#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899','#14B8A6','#F97316'];
 
@@ -5415,6 +5537,8 @@ export default function ArmvetDashboard() {
     content = <LeadScoringPage appConfig={appConfig} setAppConfig={setAppConfig} addToast={addToast} />;
   } else if (page === "customize-fields") {
     content = <CustomFieldsPage appConfig={appConfig} setAppConfig={setAppConfig} addToast={addToast} />;
+  } else if (page === "customize-notifications") {
+    content = <NotificationsPage appConfig={appConfig} setAppConfig={setAppConfig} addToast={addToast} />;
   } else if (page === "customize-appearance") {
     content = <AppearancePage addToast={addToast} />;
   } else if (page === "advanced-origins") {
