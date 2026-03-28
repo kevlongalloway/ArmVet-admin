@@ -2485,15 +2485,7 @@ function TagEditor({ entityType, entityId, addToast }) {
 
 // ─── CRM: Pipeline Page ───
 function PipelinePage({ deals, setDeals, appConfig, setPage, setSelectedDeal, addToast }) {
-  const DEFAULT_STAGES = [
-    { id: 'new', name: 'New', color: '#6B7280' },
-    { id: 'qualified', name: 'Qualified', color: '#3B82F6' },
-    { id: 'proposal', name: 'Proposal Sent', color: '#F59E0B' },
-    { id: 'negotiation', name: 'Negotiation', color: '#8B5CF6' },
-    { id: 'won', name: 'Won', color: '#10B981' },
-    { id: 'lost', name: 'Lost', color: '#EF4444' },
-  ];
-  const stages = appConfig?.pipeline_stages || DEFAULT_STAGES;
+  const stages = appConfig?.pipeline_stages || DEFAULT_PIPELINE_STAGES;
 
   const [addingStage, setAddingStage] = useState(null);
   const [newDealTitle, setNewDealTitle] = useState('');
@@ -2591,6 +2583,127 @@ function PipelinePage({ deals, setDeals, appConfig, setPage, setSelectedDeal, ad
             </div>
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+// ─── Customize: Pipeline Stages Page ───
+const STAGE_COLORS = ['#6B7280','#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899','#14B8A6','#F97316'];
+
+const DEFAULT_PIPELINE_STAGES = [
+  { id: 'new', name: 'New', color: '#6B7280' },
+  { id: 'qualified', name: 'Qualified', color: '#3B82F6' },
+  { id: 'proposal', name: 'Proposal Sent', color: '#F59E0B' },
+  { id: 'negotiation', name: 'Negotiation', color: '#8B5CF6' },
+  { id: 'won', name: 'Won', color: '#10B981' },
+  { id: 'lost', name: 'Lost', color: '#EF4444' },
+];
+
+function PipelineStagesPage({ appConfig, setAppConfig, addToast }) {
+  const [stages, setStages] = useState(() => appConfig?.pipeline_stages || DEFAULT_PIPELINE_STAGES);
+  const [editingId, setEditingId] = useState(null);
+  const [saving, setSaving] = useState(false);
+
+  const updateStage = (id, field, val) =>
+    setStages(prev => prev.map(s => s.id === id ? { ...s, [field]: val } : s));
+
+  const addStage = () => {
+    const newId = 'stage_' + Date.now();
+    setStages(prev => [...prev, { id: newId, name: 'New Stage', color: '#6B7280' }]);
+    setEditingId(newId);
+  };
+
+  const removeStage = (id) => {
+    if (stages.length <= 1) {
+      addToast({ message: 'Must have at least one stage', type: 'error' });
+      return;
+    }
+    setStages(prev => prev.filter(s => s.id !== id));
+    if (editingId === id) setEditingId(null);
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await api.saveConfig({ pipeline_stages: stages });
+      setAppConfig(c => ({ ...c, pipeline_stages: stages }));
+      addToast({ message: 'Pipeline stages saved' });
+      setEditingId(null);
+    } catch {
+      addToast({ message: 'Failed to save stages', type: 'error' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>Pipeline Stages</h2>
+        <p>Customize the stages deals move through. Changes apply to the Pipeline board immediately after saving.</p>
+      </div>
+      <div className="settings-section">
+        {stages.map((stage) => (
+          <div key={stage.id} className="stage-editor-row">
+            <div className="stage-color-dot" style={{ background: stage.color }} />
+            {editingId === stage.id ? (
+              <>
+                <input
+                  className="form-input"
+                  style={{ flex: 1 }}
+                  value={stage.name}
+                  onChange={e => updateStage(stage.id, 'name', e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && setEditingId(null)}
+                  autoFocus
+                />
+                <div className="stage-color-picker">
+                  {STAGE_COLORS.map(c => (
+                    <button
+                      key={c}
+                      className={`stage-color-swatch${stage.color === c ? ' selected' : ''}`}
+                      style={{ background: c }}
+                      onClick={() => updateStage(stage.id, 'color', c)}
+                      title={c}
+                    />
+                  ))}
+                </div>
+                <button className="btn-secondary" style={{ fontSize: 12, padding: '5px 12px', whiteSpace: 'nowrap' }} onClick={() => setEditingId(null)}>Done</button>
+              </>
+            ) : (
+              <>
+                <span style={{ flex: 1, fontSize: 14, color: 'var(--text-primary)', fontWeight: 500 }}>{stage.name}</span>
+                <button className="btn-secondary" style={{ fontSize: 12, padding: '5px 12px' }} onClick={() => setEditingId(stage.id)}>Edit</button>
+                <button
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '4px 6px', fontSize: 13 }}
+                  onClick={() => removeStage(stage.id)}
+                  title="Remove stage"
+                >
+                  {Icons.trash}
+                </button>
+              </>
+            )}
+          </div>
+        ))}
+
+        <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
+          <button className="btn-secondary" onClick={addStage}>{Icons.plus} Add Stage</button>
+          <button className="btn-primary" onClick={handleSave} disabled={saving}>
+            {saving ? 'Saving…' : 'Save Stages'}
+          </button>
+        </div>
+
+        <div style={{ marginTop: 24, padding: '14px 16px', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 10 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 10 }}>Preview</div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {stages.map(s => (
+              <span key={s.id} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: s.color + '22', color: s.color, padding: '4px 12px', borderRadius: 10, fontSize: 12, fontWeight: 700 }}>
+                <div style={{ width: 7, height: 7, borderRadius: '50%', background: s.color }} />
+                {s.name}
+              </span>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -4483,6 +4596,8 @@ export default function ArmvetDashboard() {
     content = <ServicesPage appConfig={appConfig} setAppConfig={setAppConfig} addToast={addToast} />;
   } else if (page === "customize-categories") {
     content = <CategoriesPage appConfig={appConfig} setAppConfig={setAppConfig} addToast={addToast} />;
+  } else if (page === "customize-stages") {
+    content = <PipelineStagesPage appConfig={appConfig} setAppConfig={setAppConfig} addToast={addToast} />;
   } else if (page === "customize-appearance") {
     content = <AppearancePage addToast={addToast} />;
   } else if (page === "advanced-origins") {
