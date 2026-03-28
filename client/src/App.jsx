@@ -2588,6 +2588,171 @@ function PipelinePage({ deals, setDeals, appConfig, setPage, setSelectedDeal, ad
   );
 }
 
+// ─── CRM: Analytics Page ───
+function AnalyticsPage({ appConfig }) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    api.getAnalytics()
+      .then(setData)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return (
+    <div>
+      <div className="page-header"><h2>Analytics</h2><p>Performance overview and pipeline insights</p></div>
+      <div style={{ color: 'var(--text-muted)', fontSize: 14, padding: '40px 0' }}>Loading analytics…</div>
+    </div>
+  );
+
+  if (error || !data) return (
+    <div>
+      <div className="page-header"><h2>Analytics</h2></div>
+      <div className="empty-state"><p>Failed to load analytics data.</p></div>
+    </div>
+  );
+
+  const stages = appConfig?.pipeline_stages || DEFAULT_PIPELINE_STAGES;
+
+  const bStatus = data.bookings_by_status || {};
+  const totalBookings = Object.values(bStatus).reduce((s, v) => s + v, 0);
+
+  const bookMonthData = (data.bookings_by_month || []).map(r => ({ label: r.month.slice(5), value: r.count }));
+  const revMonthData  = (data.revenue_by_month  || []).map(r => ({ label: r.month.slice(5), value: Math.round(r.won_value) }));
+  const servicesData  = (data.top_services      || []).map(r => ({ label: r.service,         value: r.count }));
+  const catsData      = (data.top_categories    || []).map(r => ({ label: r.category,         value: r.count }));
+
+  const donutData = stages
+    .map(s => ({
+      label: s.name,
+      value: (data.deals_by_stage || [])
+        .filter(d => d.stageId === s.id && d.status === 'open')
+        .reduce((sum, d) => sum + d.count, 0),
+    }))
+    .filter(d => d.value > 0);
+
+  const donutColors = stages.map(s => s.color);
+
+  const ts = data.tasks_summary || { overdue: 0, due_today: 0, upcoming: 0 };
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>Analytics</h2>
+        <p>Performance overview and pipeline insights</p>
+      </div>
+
+      {/* KPI row */}
+      <div className="analytics-grid">
+        <div className="kpi-card">
+          <div className="kpi-label">Total Bookings</div>
+          <div className="kpi-value">{totalBookings}</div>
+          <div className="kpi-sub">{bStatus.pending || 0} pending review</div>
+        </div>
+        <div className="kpi-card">
+          <div className="kpi-label">Conversion Rate</div>
+          <div className="kpi-value">{data.conversion_rate}%</div>
+          <div className="kpi-sub">Approved or on-calendar</div>
+        </div>
+        <div className="kpi-card">
+          <div className="kpi-label">Open Pipeline</div>
+          <div className="kpi-value" style={{ fontSize: 22 }}>{formatCurrency(data.open_deals_value)}</div>
+          <div className="kpi-sub">Total value of open deals</div>
+        </div>
+        <div className="kpi-card">
+          <div className="kpi-label">Won Revenue</div>
+          <div className="kpi-value" style={{ fontSize: 22, color: 'var(--green)' }}>{formatCurrency(data.won_revenue)}</div>
+          <div className="kpi-sub">Last 6 months</div>
+        </div>
+      </div>
+
+      {/* Tasks quick-stats */}
+      <div className="analytics-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', marginBottom: 24 }}>
+        <div className="kpi-card">
+          <div className="kpi-label">Overdue Tasks</div>
+          <div className="kpi-value" style={{ color: ts.overdue > 0 ? 'var(--red)' : undefined }}>{ts.overdue}</div>
+        </div>
+        <div className="kpi-card">
+          <div className="kpi-label">Due Today</div>
+          <div className="kpi-value" style={{ color: ts.due_today > 0 ? 'var(--orange)' : undefined }}>{ts.due_today}</div>
+        </div>
+        <div className="kpi-card">
+          <div className="kpi-label">Upcoming Tasks</div>
+          <div className="kpi-value">{ts.upcoming}</div>
+        </div>
+      </div>
+
+      {/* Charts row 1 */}
+      <div className="chart-grid">
+        <div className="chart-card">
+          <h4>Bookings Per Month</h4>
+          <BarChart data={bookMonthData} valueKey="value" labelKey="label" />
+        </div>
+        <div className="chart-card">
+          <h4>Revenue Won Per Month</h4>
+          <BarChart data={revMonthData} valueKey="value" labelKey="label" color="var(--green)" />
+        </div>
+      </div>
+
+      {/* Charts row 2 */}
+      <div className="chart-grid">
+        <div className="chart-card">
+          <h4>Open Deals by Stage</h4>
+          {donutData.length > 0
+            ? <DonutChart data={donutData} colors={donutColors} />
+            : <div className="chart-empty">No open deals yet</div>}
+        </div>
+        <div className="chart-card">
+          <h4>Bookings by Status</h4>
+          <table className="analytics-table">
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Count</th>
+                <th style={{ width: '45%' }}>Share</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(bStatus).sort((a, b) => b[1] - a[1]).map(([s, count]) => {
+                const pct = totalBookings ? Math.round((count / totalBookings) * 100) : 0;
+                return (
+                  <tr key={s}>
+                    <td>{s}</td>
+                    <td>{count}</td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div className="analytics-pct-bar">
+                          <div className="analytics-pct-fill" style={{ width: `${pct}%` }} />
+                        </div>
+                        <span style={{ fontSize: 11, color: 'var(--text-muted)', minWidth: 28 }}>{pct}%</span>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Charts row 3 */}
+      <div className="chart-grid">
+        <div className="chart-card">
+          <h4>Top Services</h4>
+          <HBarChart data={servicesData} valueKey="value" labelKey="label" />
+        </div>
+        <div className="chart-card">
+          <h4>Top Categories</h4>
+          <HBarChart data={catsData} valueKey="value" labelKey="label" color="var(--purple)" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Customize: Pipeline Stages Page ───
 const STAGE_COLORS = ['#6B7280','#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899','#14B8A6','#F97316'];
 
@@ -4596,6 +4761,8 @@ export default function ArmvetDashboard() {
     content = <ServicesPage appConfig={appConfig} setAppConfig={setAppConfig} addToast={addToast} />;
   } else if (page === "customize-categories") {
     content = <CategoriesPage appConfig={appConfig} setAppConfig={setAppConfig} addToast={addToast} />;
+  } else if (page === "analytics") {
+    content = <AnalyticsPage appConfig={appConfig} />;
   } else if (page === "customize-stages") {
     content = <PipelineStagesPage appConfig={appConfig} setAppConfig={setAppConfig} addToast={addToast} />;
   } else if (page === "customize-appearance") {
