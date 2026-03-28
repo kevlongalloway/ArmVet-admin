@@ -45,6 +45,7 @@ export const api = {
   },
   logout: clearToken,
   getBookings: () => request('GET', '/bookings'),
+  createBooking: (data) => request('POST', '/bookings', data),
   updateBookingStatus: (id, status) => request('PUT', `/bookings/${id}/status`, { status }),
   getContacts: () => request('GET', '/contacts'),
   updateContactStatus: (id, status) => request('PUT', `/contacts/${id}/status`, { status }),

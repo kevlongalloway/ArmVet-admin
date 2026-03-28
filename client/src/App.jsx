@@ -3831,10 +3831,32 @@ function DashboardPage({ bookings, contacts, setPage, setSelectedBooking, setSel
   );
 }
 
-function BookingsPage({ bookings, setPage, setSelectedBooking, searchTerm, setSearchTerm, statusFilter, setStatusFilter, categoryFilter, setCategoryFilter, categories }) {
+function BookingsPage({ bookings, setBookings, setPage, setSelectedBooking, searchTerm, setSearchTerm, statusFilter, setStatusFilter, categoryFilter, setCategoryFilter, categories, services, addToast }) {
   const cats = categories || DEFAULT_CATEGORIES;
+  const svcs = services || DEFAULT_SERVICES;
+
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ name: '', email: '', phone: '', org: '', service: svcs[0] || '', category: cats[0] || '', date: '', time: '', status: 'pending', message: '' });
+  const [saving, setSaving] = useState(false);
+
+  const setField = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  const handleCreate = async () => {
+    if (!form.name.trim()) { addToast({ message: 'Name is required', type: 'error' }); return; }
+    setSaving(true);
+    try {
+      const booking = await api.createBooking({ ...form, name: form.name.trim() });
+      setBookings(prev => [booking, ...prev]);
+      setShowForm(false);
+      setForm({ name: '', email: '', phone: '', org: '', service: svcs[0] || '', category: cats[0] || '', date: '', time: '', status: 'pending', message: '' });
+      addToast({ message: `Booking added for ${booking.name}` });
+    } catch {
+      addToast({ message: 'Failed to create booking', type: 'error' });
+    } finally { setSaving(false); }
+  };
+
   const filtered = bookings.filter((b) => {
-    const matchSearch = !searchTerm || b.name.toLowerCase().includes(searchTerm.toLowerCase()) || b.org.toLowerCase().includes(searchTerm.toLowerCase()) || b.service.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchSearch = !searchTerm || b.name.toLowerCase().includes(searchTerm.toLowerCase()) || (b.org || '').toLowerCase().includes(searchTerm.toLowerCase()) || (b.service || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchStatus = statusFilter === "all" || b.status === statusFilter;
     const matchCat = categoryFilter === "all" || b.category === categoryFilter;
     return matchSearch && matchStatus && matchCat;
@@ -3842,10 +3864,76 @@ function BookingsPage({ bookings, setPage, setSelectedBooking, searchTerm, setSe
 
   return (
     <div>
-      <div className="page-header">
-        <h2>Consultation Bookings</h2>
-        <p>Manage requests for proposals and consultation appointments</p>
+      <div className="page-header" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+        <div>
+          <h2>Consultation Bookings</h2>
+          <p>Manage requests for proposals and consultation appointments</p>
+        </div>
+        <button className="btn-primary" onClick={() => setShowForm(v => !v)} style={{ flexShrink: 0 }}>
+          {Icons.plus} New Booking
+        </button>
       </div>
+
+      {showForm && (
+        <div className="quick-form" style={{ marginBottom: 20 }}>
+          <h3>Add Booking Manually</h3>
+          <div className="quick-form-grid">
+            <div className="form-group">
+              <label className="form-label">Name *</label>
+              <input className="form-input" value={form.name} onChange={e => setField('name', e.target.value)} placeholder="Full name" autoFocus />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Email</label>
+              <input className="form-input" type="email" value={form.email} onChange={e => setField('email', e.target.value)} placeholder="email@example.com" />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Phone</label>
+              <input className="form-input" value={form.phone} onChange={e => setField('phone', e.target.value)} placeholder="+1 (555) 000-0000" />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Organization</label>
+              <input className="form-input" value={form.org} onChange={e => setField('org', e.target.value)} placeholder="Company or agency" />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Service</label>
+              <select className="form-input" value={form.service} onChange={e => setField('service', e.target.value)}>
+                {svcs.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Sector</label>
+              <select className="form-input" value={form.category} onChange={e => setField('category', e.target.value)}>
+                {cats.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Consultation Date</label>
+              <input className="form-input" type="date" value={form.date} onChange={e => setField('date', e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Time</label>
+              <input className="form-input" type="time" value={form.time} onChange={e => setField('time', e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Status</label>
+              <select className="form-input" value={form.status} onChange={e => setField('status', e.target.value)}>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="on-calendar">On Calendar</option>
+                <option value="declined">Declined</option>
+              </select>
+            </div>
+          </div>
+          <div className="form-group">
+            <label className="form-label">Message / Notes</label>
+            <textarea className="form-input" rows={3} style={{ resize: 'vertical' }} value={form.message} onChange={e => setField('message', e.target.value)} placeholder="Optional notes…" />
+          </div>
+          <div className="quick-form-actions">
+            <button className="btn-primary" onClick={handleCreate} disabled={saving}>{saving ? 'Saving…' : 'Add Booking'}</button>
+            <button className="btn-secondary" onClick={() => setShowForm(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
 
       <div className="search-bar">
         <span className="search-icon">{Icons.search}</span>
@@ -3879,11 +3967,11 @@ function BookingsPage({ bookings, setPage, setSelectedBooking, searchTerm, setSe
               <div className="card-body">
                 <div className="card-top-row">
                   <span className="card-name">{b.name}</span>
-                  <span className="card-date">{b.time} · {formatDate(b.date)}</span>
+                  <span className="card-date">{b.time ? `${b.time} · ` : ''}{b.date ? formatDate(b.date) : '—'}</span>
                 </div>
-                <div className="card-preview">{b.service} — {b.org}</div>
+                <div className="card-preview">{b.service}{b.org ? ` — ${b.org}` : ''}</div>
                 <div className="card-tags">
-                  <span className={`tag tag-${b.category.toLowerCase()}`}>{b.category}</span>
+                  {b.category && <span className={`tag tag-${b.category.toLowerCase()}`}>{b.category}</span>}
                   <span className={`status-badge status-${b.status}`}>{b.status === "on-calendar" ? "On Calendar" : b.status}</span>
                 </div>
               </div>
@@ -5510,7 +5598,7 @@ export default function ArmvetDashboard() {
   if (page === "dashboard") {
     content = <DashboardPage bookings={bookings} contacts={contacts} setPage={setPage} setSelectedBooking={setSelectedBooking} setSelectedContact={setSelectedContact} />;
   } else if (page === "bookings") {
-    content = <BookingsPage bookings={bookings} setPage={setPage} setSelectedBooking={setSelectedBooking} searchTerm={searchTerm} setSearchTerm={setSearchTerm} statusFilter={statusFilter} setStatusFilter={setStatusFilter} categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter} categories={appConfig?.categories} />;
+    content = <BookingsPage bookings={bookings} setBookings={setBookings} setPage={setPage} setSelectedBooking={setSelectedBooking} searchTerm={searchTerm} setSearchTerm={setSearchTerm} statusFilter={statusFilter} setStatusFilter={setStatusFilter} categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter} categories={appConfig?.categories} services={appConfig?.services} addToast={addToast} />;
   } else if (page === "booking-detail") {
     content = <BookingDetail booking={selectedBooking} onBack={() => setPage("bookings")} onUpdateStatus={updateBookingStatus} onAddToCalendar={addToCalendar} onDelete={deleteBooking} addToast={addToast} appConfig={appConfig} setPage={setPage} setSelectedDeal={setSelectedDeal} setDeals={setDeals} deals={deals} />;
   } else if (page === "contacts") {
