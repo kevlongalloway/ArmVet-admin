@@ -2483,6 +2483,119 @@ function TagEditor({ entityType, entityId, addToast }) {
   );
 }
 
+// ─── CRM: Pipeline Page ───
+function PipelinePage({ deals, setDeals, appConfig, setPage, setSelectedDeal, addToast }) {
+  const DEFAULT_STAGES = [
+    { id: 'new', name: 'New', color: '#6B7280' },
+    { id: 'qualified', name: 'Qualified', color: '#3B82F6' },
+    { id: 'proposal', name: 'Proposal Sent', color: '#F59E0B' },
+    { id: 'negotiation', name: 'Negotiation', color: '#8B5CF6' },
+    { id: 'won', name: 'Won', color: '#10B981' },
+    { id: 'lost', name: 'Lost', color: '#EF4444' },
+  ];
+  const stages = appConfig?.pipeline_stages || DEFAULT_STAGES;
+
+  const [addingStage, setAddingStage] = useState(null);
+  const [newDealTitle, setNewDealTitle] = useState('');
+  const [newDealValue, setNewDealValue] = useState('');
+
+  const openDeals = deals.filter(d => d.status === 'open');
+
+  const getDealsByStage = (stageId) => openDeals.filter(d => d.stageId === stageId);
+
+  const moveToStage = async (deal, stageId) => {
+    try {
+      const updated = await api.updateDeal(deal.id, { stage_id: stageId });
+      setDeals(prev => prev.map(d => d.id === deal.id ? { ...d, stageId: updated.stageId } : d));
+    } catch { addToast({ message: 'Failed to move deal', type: 'error' }); }
+  };
+
+  const createDeal = async (stageId) => {
+    const title = newDealTitle.trim();
+    if (!title) return;
+    try {
+      const deal = await api.createDeal({ title, stage_id: stageId, value: parseFloat(newDealValue) || 0 });
+      setDeals(prev => [deal, ...prev]);
+      setNewDealTitle('');
+      setNewDealValue('');
+      setAddingStage(null);
+      addToast({ message: `Deal "${deal.title}" created` });
+    } catch { addToast({ message: 'Failed to create deal', type: 'error' }); }
+  };
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>Pipeline</h2>
+        <p>Track deals through your sales stages</p>
+      </div>
+      <div className="pipeline-board">
+        {stages.map(stage => {
+          const stageDeals = getDealsByStage(stage.id);
+          const stageValue = stageDeals.reduce((s, d) => s + (d.value || 0), 0);
+          return (
+            <div key={stage.id} className="pipeline-col">
+              <div className="pipeline-col-header">
+                <div className="pipeline-col-title">
+                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: stage.color, flexShrink: 0 }} />
+                  {stage.name}
+                  <span style={{ background: stage.color + '22', color: stage.color, fontSize: 10, fontWeight: 700, padding: '1px 7px', borderRadius: 10 }}>{stageDeals.length}</span>
+                </div>
+                <div className="pipeline-col-meta">{formatCurrency(stageValue)}</div>
+              </div>
+              <div className="pipeline-col-body">
+                {stageDeals.length === 0 && addingStage !== stage.id && (
+                  <div className="pipeline-empty">No deals</div>
+                )}
+                {stageDeals.map(deal => (
+                  <div key={deal.id} className="pipeline-card" onClick={() => { setSelectedDeal(deal.id); setPage('deal-detail'); }}>
+                    <div className="pipeline-card-title">{deal.title}</div>
+                    <div className="pipeline-card-meta">
+                      <span className="pipeline-card-value">{formatCurrency(deal.value)}</span>
+                      {deal.contactName && <span className="pipeline-card-sub">{deal.contactName}</span>}
+                    </div>
+                    <div className="pipeline-card-stage-btns">
+                      {stages.filter(s => s.id !== stage.id).slice(0, 3).map(s => (
+                        <button key={s.id} className="pipeline-stage-btn" onClick={e => { e.stopPropagation(); moveToStage(deal, s.id); }}>
+                          → {s.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+                {addingStage === stage.id ? (
+                  <div className="pipeline-new-form">
+                    <input
+                      placeholder="Deal title"
+                      value={newDealTitle}
+                      onChange={e => setNewDealTitle(e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Enter') createDeal(stage.id); if (e.key === 'Escape') setAddingStage(null); }}
+                      autoFocus
+                    />
+                    <input
+                      placeholder="Value ($)"
+                      type="number"
+                      value={newDealValue}
+                      onChange={e => setNewDealValue(e.target.value)}
+                      style={{ marginBottom: 8 }}
+                    />
+                    <div className="pipeline-new-form-btns">
+                      <button className="btn-primary" style={{ fontSize: 12, padding: '6px 12px' }} onClick={() => createDeal(stage.id)}>Add</button>
+                      <button className="btn-secondary" style={{ fontSize: 12, padding: '6px 12px' }} onClick={() => { setAddingStage(null); setNewDealTitle(''); setNewDealValue(''); }}>Cancel</button>
+                    </div>
+                  </div>
+                ) : (
+                  <button className="pipeline-add-btn" onClick={() => { setAddingStage(stage.id); setNewDealTitle(''); setNewDealValue(''); }}>+ Add Deal</button>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ─── Components ───
 function Toast({ toasts }) {
   return (
@@ -4242,6 +4355,8 @@ export default function ArmvetDashboard() {
   const [bookings, setBookings] = useState([]);
   const [contacts, setContacts] = useState([]);
   const [slots, setSlots] = useState([]);
+  const [deals, setDeals] = useState([]);
+  const [selectedDealId, setSelectedDeal] = useState(null);
   const [selectedBookingId, setSelectedBooking] = useState(null);
   const [selectedContactId, setSelectedContact] = useState(null);
   const [toasts, setToasts] = useState([]);
@@ -4261,6 +4376,7 @@ export default function ArmvetDashboard() {
     api.getContacts().then(setContacts).catch(() => {});
     api.getAvailability().then(setSlots).catch(() => {});
     api.getAdminConfig().then(setAppConfig).catch(() => {});
+    api.getDeals().then(setDeals).catch(() => {});
   }, [loggedIn]);
 
   const addToast = ({ message, type = "success" }) => {
@@ -4320,6 +4436,7 @@ export default function ArmvetDashboard() {
     setBookings([]);
     setContacts([]);
     setSlots([]);
+    setDeals([]);
     setPage("dashboard");
   };
 
@@ -4374,6 +4491,25 @@ export default function ArmvetDashboard() {
     content = <ApiDocsPage addToast={addToast} />;
   } else if (page === "advanced-reset") {
     content = <ResetSetupPage addToast={addToast} onResetComplete={() => { setShowSetupWizard(true); setPage("dashboard"); }} />;
+  } else if (page === "pipeline") {
+    content = <PipelinePage deals={deals} setDeals={setDeals} appConfig={appConfig} setPage={setPage} setSelectedDeal={setSelectedDeal} addToast={addToast} />;
+  } else if (page === "deal-detail") {
+    const deal = deals.find(d => d.id === selectedDealId);
+    content = deal ? (
+      <div className="detail-view">
+        <button className="detail-back" onClick={() => setPage("pipeline")}>{Icons.back} Back to Pipeline</button>
+        <div className="detail-card">
+          <div className="detail-header">
+            <div>
+              <div className="detail-name">{deal.title}</div>
+              <div className="detail-org">{deal.contactName || deal.bookingName || ''}</div>
+            </div>
+            <span style={{ fontSize: 22, fontWeight: 800, color: 'var(--accent)' }}>{formatCurrency(deal.value)}</span>
+          </div>
+          <ActivityTimeline entityType="deal" entityId={deal.id} addToast={addToast} />
+        </div>
+      </div>
+    ) : <div className="empty-state"><p>Deal not found.</p></div>;
   }
 
   const mobileTitle = appConfig?.company_name || 'Admin';
