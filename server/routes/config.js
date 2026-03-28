@@ -195,6 +195,8 @@ router.get('/config', requireAuth, async (req, res) => {
       custom_fields_contacts: JSON.parse(all.custom_fields_contacts || '[]'),
       lead_scoring_rules: JSON.parse(all.lead_scoring_rules || '{"rules":[],"thresholds":{"hot":70,"warm":40}}'),
       email_notifications_config: JSON.parse(all.email_notifications_config || '{}'),
+      site_domain: all.site_domain || '',
+      contact_form_config: JSON.parse(all.contact_form_config || '{}'),
     });
   } catch (err) {
     console.error(err);
@@ -209,7 +211,7 @@ router.put('/config', requireAuth, async (req, res) => {
     'support_email', 'company_website', 'company_phone',
     'services', 'categories', 'allowed_origins',
     'pipeline_stages', 'custom_fields_bookings', 'custom_fields_contacts',
-    'lead_scoring_rules', 'email_notifications_config',
+    'lead_scoring_rules', 'email_notifications_config', 'contact_form_config', 'site_domain',
   ];
   try {
     for (const [key, value] of Object.entries(req.body)) {

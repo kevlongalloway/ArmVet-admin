@@ -164,6 +164,21 @@ async function seedDefaultConfig() {
       smtp_host: '', smtp_port: 587, smtp_user: '', smtp_pass: '',
       from_address: '', notify_new_booking: false, notify_new_contact: false, notify_task_due: false,
     })],
+    ['site_domain', ''],
+    ['contact_form_config', JSON.stringify({
+      accentColor: '#C8A84E',
+      fontFamily: 'inherit',
+      contact: {
+        showPhone: true, showSubject: true, showCategory: false,
+        buttonText: 'Send Message',
+        successMessage: "Thank you! We'll be in touch soon.",
+      },
+      booking: {
+        showPhone: true, showService: true, showCategory: true,
+        buttonText: 'Request Consultation',
+        successMessage: "Your request has been submitted! We'll be in touch soon.",
+      },
+    })],
   ];
   for (const [key, value] of defaults) {
     await pool.query(

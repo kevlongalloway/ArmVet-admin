@@ -3701,6 +3701,7 @@ function Sidebar({ page, setPage, bookings, contacts, isOpen, onClose, onLogout,
             {navItem("customize-fields", Icons.fields, "Custom Fields")}
             {navItem("customize-scoring", Icons.scoring, "Lead Scoring")}
             {navItem("customize-notifications", Icons.bell, "Notifications")}
+            {navItem("customize-embed", Icons.code, "Embed Forms")}
             {navItem("customize-appearance", Icons.sun, "Appearance")}
           </nav>
           <div className="sidebar-label" style={{ marginTop: 8 }}>Advanced</div>
@@ -4962,6 +4963,237 @@ function SetupWizard({ onComplete, onSkip, addToast }) {
   );
 }
 
+// ─── Customize: Embed Forms Page ───
+function EmbedFormsPage({ appConfig, setAppConfig, addToast }) {
+  const defaultCfg = {
+    accentColor: '#C8A84E',
+    fontFamily: 'inherit',
+    contact: {
+      showPhone: true, showSubject: true, showCategory: false,
+      buttonText: 'Send Message',
+      successMessage: "Thank you! We'll be in touch soon.",
+    },
+    booking: {
+      showPhone: true, showService: true, showCategory: true,
+      buttonText: 'Request Consultation',
+      successMessage: "Your request has been submitted! We'll be in touch soon.",
+    },
+  };
+  const [tab, setTab] = useState('contact');
+  const [cfg, setCfg] = useState(() => {
+    const saved = appConfig?.contact_form_config || {};
+    return {
+      accentColor: saved.accentColor || defaultCfg.accentColor,
+      fontFamily: saved.fontFamily || defaultCfg.fontFamily,
+      contact: { ...defaultCfg.contact, ...(saved.contact || {}) },
+      booking: { ...defaultCfg.booking, ...(saved.booking || {}) },
+    };
+  });
+  const [siteDomain, setSiteDomain] = useState(appConfig?.site_domain || '');
+  const [saving, setSaving] = useState(false);
+  const [copied, setCopied] = useState('');
+
+  const baseUrl = siteDomain.trim() || window.location.origin;
+  const cleanBase = baseUrl.replace(/\/$/, '');
+
+  const contactSnippet = `<!-- Contact Form -->\n<div id="armvet-contact"></div>\n<script src="${cleanBase}/api/public/contact-widget.js"></script>`;
+  const bookingSnippet = `<!-- Booking Request Form -->\n<div id="armvet-booking"></div>\n<script src="${cleanBase}/api/public/booking-widget.js"></script>`;
+
+  const copySnippet = (text, key) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(key);
+      setTimeout(() => setCopied(''), 2000);
+    });
+  };
+
+  const updateContact = (key, val) => setCfg(c => ({ ...c, contact: { ...c.contact, [key]: val } }));
+  const updateBooking = (key, val) => setCfg(c => ({ ...c, booking: { ...c.booking, [key]: val } }));
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await api.saveConfig({ contact_form_config: cfg, site_domain: siteDomain.trim() });
+      setAppConfig(c => ({ ...c, contact_form_config: cfg, site_domain: siteDomain.trim() }));
+      addToast({ message: 'Embed settings saved' });
+    } catch {
+      addToast({ message: 'Failed to save', type: 'error' });
+    } finally { setSaving(false); }
+  };
+
+  const Toggle = ({ checked, onChange, label, sub }) => (
+    <div className="notif-row">
+      <div>
+        <div className="notif-label">{label}</div>
+        {sub && <div className="notif-sub">{sub}</div>}
+      </div>
+      <label className="toggle-switch">
+        <input type="checkbox" checked={!!checked} onChange={e => onChange(e.target.checked)} />
+        <span className="toggle-track" />
+      </label>
+    </div>
+  );
+
+  const CodeBlock = ({ code, copyKey, label }) => (
+    <div style={{ marginBottom: 20 }}>
+      {label && <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 8 }}>{label}</div>}
+      <div style={{ position: 'relative' }}>
+        <pre style={{
+          background: 'var(--bg-secondary)', border: '1px solid var(--border)',
+          borderRadius: 8, padding: '14px 44px 14px 16px', fontSize: 12,
+          fontFamily: 'monospace', overflowX: 'auto', margin: 0,
+          color: 'var(--text-secondary)', lineHeight: 1.6, whiteSpace: 'pre',
+        }}>{code}</pre>
+        <button
+          onClick={() => copySnippet(code, copyKey)}
+          title="Copy"
+          style={{
+            position: 'absolute', top: 8, right: 8, background: 'var(--bg-tertiary, var(--bg-secondary))',
+            border: '1px solid var(--border)', borderRadius: 6, padding: '4px 8px',
+            cursor: 'pointer', color: 'var(--text-muted)', fontSize: 11, display: 'flex',
+            alignItems: 'center', gap: 4,
+          }}
+        >
+          {copied === copyKey ? 'Copied!' : <>{Icons.copy} Copy</>}
+        </button>
+      </div>
+    </div>
+  );
+
+  const FONT_OPTIONS = [
+    { value: 'inherit', label: 'Inherit from page' },
+    { value: 'system-ui, sans-serif', label: 'System UI' },
+    { value: "'Georgia', serif", label: 'Georgia (serif)' },
+    { value: "'Roboto', sans-serif", label: 'Roboto' },
+    { value: "'Open Sans', sans-serif", label: 'Open Sans' },
+  ];
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>Embed Forms</h2>
+        <p>Add contact and booking forms to your website with a single line of code</p>
+      </div>
+
+      <div className="settings-section">
+        <h3>Installation</h3>
+        <p className="settings-desc">
+          Copy the snippet for the form you want and paste it into your website's HTML where you'd like the form to appear.
+          The widget fetches its own configuration—no additional setup required.
+        </p>
+
+        <div style={{ marginBottom: 16 }}>
+          <label className="form-label">Site Domain (optional)</label>
+          <input
+            className="form-input"
+            value={siteDomain}
+            onChange={e => setSiteDomain(e.target.value)}
+            placeholder={window.location.origin}
+            style={{ maxWidth: 400 }}
+          />
+          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>
+            Only needed if your public site is on a different domain than this admin panel.
+            Defaults to <code style={{ background: 'var(--bg-secondary)', padding: '1px 4px', borderRadius: 4 }}>{window.location.origin}</code>.
+          </div>
+        </div>
+
+        <CodeBlock
+          code={contactSnippet}
+          copyKey="contact"
+          label="Contact Form"
+        />
+        <CodeBlock
+          code={bookingSnippet}
+          copyKey="booking"
+          label="Booking Request Form"
+        />
+      </div>
+
+      <div className="settings-section" style={{ marginTop: 20 }}>
+        <h3>Customization</h3>
+        <p className="settings-desc">Adjust colors, fonts, and visible fields. Changes apply to both widgets after saving.</p>
+
+        <div style={{ display: 'flex', gap: 16, marginBottom: 20 }}>
+          <div className="form-group" style={{ flex: '0 0 auto' }}>
+            <label className="form-label">Accent Color</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <input
+                type="color"
+                value={cfg.accentColor}
+                onChange={e => setCfg(c => ({ ...c, accentColor: e.target.value }))}
+                style={{ width: 44, height: 36, padding: 2, borderRadius: 6, border: '1px solid var(--border)', cursor: 'pointer', background: 'none' }}
+              />
+              <input
+                className="form-input"
+                value={cfg.accentColor}
+                onChange={e => setCfg(c => ({ ...c, accentColor: e.target.value }))}
+                style={{ width: 110, fontFamily: 'monospace', fontSize: 13 }}
+              />
+            </div>
+          </div>
+          <div className="form-group" style={{ flex: '1 1 200px' }}>
+            <label className="form-label">Font Family</label>
+            <select
+              className="form-input"
+              value={cfg.fontFamily}
+              onChange={e => setCfg(c => ({ ...c, fontFamily: e.target.value }))}
+            >
+              {FONT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', marginBottom: 16 }}>
+          {['contact', 'booking'].map(t => (
+            <button key={t} onClick={() => setTab(t)} style={{
+              padding: '8px 20px', background: 'none', border: 'none', cursor: 'pointer',
+              fontWeight: tab === t ? 700 : 400,
+              borderBottom: tab === t ? '2px solid var(--accent)' : '2px solid transparent',
+              color: tab === t ? 'var(--accent)' : 'var(--text-muted)',
+              fontSize: 14, textTransform: 'capitalize',
+            }}>{t === 'contact' ? 'Contact Form' : 'Booking Form'}</button>
+          ))}
+        </div>
+
+        {tab === 'contact' && (
+          <div>
+            <Toggle checked={cfg.contact.showPhone} onChange={v => updateContact('showPhone', v)} label="Show Phone field" />
+            <Toggle checked={cfg.contact.showSubject} onChange={v => updateContact('showSubject', v)} label="Show Subject field" />
+            <Toggle checked={cfg.contact.showCategory} onChange={v => updateContact('showCategory', v)} label="Show Sector/Category dropdown" />
+            <div className="form-group" style={{ marginTop: 16 }}>
+              <label className="form-label">Button Text</label>
+              <input className="form-input" value={cfg.contact.buttonText} onChange={e => updateContact('buttonText', e.target.value)} style={{ maxWidth: 300 }} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Success Message</label>
+              <input className="form-input" value={cfg.contact.successMessage} onChange={e => updateContact('successMessage', e.target.value)} />
+            </div>
+          </div>
+        )}
+
+        {tab === 'booking' && (
+          <div>
+            <Toggle checked={cfg.booking.showPhone} onChange={v => updateBooking('showPhone', v)} label="Show Phone & Organization fields" />
+            <Toggle checked={cfg.booking.showService} onChange={v => updateBooking('showService', v)} label="Show Service dropdown" />
+            <Toggle checked={cfg.booking.showCategory} onChange={v => updateBooking('showCategory', v)} label="Show Sector/Category dropdown" />
+            <div className="form-group" style={{ marginTop: 16 }}>
+              <label className="form-label">Button Text</label>
+              <input className="form-input" value={cfg.booking.buttonText} onChange={e => updateBooking('buttonText', e.target.value)} style={{ maxWidth: 300 }} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Success Message</label>
+              <input className="form-input" value={cfg.booking.successMessage} onChange={e => updateBooking('successMessage', e.target.value)} />
+            </div>
+          </div>
+        )}
+
+        <div className="page-actions" style={{ marginTop: 24 }}>
+          <button className="btn-primary" onClick={handleSave} disabled={saving}>{saving ? 'Saving…' : 'Save Settings'}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Customize: Appearance Page ───
 function AppearancePage({ addToast }) {
   const [theme, setTheme] = useTheme();
@@ -5627,6 +5859,8 @@ export default function ArmvetDashboard() {
     content = <CustomFieldsPage appConfig={appConfig} setAppConfig={setAppConfig} addToast={addToast} />;
   } else if (page === "customize-notifications") {
     content = <NotificationsPage appConfig={appConfig} setAppConfig={setAppConfig} addToast={addToast} />;
+  } else if (page === "customize-embed") {
+    content = <EmbedFormsPage appConfig={appConfig} setAppConfig={setAppConfig} addToast={addToast} />;
   } else if (page === "customize-appearance") {
     content = <AppearancePage addToast={addToast} />;
   } else if (page === "advanced-origins") {
