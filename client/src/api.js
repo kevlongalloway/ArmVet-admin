@@ -20,11 +20,24 @@ async function request(method, path, body) {
   const token = getToken();
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  const res = await fetch(BASE + path, {
-    method,
-    headers,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  });
+  const url = BASE + path;
+  let res;
+  try {
+    res = await fetch(url, {
+      method,
+      headers,
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    });
+  } catch (networkErr) {
+    // fetch() itself threw — network failure, CORS preflight rejection, or bad URL.
+    const apiUrl = import.meta.env.VITE_API_URL || '(not set)';
+    throw new Error(
+      `Network request failed: ${networkErr.message}\n` +
+      `URL: ${url}\n` +
+      `VITE_API_URL at build time: ${apiUrl}\n` +
+      `Possible causes: CORS blocked, wrong API URL, or Worker not deployed.`
+    );
+  }
 
   if (res.status === 401) {
     clearToken();
@@ -33,8 +46,9 @@ async function request(method, path, body) {
   }
 
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || `HTTP ${res.status}`);
+    let text = '';
+    try { text = await res.text(); } catch { /* ignore */ }
+    throw new Error(text || `HTTP ${res.status} from ${url}`);
   }
 
   return res.json();
