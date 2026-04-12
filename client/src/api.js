@@ -76,6 +76,7 @@ export const api = {
   deleteBooking: (id) => request('DELETE', `/bookings/${id}`),
   deleteContact: (id) => request('DELETE', `/contacts/${id}`),
   hasToken: () => !!getToken(),
+  applyWeeklySchedule: (weeksAhead = 4) => request('POST', '/availability/apply-weekly', { weeksAhead }),
   getAdminConfig: () => request('GET', '/admin/config'),
   saveConfig: (updates) => request('PUT', '/admin/config', updates),
   getDocs: () => request('GET', '/admin/docs'),

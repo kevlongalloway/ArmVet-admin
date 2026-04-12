@@ -9,6 +9,7 @@ const ALLOWED_CONFIG_KEYS = [
   'services', 'categories', 'allowed_origins',
   'pipeline_stages', 'custom_fields_bookings', 'custom_fields_contacts',
   'lead_scoring_rules', 'email_notifications_config', 'contact_form_config', 'site_domain',
+  'weekly_schedule',
 ];
 
 const LOGO_MAX_D1_BYTES = 900_000; // ~900KB base64; anything larger goes to R2
@@ -41,6 +42,7 @@ app.get('/config', async (c) => {
     email_notifications_config: JSON.parse(all.email_notifications_config || '{}'),
     site_domain: all.site_domain || '',
     contact_form_config: JSON.parse(all.contact_form_config || '{}'),
+    weekly_schedule: JSON.parse(all.weekly_schedule || '[]'),
   });
 });
 

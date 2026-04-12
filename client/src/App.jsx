@@ -4484,7 +4484,104 @@ function previewSlots(fromTime, toTime, duration) {
   return slots;
 }
 
-function AvailabilityPage({ slots, setSlots, addToast, setPage, setSelectedBooking }) {
+const DAYS_OF_WEEK = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+function WeeklyScheduleSection({ appConfig, setAppConfig, setSlots, addToast }) {
+  const [rules, setRules] = useState(() => appConfig?.weekly_schedule || []);
+  const [saving, setSaving] = useState(false);
+  const [applying, setApplying] = useState(false);
+  const [weeksAhead, setWeeksAhead] = useState(4);
+
+  const addRule = () => setRules(r => [...r, { dayOfWeek: 1, fromTime: "09:00", toTime: "17:00", durationMinutes: 60, label: "" }]);
+  const removeRule = (i) => setRules(r => r.filter((_, idx) => idx !== i));
+  const updateRule = (i, key, val) => setRules(r => r.map((rule, idx) => idx === i ? { ...rule, [key]: val } : rule));
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await api.saveConfig({ weekly_schedule: rules });
+      setAppConfig(c => ({ ...c, weekly_schedule: rules }));
+      addToast({ message: "Weekly schedule saved." });
+    } catch {
+      addToast({ message: "Failed to save schedule.", type: "error" });
+    } finally { setSaving(false); }
+  };
+
+  const handleApply = async () => {
+    setApplying(true);
+    try {
+      const result = await api.applyWeeklySchedule(weeksAhead);
+      const fresh = await api.getAvailability();
+      setSlots(fresh);
+      addToast({ message: `Generated ${result.created} new slot${result.created !== 1 ? "s" : ""} across the next ${weeksAhead} week${weeksAhead !== 1 ? "s" : ""}.` });
+    } catch {
+      addToast({ message: "Failed to apply schedule.", type: "error" });
+    } finally { setApplying(false); }
+  };
+
+  return (
+    <div className="avail-form-card" style={{ marginBottom: 24 }}>
+      <h3>Weekly Schedule</h3>
+      <p className="avail-section-hint">Define your recurring availability by day of week. Then click "Generate Slots" to create actual bookable slots for the coming weeks.</p>
+
+      {rules.length === 0 && (
+        <p style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 12 }}>No recurring schedule set. Add a rule below.</p>
+      )}
+
+      {rules.map((rule, i) => (
+        <div key={i} className="avail-form-inline" style={{ alignItems: "flex-end", flexWrap: "wrap", gap: 10, marginBottom: 12, background: "var(--bg-input)", padding: "12px 14px", borderRadius: 8, border: "1px solid var(--border)" }}>
+          <div className="form-group" style={{ margin: 0, flex: "0 0 140px" }}>
+            <label style={{ fontSize: 11, marginBottom: 4 }}>Day</label>
+            <select value={rule.dayOfWeek} onChange={e => updateRule(i, "dayOfWeek", Number(e.target.value))}>
+              {DAYS_OF_WEEK.map((d, idx) => <option key={idx} value={idx}>{d}</option>)}
+            </select>
+          </div>
+          <div className="form-group" style={{ margin: 0, flex: "0 0 110px" }}>
+            <label style={{ fontSize: 11, marginBottom: 4 }}>From</label>
+            <input type="time" value={rule.fromTime} onChange={e => updateRule(i, "fromTime", e.target.value)} />
+          </div>
+          <div className="form-group" style={{ margin: 0, flex: "0 0 110px" }}>
+            <label style={{ fontSize: 11, marginBottom: 4 }}>Until</label>
+            <input type="time" value={rule.toTime} onChange={e => updateRule(i, "toTime", e.target.value)} />
+          </div>
+          <div className="form-group" style={{ margin: 0, flex: "0 0 150px" }}>
+            <label style={{ fontSize: 11, marginBottom: 4 }}>Session length</label>
+            <select value={rule.durationMinutes} onChange={e => updateRule(i, "durationMinutes", Number(e.target.value))}>
+              <option value={30}>30 min</option>
+              <option value={60}>60 min</option>
+              <option value={90}>90 min</option>
+            </select>
+          </div>
+          <div className="form-group" style={{ margin: 0, flex: "1 1 140px" }}>
+            <label style={{ fontSize: 11, marginBottom: 4 }}>Note (optional)</label>
+            <input type="text" placeholder="e.g. Coaching only" maxLength={100} value={rule.label} onChange={e => updateRule(i, "label", e.target.value)} />
+          </div>
+          <button onClick={() => removeRule(i)} className="btn-slot-delete" style={{ marginBottom: 2 }} title="Remove this rule">{Icons.trash}</button>
+        </div>
+      ))}
+
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", marginTop: 8 }}>
+        <button className="btn-secondary" onClick={addRule} style={{ flex: "0 0 auto" }}>+ Add Rule</button>
+        <button className="btn-primary" onClick={handleSave} disabled={saving} style={{ flex: "0 0 auto" }}>{saving ? "Saving…" : "Save Schedule"}</button>
+        {rules.length > 0 && (
+          <>
+            <div style={{ flex: "0 0 auto", display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ fontSize: 13, color: "var(--text-secondary)", whiteSpace: "nowrap" }}>Generate for next</span>
+              <select value={weeksAhead} onChange={e => setWeeksAhead(Number(e.target.value))} style={{ width: 80 }}>
+                {[1,2,3,4,6,8,12].map(w => <option key={w} value={w}>{w} wk{w !== 1 ? "s" : ""}</option>)}
+              </select>
+            </div>
+            <button className="btn-primary" onClick={handleApply} disabled={applying} style={{ flex: "0 0 auto", background: "var(--accent-dim)", color: "var(--accent)" }}>
+              {applying ? "Generating…" : "Generate Slots"}
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function AvailabilityPage({ slots, setSlots, addToast, setPage, setSelectedBooking, appConfig, setAppConfig }) {
   const today = new Date().toISOString().split("T")[0];
   const [form, setForm] = useState({ date: "", fromTime: "09:00", toTime: "17:00", durationMinutes: 60, label: "" });
   const [saving, setSaving] = useState(false);
@@ -4538,8 +4635,10 @@ function AvailabilityPage({ slots, setSlots, addToast, setPage, setSelectedBooki
       </div>
 
       <div className="avail-intro">
-        <strong>How this works:</strong> Pick a day and the hours you're free. We'll automatically create one bookable time slot for every session in that window. Those open slots will appear on your website for clients to choose from — when someone books one, it shows up here as a new booking.
+        <strong>How this works:</strong> Set a weekly schedule to define your recurring hours, then generate slots for upcoming weeks — or open a specific day manually below.
       </div>
+
+      <WeeklyScheduleSection appConfig={appConfig} setAppConfig={setAppConfig} setSlots={setSlots} addToast={addToast} />
 
       <div className="avail-form-card">
         <h3>Open Up a Day</h3>
@@ -5844,7 +5943,7 @@ export default function ArmvetDashboard() {
   } else if (page === "contact-detail") {
     content = <ContactDetail contact={selectedContact} onBack={() => setPage("contacts")} onUpdateStatus={updateContactStatus} onDelete={deleteContact} addToast={addToast} appConfig={appConfig} setPage={setPage} setSelectedDeal={setSelectedDeal} setDeals={setDeals} />;
   } else if (page === "availability") {
-    content = <AvailabilityPage slots={slots} setSlots={setSlots} addToast={addToast} setPage={setPage} setSelectedBooking={setSelectedBooking} />;
+    content = <AvailabilityPage slots={slots} setSlots={setSlots} addToast={addToast} setPage={setPage} setSelectedBooking={setSelectedBooking} appConfig={appConfig} setAppConfig={setAppConfig} />;
   } else if (page === "calendar") {
     content = <CalendarPage bookings={bookings} setPage={setPage} setSelectedBooking={setSelectedBooking} />;
   } else if (page === "settings") {

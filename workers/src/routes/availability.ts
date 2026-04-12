@@ -1,6 +1,15 @@
 import { Hono } from 'hono';
 import type { Env, Variables, SlotRow } from '../types';
 import { requireAuth } from '../auth';
+import { getConfig } from '../db';
+
+interface ScheduleRule {
+  dayOfWeek: number;       // 0=Sun … 6=Sat
+  fromTime: string;        // HH:MM
+  toTime: string;          // HH:MM
+  durationMinutes: number; // 30 | 60 | 90
+  label: string;
+}
 
 const app = new Hono<{ Bindings: Env; Variables: Variables }>();
 app.use('*', requireAuth);
@@ -130,6 +139,58 @@ app.post('/', async (c) => {
   }
 
   return c.json({ success: true, id: result.meta.last_row_id }, 201);
+});
+
+// POST /api/availability/apply-weekly
+// Generates concrete date slots from the saved weekly_schedule config.
+// Body: { weeksAhead?: number }  (1–12, default 4)
+app.post('/apply-weekly', async (c) => {
+  const body = await c.req.json<{ weeksAhead?: number }>().catch(() => ({}));
+  const weeksAhead = Math.min(Math.max(Number(body.weeksAhead ?? 4), 1), 12);
+
+  const raw = await getConfig(c.env.DB, 'weekly_schedule');
+  if (!raw) return c.json({ created: 0, message: 'No weekly schedule configured' });
+
+  const schedule: ScheduleRule[] = JSON.parse(raw);
+  if (schedule.length === 0) return c.json({ created: 0 });
+
+  // Build list of dates: today … today + weeksAhead*7 days
+  const todayMs = Date.now();
+  const days = weeksAhead * 7;
+  let totalCreated = 0;
+
+  for (let i = 0; i < days; i++) {
+    const d = new Date(todayMs + i * 86_400_000);
+    const dow = d.getUTCDay();
+    const dateStr = d.toISOString().split('T')[0];
+
+    for (const rule of schedule) {
+      if (rule.dayOfWeek !== dow) continue;
+
+      const [fromH, fromM] = rule.fromTime.split(':').map(Number);
+      const [toH, toM] = rule.toTime.split(':').map(Number);
+      const fromMins = fromH * 60 + fromM;
+      const toMins = toH * 60 + toM;
+      const dur = rule.durationMinutes || 60;
+
+      for (let m = fromMins; m + dur <= toMins; m += dur) {
+        const h = Math.floor(m / 60);
+        const min = m % 60;
+        const startTime = `${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+        const result = await c.env.DB
+          .prepare(
+            `INSERT INTO availability_slots (date, start_time, duration_minutes, label)
+             VALUES (?, ?, ?, ?)
+             ON CONFLICT(date, start_time) DO NOTHING`,
+          )
+          .bind(dateStr, startTime, dur, (rule.label || '').trim().slice(0, 100))
+          .run();
+        if (result.meta.changes > 0) totalCreated++;
+      }
+    }
+  }
+
+  return c.json({ created: totalCreated, weeksAhead });
 });
 
 // DELETE /api/availability/:id  (delete an un-booked slot)
