@@ -437,7 +437,7 @@ const CSS = `
 
 html {
   overflow-x: hidden;
-  height: 100%;
+  /* no height: 100% — a fixed height on <html> prevents document scroll on Android Chrome */
 }
 
 body {
@@ -681,7 +681,9 @@ body {
   display: flex;
   min-height: 100vh;
   max-width: 100vw;
-  overflow-x: hidden;
+  /* clip instead of hidden: visually clips without creating a scroll container,
+     so Android Chrome touch-scroll events still reach the document */
+  overflow-x: clip;
 }
 
 .sidebar {
