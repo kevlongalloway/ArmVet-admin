@@ -74,11 +74,18 @@ app.put('/config', async (c) => {
       continue;
     }
 
+    // allowed_origins: empty array means "allow all" — store ["*"] so the
+    // CORS handler lets the admin always reach the dashboard.
+    const normalized =
+      key === 'allowed_origins' && Array.isArray(value) && value.length === 0
+        ? ['*']
+        : value;
+
     // Serialize arrays / objects; everything else is a string
     const stored =
-      Array.isArray(value) || (value !== null && typeof value === 'object')
-        ? JSON.stringify(value)
-        : String(value ?? '');
+      Array.isArray(normalized) || (normalized !== null && typeof normalized === 'object')
+        ? JSON.stringify(normalized)
+        : String(normalized ?? '');
 
     await setConfig(c.env.DB, key, stored);
   }

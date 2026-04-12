@@ -4830,7 +4830,9 @@ function SetupWizard({ onComplete, onSkip, addToast }) {
   const handleFinish = async () => {
     setSaving(true);
     try {
-      await api.saveConfig({ ...data, setup_complete: '1' });
+      // Empty allowed_origins → default to ["*"] so the admin isn't locked out
+      const origins = data.allowed_origins.length > 0 ? data.allowed_origins : ['*'];
+      await api.saveConfig({ ...data, allowed_origins: origins, setup_complete: '1' });
       onComplete();
     } catch {
       addToast({ message: 'Failed to save setup. Please try again.', type: 'error' });
@@ -4907,13 +4909,14 @@ function SetupWizard({ onComplete, onSkip, addToast }) {
     stepContent = (
       <div className="wizard-step-content">
         <div className="origins-info">
-          <strong>CORS Allowed Origins</strong> — Add the domain(s) of your public website that will use the booking/contact API. Example: <code>https://yoursite.com</code>. Changes take effect within 60 seconds.
+          <strong>CORS Allowed Origins</strong> — Add the domain(s) of your public website that will use the booking/contact API. Example: <code>https://yoursite.com</code>. Changes take effect within 60 seconds. <strong>Leave empty to allow all origins</strong> (recommended until you know your domain).
         </div>
         <ListEditor
           items={data.allowed_origins}
           onChange={(v) => update('allowed_origins', v)}
-          placeholder="https://your-site.com"
+          placeholder="https://your-site.com (leave empty to allow all)"
           validateItem={(val) => {
+            if (val === '*') return null; // explicit wildcard is valid
             if (!/^https?:\/\/.+/.test(val)) return 'Must be a valid URL starting with http:// or https://';
             return null;
           }}
@@ -5441,9 +5444,11 @@ function AllowedOriginsPage({ appConfig, setAppConfig, addToast }) {
 
   const handleSave = async () => {
     setSaving(true);
+    // Empty list → save ["*"] so the admin can always reach the dashboard
+    const toSave = origins.length > 0 ? origins : ['*'];
     try {
-      await api.saveConfig({ allowed_origins: origins });
-      setAppConfig(c => ({ ...c, allowed_origins: origins }));
+      await api.saveConfig({ allowed_origins: toSave });
+      setAppConfig(c => ({ ...c, allowed_origins: toSave }));
       addToast({ message: 'Allowed origins saved. Changes take effect within 60 seconds.' });
     } catch {
       addToast({ message: 'Failed to save origins', type: 'error' });
@@ -5460,13 +5465,14 @@ function AllowedOriginsPage({ appConfig, setAppConfig, addToast }) {
       </div>
       <div className="settings-section">
         <div className="origins-info">
-          <strong>CORS Allowed Origins</strong> — Add the domain(s) of your public website that will call the booking/contact API. Example: <code>https://yoursite.com</code>. The dev origins (<code>localhost:3000</code>, <code>localhost:5173</code>) are always allowed. Changes take effect within 60 seconds — no restart needed.
+          <strong>CORS Allowed Origins</strong> — Add the domain(s) of your public website that will call the booking/contact API. Example: <code>https://yoursite.com</code>. The dev origins (<code>localhost:3000</code>, <code>localhost:5173</code>) are always allowed. <strong>Leave empty (or add <code>*</code>) to allow all origins.</strong> Changes take effect within 60 seconds — no restart needed.
         </div>
         <ListEditor
           items={origins}
           onChange={setOrigins}
-          placeholder="https://your-site.com"
+          placeholder="https://your-site.com (leave empty to allow all)"
           validateItem={(val) => {
+            if (val === '*') return null; // explicit wildcard is valid
             if (!/^https?:\/\/.+/.test(val)) return 'Must be a valid URL starting with http:// or https://';
             return null;
           }}
