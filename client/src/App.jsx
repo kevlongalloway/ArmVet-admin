@@ -3789,7 +3789,7 @@ function DashboardPage({ bookings, contacts, setPage, setSelectedBooking, setSel
                   </div>
                   <div className="card-preview">{b.service} — {b.org}</div>
                   <div className="card-tags">
-                    <span className={`tag tag-${b.category.toLowerCase()}`}>{b.category}</span>
+                    {b.category && <span className={`tag tag-${b.category.toLowerCase()}`}>{b.category}</span>}
                     <span className={`status-badge status-${b.status}`}>{b.status}</span>
                   </div>
                 </div>
@@ -3819,7 +3819,7 @@ function DashboardPage({ bookings, contacts, setPage, setSelectedBooking, setSel
                   </div>
                   <div className="card-preview">{c.subject}</div>
                   <div className="card-tags">
-                    <span className={`tag tag-${c.category.toLowerCase()}`}>{c.category}</span>
+                    {c.category && <span className={`tag tag-${c.category.toLowerCase()}`}>{c.category}</span>}
                   </div>
                 </div>
                 <span className="card-chevron">{Icons.chevronRight}</span>
@@ -4043,7 +4043,7 @@ function BookingDetail({ booking, onBack, onUpdateStatus, onAddToCalendar, onDel
         {activeTab === 'details' && <>
           <div className="detail-grid">
             <div className="detail-field"><label>Service Requested</label><span>{booking.service}</span></div>
-            <div className="detail-field"><label>Sector</label><span className={`tag tag-${booking.category.toLowerCase()}`}>{booking.category}</span></div>
+            <div className="detail-field"><label>Sector</label>{booking.category ? <span className={`tag tag-${booking.category.toLowerCase()}`}>{booking.category}</span> : <span>—</span>}</div>
             <div className="detail-field"><label>Consultation Date</label><span>{formatDate(booking.date)} at {booking.time}</span></div>
             <div className="detail-field"><label>Submitted</label><span>{formatDate(booking.submittedAt)}</span></div>
             <div className="detail-field"><label>Email</label><a href={`mailto:${booking.email}`}>{booking.email}</a></div>
@@ -4147,7 +4147,7 @@ function ContactsPage({ contacts, setPage, setSelectedContact, searchTerm, setSe
                 </div>
                 <div className="card-preview">{c.subject}</div>
                 <div className="card-tags">
-                  <span className={`tag tag-${c.category.toLowerCase()}`}>{c.category}</span>
+                  {c.category && <span className={`tag tag-${c.category.toLowerCase()}`}>{c.category}</span>}
                   <span className={`status-badge status-${c.status}`}>{c.status}</span>
                 </div>
               </div>
@@ -4216,7 +4216,7 @@ function ContactDetail({ contact, onBack, onUpdateStatus, onDelete, addToast, ap
 
         {activeTab === 'details' && <>
           <div className="detail-grid">
-            <div className="detail-field"><label>Sector</label><span className={`tag tag-${contact.category.toLowerCase()}`}>{contact.category}</span></div>
+            <div className="detail-field"><label>Sector</label>{contact.category ? <span className={`tag tag-${contact.category.toLowerCase()}`}>{contact.category}</span> : <span>—</span>}</div>
             <div className="detail-field"><label>Received</label><span>{formatDate(contact.submittedAt)}</span></div>
             <div className="detail-field"><label>Email</label><a href={`mailto:${contact.email}`}>{contact.email}</a></div>
             <div className="detail-field"><label>Phone</label><a href={`tel:${contact.phone}`}>{contact.phone}</a></div>
