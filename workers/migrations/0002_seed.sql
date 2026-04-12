@@ -43,11 +43,11 @@ INSERT OR IGNORE INTO app_config (key, value) VALUES
     "contact":{
       "showPhone":true,"showSubject":true,"showCategory":false,
       "buttonText":"Send Message",
-      "successMessage":"Thank you! We'\''ll be in touch soon."
+      "successMessage":"Thank you! We''ll be in touch soon."
     },
     "booking":{
       "showPhone":true,"showService":true,"showCategory":true,
       "buttonText":"Request Consultation",
-      "successMessage":"Your request has been submitted! We'\''ll be in touch soon."
+      "successMessage":"Your request has been submitted! We''ll be in touch soon."
     }
   }');
