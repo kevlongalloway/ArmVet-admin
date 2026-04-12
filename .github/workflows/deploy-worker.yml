@@ -42,7 +42,7 @@ jobs:
       # Wrangler tracks which migration files have already been applied in a
       # d1_migrations table inside your D1 database. On every deploy it only
       # runs migration files that haven't been applied yet — safe to run every time.
-      - name: Run D1 migrations (new ones only)
+      - name: Run D1 migrations (new ones only) 
         working-directory: workers
         run: npx wrangler d1 migrations apply armvet-db --remote
         env:
