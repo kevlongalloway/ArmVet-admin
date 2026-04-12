@@ -31,11 +31,10 @@ jobs:
 
       # Injects CF_D1_DATABASE_ID and CF_KV_NAMESPACE_ID from GitHub secrets
       # into wrangler.toml before any wrangler commands run
-      - name: Inject resource IDs into wrangler.toml
+      - name: Inject D1 database ID into wrangler.toml
         working-directory: workers
         run: |
           sed -i "s/CF_D1_DATABASE_ID/${{ secrets.CF_D1_DATABASE_ID }}/g" wrangler.toml
-          sed -i "s/CF_KV_NAMESPACE_ID/${{ secrets.CF_KV_NAMESPACE_ID }}/g" wrangler.toml
 
       # Wrangler tracks which migration files have already been applied in a
       # d1_migrations table inside your D1 database. On every deploy it only

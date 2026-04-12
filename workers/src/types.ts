@@ -4,8 +4,6 @@ export interface Env {
   DB: D1Database;
   /** R2 bucket for logo / media storage */
   R2: R2Bucket;
-  /** KV namespace for JWT secret cache + rate-limit counters */
-  KV: KVNamespace;
   /** Admin username (plaintext env var or secret) */
   ADMIN_USERNAME: string;
   /** Admin password (plaintext env var or secret) */

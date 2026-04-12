@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import type { Env, Variables } from './types';
-import { checkRateLimit, getConfig } from './db';
+import { getConfig } from './db';
 
 import authRoutes from './routes/auth';
 import publicRoutes from './routes/public';
@@ -35,10 +35,9 @@ app.use(
         const list = stored ? (JSON.parse(stored) as string[]) : [];
         if (list.includes(origin)) return origin;
       } catch {
-        // Config read failure — be permissive in dev, restrictive in prod
         if (c.env.ENVIRONMENT !== 'production') return origin;
       }
-      return null; // reject unknown origins
+      return null;
     },
     allowHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -46,30 +45,6 @@ app.use(
     maxAge: 600,
   }),
 );
-
-// ─── Rate limiters ────────────────────────────────────────────────────────────
-
-/** 10 requests / 60 s per IP — applied to public form-submission endpoints */
-app.use('/api/public/*', async (c, next) => {
-  const ip =
-    c.req.header('CF-Connecting-IP') ??
-    c.req.header('X-Forwarded-For') ??
-    'unknown';
-  const ok = await checkRateLimit(c.env.KV, `pub:${ip}`, 10, 60_000);
-  if (!ok) return c.json({ error: 'Too many requests, please try again later.' }, 429);
-  await next();
-});
-
-/** 20 requests / 15 min per IP — applied to the login endpoint */
-app.use('/api/auth/login', async (c, next) => {
-  const ip =
-    c.req.header('CF-Connecting-IP') ??
-    c.req.header('X-Forwarded-For') ??
-    'unknown';
-  const ok = await checkRateLimit(c.env.KV, `auth:${ip}`, 20, 15 * 60_000);
-  if (!ok) return c.json({ error: 'Too many login attempts, please try again later.' }, 429);
-  await next();
-});
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.route('/api/auth',         authRoutes);

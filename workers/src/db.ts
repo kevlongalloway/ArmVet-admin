@@ -31,20 +31,21 @@ export async function getAllConfig(db: D1Database): Promise<Record<string, strin
 }
 
 // ─── JWT secret management ────────────────────────────────────────────────────
+// Module-level cache: persists across requests within the same Worker isolate
+// (warm requests). Cold starts read from D1 once then cache in memory.
+
+let _jwtSecretCache: string | null = null;
 
 export async function getOrCreateJwtSecret(env: Env): Promise<string> {
-  // Fast path: KV cache
-  const cached = await env.KV.get('jwt_secret');
-  if (cached) return cached;
+  if (_jwtSecretCache) return _jwtSecretCache;
 
-  // Medium path: D1
   const stored = await getConfig(env.DB, 'jwt_secret');
   if (stored) {
-    await env.KV.put('jwt_secret', stored); // warm cache
+    _jwtSecretCache = stored;
     return stored;
   }
 
-  // Slow path: generate and persist
+  // First-run: generate a secret and persist it
   const bytes = new Uint8Array(64);
   crypto.getRandomValues(bytes);
   const secret = Array.from(bytes)
@@ -52,24 +53,6 @@ export async function getOrCreateJwtSecret(env: Env): Promise<string> {
     .join('');
 
   await setConfig(env.DB, 'jwt_secret', secret);
-  await env.KV.put('jwt_secret', secret);
+  _jwtSecretCache = secret;
   return secret;
-}
-
-// ─── Rate limiter (KV-backed sliding window) ──────────────────────────────────
-
-export async function checkRateLimit(
-  kv: KVNamespace,
-  identifier: string,
-  maxRequests: number,
-  windowMs: number,
-): Promise<boolean> {
-  const windowSlot = Math.floor(Date.now() / windowMs);
-  const key = `rl:${identifier}:${windowSlot}`;
-  const raw = await kv.get(key);
-  const count = raw ? parseInt(raw, 10) : 0;
-  if (count >= maxRequests) return false;
-  const ttlSeconds = Math.ceil(windowMs / 1000) + 5; // a little buffer
-  await kv.put(key, String(count + 1), { expirationTtl: ttlSeconds });
-  return true;
 }
