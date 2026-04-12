@@ -8,7 +8,7 @@ compatibility_flags = ["nodejs_compat"]
 [[d1_databases]]
 binding = "DB"
 database_name = "armvet-db"
-database_id = "a5646b86-4cb5-4ea2-b722"
+database_id = "CF_D1_DATABASE_ID"
 
 # ─── R2 Object Storage ───────────────────────────────────────────────────────
 # No ID needed — just the bucket name
