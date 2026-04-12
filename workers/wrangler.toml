@@ -4,7 +4,7 @@ compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 
 # ─── D1 Database ─────────────────────────────────────────────────────────────
-# database_id is injected at deploy time from the CF_D1_DATABASE_ID GitHub secret
+# database_id is injected at deploy time from the CF_D1_DATABASE_ID GitHub secret 
 [[d1_databases]]
 binding = "DB"
 database_name = "armvet-db"
