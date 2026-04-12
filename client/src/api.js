@@ -1,4 +1,7 @@
-const BASE = '/api';
+// In production the API lives on a Cloudflare Worker (set VITE_API_URL).
+// In development the Vite dev server proxies /api → the local Wrangler dev
+// server, so an empty string keeps the same relative-URL behaviour.
+const BASE = (import.meta.env.VITE_API_URL ?? '') + '/api';
 
 function getToken() {
   return localStorage.getItem('armvet_token');

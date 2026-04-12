@@ -1,0 +1,22 @@
+{
+  "name": "armvet-api",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:migrate": "wrangler d1 migrations apply armvet-db",
+    "db:migrate:local": "wrangler d1 migrations apply armvet-db --local",
+    "db:seed": "wrangler d1 execute armvet-db --file=migrations/0002_seed.sql",
+    "db:seed:local": "wrangler d1 execute armvet-db --local --file=migrations/0002_seed.sql",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "hono": "^4.6.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241004.0",
+    "typescript": "^5.6.2",
+    "wrangler": "^3.80.0"
+  }
+}
