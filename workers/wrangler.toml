@@ -8,7 +8,7 @@ compatibility_flags = ["nodejs_compat"]
 [[d1_databases]]
 binding = "DB"
 database_name = "armvet-db"
-database_id = "CF_D1_DATABASE_ID"
+database_id = "a5646b86-4cb5-4ea2-b722"
 
 # ─── R2 Object Storage ───────────────────────────────────────────────────────
 # No ID needed — just the bucket name
@@ -20,7 +20,7 @@ bucket_name = "armvet-media"
 # id is injected at deploy time from the CF_KV_NAMESPACE_ID GitHub secret
 [[kv_namespaces]]
 binding = "KV"
-id = "CF_KV_NAMESPACE_ID"
+id = "582f1b0f9c9744ae8be7597e4040c69e"
 
 # ─── Plaintext vars ───────────────────────────────────────────────────────────
 [vars]
