@@ -3,56 +3,29 @@ main = "src/index.ts"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 
-# ─── D1 Database (Cloudflare's serverless SQLite) ────────────────────────────
-# Create with: wrangler d1 create armvet-db
-# Then paste the database_id below.
+# ─── D1 Database ─────────────────────────────────────────────────────────────
+# database_id is injected at deploy time from the CF_D1_DATABASE_ID GitHub secret
 [[d1_databases]]
 binding = "DB"
 database_name = "armvet-db"
-database_id = "REPLACE_WITH_D1_DATABASE_ID"
+database_id = "CF_D1_DATABASE_ID"
 
-# ─── R2 Object Storage (for logo / media uploads) ────────────────────────────
-# Create with: wrangler r2 bucket create armvet-media
+# ─── R2 Object Storage ───────────────────────────────────────────────────────
+# No ID needed — just the bucket name
 [[r2_buckets]]
 binding = "R2"
 bucket_name = "armvet-media"
 
-# ─── KV Namespace (for JWT secret cache + rate limiting) ─────────────────────
-# Create with: wrangler kv namespace create armvet-kv
-# Then paste the id below.
+# ─── KV Namespace ────────────────────────────────────────────────────────────
+# id is injected at deploy time from the CF_KV_NAMESPACE_ID GitHub secret
 [[kv_namespaces]]
 binding = "KV"
-id = "REPLACE_WITH_KV_NAMESPACE_ID"
+id = "CF_KV_NAMESPACE_ID"
 
-# ─── Plaintext vars (non-secret) ─────────────────────────────────────────────
+# ─── Plaintext vars ───────────────────────────────────────────────────────────
 [vars]
 ENVIRONMENT = "production"
 
-# ─── Secrets (never put values here — set via `wrangler secret put`) ─────────
-# wrangler secret put ADMIN_USERNAME
-# wrangler secret put ADMIN_PASSWORD
-
-# ─── Local dev overrides ──────────────────────────────────────────────────────
-[dev]
-port = 8787
-
-# Bindings used only when running `wrangler dev`
-[[env.development.d1_databases]]
-binding = "DB"
-database_name = "armvet-db"
-database_id = "REPLACE_WITH_D1_DATABASE_ID"
-
-[[env.development.r2_buckets]]
-binding = "R2"
-bucket_name = "armvet-media"
-preview_bucket_name = "armvet-media-preview"
-
-[[env.development.kv_namespaces]]
-binding = "KV"
-id = "REPLACE_WITH_KV_NAMESPACE_ID"
-preview_id = "REPLACE_WITH_KV_PREVIEW_ID"
-
-[env.development.vars]
-ENVIRONMENT = "development"
-ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "changeme"
+# ─── Secrets set via Cloudflare dashboard after first deploy ─────────────────
+# Workers & Pages → armvet-api → Settings → Variables and Secrets
+# Add: ADMIN_USERNAME, ADMIN_PASSWORD
