@@ -93,6 +93,7 @@ async function start() {
   app.use('/api/tags',        express.json(), tagsRouter);
   app.use('/api/entity-tags', express.json(), entityTagsRouter);
   app.use('/api/analytics',                   require('./routes/analytics'));
+  app.use('/api/assistant',    express.json(), require('./routes/assistant'));
   // Admin config routes (larger body limit for logo uploads)
   app.use('/api/admin',        express.json({ limit: '3mb' }), require('./routes/config'));
 
