@@ -3995,6 +3995,7 @@ function Sidebar({ page, setPage, bookings, contacts, isOpen, onClose, onLogout,
           <nav className="sidebar-nav sidebar-section-group">
             {navItem("advanced-origins", Icons.globe, "Allowed Origins")}
             {navItem("advanced-docs", Icons.code, "API Docs")}
+            {navItem("advanced-debug", Icons.settings, "System Debug")}
             {navItem("advanced-reset", Icons.settings, "Reset Setup")}
           </nav>
           <div className="sidebar-label" style={{ marginTop: 8 }}>Account</div>
@@ -5981,6 +5982,152 @@ function ApiDocsPage({ addToast }) {
   );
 }
 
+// ─── Debug Page ───
+function DebugPage({ addToast }) {
+  const [status, setStatus] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [tested, setTested] = useState(false);
+
+  const runCheck = async () => {
+    setLoading(true);
+    setTested(false);
+    try {
+      const data = await api.getAssistantDebug();
+      setStatus(data);
+      setTested(true);
+    } catch (err) {
+      addToast({ message: 'Debug check failed: ' + (err.message || 'unknown error'), type: 'error' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { runCheck(); }, []);
+
+  const Chip = ({ ok, label }) => (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: 5,
+      padding: '3px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600,
+      background: ok ? 'var(--green-dim)' : 'var(--red-dim)',
+      color: ok ? 'var(--green)' : 'var(--red)',
+      border: `1px solid ${ok ? 'var(--green)' : 'var(--red)'}`,
+    }}>
+      {ok ? '✓' : '✗'} {label}
+    </span>
+  );
+
+  const Row = ({ label, value, mono }) => (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid var(--border-light)' }}>
+      <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{label}</span>
+      <span style={{ fontSize: 13, color: 'var(--text-primary)', fontFamily: mono ? 'monospace' : 'inherit', maxWidth: '60%', textAlign: 'right', wordBreak: 'break-all' }}>{value ?? '—'}</span>
+    </div>
+  );
+
+  return (
+    <div>
+      <div className="page-header">
+        <div>
+          <h2>System Debug</h2>
+          <p>Verify service configuration and connectivity</p>
+        </div>
+        <button className="btn-primary" onClick={runCheck} disabled={loading} style={{ minWidth: 130 }}>
+          {loading ? 'Checking…' : 'Re-run Check'}
+        </button>
+      </div>
+
+      {/* AI Assistant section */}
+      <div className="settings-section" style={{ marginBottom: 20 }}>
+        <h3>AI Assistant (Groq)</h3>
+        <p className="settings-desc">
+          The AI assistant requires a Groq API key set as the <code>GROQ_API_KEY</code> environment variable on the server.
+          Get a free key at <strong>console.groq.com</strong>.
+        </p>
+
+        {loading && !tested && (
+          <div style={{ padding: '20px 0', color: 'var(--text-muted)', fontSize: 13 }}>Checking configuration…</div>
+        )}
+
+        {status && (
+          <>
+            {/* Status chips */}
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
+              <Chip ok={status.groqKeyConfigured} label="API Key Set" />
+              <Chip ok={status.groqReachable} label="Groq Reachable" />
+            </div>
+
+            {/* Detail rows */}
+            <div style={{ background: 'var(--bg-secondary)', borderRadius: 'var(--radius)', padding: '0 14px', marginBottom: 16 }}>
+              <Row label="GROQ_API_KEY" value={status.groqKeyConfigured ? status.groqKeyPreview : 'Not set'} mono />
+              <Row label="Model" value={status.model} mono />
+              <Row label="Node Environment" value={status.nodeEnv} mono />
+              <Row label="Checked at" value={status.checkedAt ? new Date(status.checkedAt).toLocaleString() : null} />
+            </div>
+
+            {/* Error detail */}
+            {status.groqError && (
+              <div style={{
+                background: 'var(--red-dim)', border: '1px solid var(--red)',
+                borderRadius: 'var(--radius)', padding: '10px 14px',
+                fontSize: 13, color: 'var(--red)', lineHeight: 1.55,
+              }}>
+                <strong>Groq Error:</strong> {status.groqError}
+              </div>
+            )}
+
+            {/* Setup instructions if not configured */}
+            {!status.groqKeyConfigured && (
+              <div style={{
+                background: 'var(--orange-dim)', border: '1px solid var(--orange)',
+                borderRadius: 'var(--radius)', padding: '12px 14px',
+                fontSize: 13, color: 'var(--orange)', lineHeight: 1.65,
+              }}>
+                <strong>How to configure:</strong><br />
+                1. Get a free API key from <strong>console.groq.com</strong><br />
+                2. Add <code>GROQ_API_KEY=gsk_...</code> to your server environment variables<br />
+                3. Restart the server, then click Re-run Check above
+              </div>
+            )}
+
+            {status.groqKeyConfigured && status.groqReachable && (
+              <div style={{
+                background: 'var(--green-dim)', border: '1px solid var(--green)',
+                borderRadius: 'var(--radius)', padding: '10px 14px',
+                fontSize: 13, color: 'var(--green)',
+              }}>
+                AI assistant is fully operational. The chat button is visible in the bottom-right corner of the dashboard.
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Route check */}
+      <div className="settings-section">
+        <h3>Assistant Endpoints</h3>
+        <p className="settings-desc">Endpoints used by the AI assistant panel.</p>
+        <div style={{ background: 'var(--bg-secondary)', borderRadius: 'var(--radius)', padding: '0 14px' }}>
+          {[
+            { method: 'GET', path: '/api/assistant/debug', desc: 'This page' },
+            { method: 'GET', path: '/api/assistant/summary', desc: 'Daily briefing' },
+            { method: 'POST', path: '/api/assistant/chat', desc: 'Chat messages' },
+          ].map((ep, i, arr) => (
+            <div key={ep.path} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: i < arr.length - 1 ? '1px solid var(--border-light)' : 'none' }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: ep.method === 'GET' ? 'var(--green)' : 'var(--blue)', background: ep.method === 'GET' ? 'var(--green-dim)' : 'var(--blue-dim)', padding: '2px 7px', borderRadius: 4, fontFamily: 'monospace', flexShrink: 0 }}>
+                {ep.method}
+              </span>
+              <code style={{ fontSize: 12, color: 'var(--text-primary)', flex: 1 }}>{ep.path}</code>
+              <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{ep.desc}</span>
+              {ep.path === '/api/assistant/debug' && tested && (
+                <Chip ok={true} label="OK" />
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── AI Assistant ───
 function AIAssistant() {
   const [open, setOpen] = useState(false);
@@ -6492,6 +6639,8 @@ export default function ArmvetDashboard() {
     content = <AllowedOriginsPage appConfig={appConfig} setAppConfig={setAppConfig} addToast={addToast} />;
   } else if (page === "advanced-docs") {
     content = <ApiDocsPage addToast={addToast} />;
+  } else if (page === "advanced-debug") {
+    content = <DebugPage addToast={addToast} />;
   } else if (page === "advanced-reset") {
     content = <ResetSetupPage addToast={addToast} onResetComplete={() => { setShowSetupWizard(true); setPage("dashboard"); }} />;
   } else if (page === "pipeline") {

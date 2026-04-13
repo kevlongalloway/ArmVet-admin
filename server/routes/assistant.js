@@ -236,6 +236,37 @@ router.get('/summary', async (req, res) => {
   }
 });
 
+// ─── GET /api/assistant/debug ─────────────────────────────────────────────────
+router.get('/debug', async (req, res) => {
+  const apiKey = process.env.GROQ_API_KEY;
+  const keyConfigured = !!(apiKey && apiKey.trim().length > 0);
+
+  const result = {
+    groqKeyConfigured: keyConfigured,
+    groqKeyPreview: keyConfigured
+      ? `${apiKey.slice(0, 8)}${'*'.repeat(Math.max(0, apiKey.length - 12))}${apiKey.slice(-4)}`
+      : null,
+    model: 'llama-3.3-70b-versatile',
+    groqReachable: false,
+    groqError: null,
+    nodeEnv: process.env.NODE_ENV || 'development',
+    checkedAt: new Date().toISOString(),
+  };
+
+  if (keyConfigured) {
+    try {
+      const groq = getGroqClient();
+      // Minimal call to verify the key is accepted
+      await groq.models.list();
+      result.groqReachable = true;
+    } catch (err) {
+      result.groqError = err.message || 'Unknown error';
+    }
+  }
+
+  res.json(result);
+});
+
 // ─── POST /api/assistant/chat ──────────────────────────────────────────────────
 // Body: { messages: [{ role: 'user'|'assistant', content: string }] }
 router.post('/chat', async (req, res) => {
