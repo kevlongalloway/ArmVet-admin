@@ -2184,6 +2184,291 @@ body {
   .quick-form-grid { grid-template-columns: 1fr; }
   .analytics-grid { grid-template-columns: 1fr 1fr; }
 }
+
+/* ─── AI Assistant ─── */
+.ai-fab {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+  z-index: 900;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.ai-fab:hover { transform: scale(1.07); box-shadow: 0 6px 28px rgba(0,0,0,0.45); }
+.ai-fab .ai-fab-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--red);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-panel {
+  position: fixed;
+  bottom: 92px;
+  right: 28px;
+  width: 380px;
+  max-width: calc(100vw - 40px);
+  height: 560px;
+  max-height: calc(100vh - 110px);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.45);
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: ai-panel-in 0.2s ease;
+}
+@keyframes ai-panel-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.ai-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.ai-panel-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent-dim);
+  border: 1.5px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.ai-panel-title { font-weight: 600; font-size: 14px; color: var(--text-primary); flex: 1; }
+.ai-panel-subtitle { font-size: 11px; color: var(--text-muted); }
+.ai-panel-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.ai-tab {
+  flex: 1;
+  padding: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color var(--transition), border-color var(--transition);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.ai-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.ai-tab:hover:not(.active) { color: var(--text-secondary); }
+
+.ai-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Summary tab */
+.ai-summary-pane {
+  flex: 1;
+  padding: 14px 16px;
+  overflow-y: auto;
+}
+.ai-summary-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 100%;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.ai-summary-content {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+}
+.ai-summary-content strong { color: var(--accent); }
+.ai-summary-refresh {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 6px 0;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  transition: color var(--transition);
+}
+.ai-summary-refresh:hover { color: var(--accent); }
+
+/* Chat tab */
+.ai-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ai-msg {
+  display: flex;
+  flex-direction: column;
+  max-width: 88%;
+}
+.ai-msg.user { align-self: flex-end; align-items: flex-end; }
+.ai-msg.assistant { align-self: flex-start; align-items: flex-start; }
+.ai-msg-bubble {
+  padding: 9px 13px;
+  border-radius: 14px;
+  font-size: 13px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.ai-msg.user .ai-msg-bubble {
+  background: var(--accent);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+.ai-msg.assistant .ai-msg-bubble {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+}
+.ai-msg-time {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 3px;
+  padding: 0 2px;
+}
+.ai-typing {
+  align-self: flex-start;
+  padding: 9px 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  border-bottom-left-radius: 4px;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.ai-typing span {
+  width: 6px; height: 6px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  animation: ai-bounce 1.2s infinite;
+}
+.ai-typing span:nth-child(2) { animation-delay: 0.2s; }
+.ai-typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes ai-bounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+  40%            { transform: translateY(-4px); opacity: 1; }
+}
+
+.ai-chat-input-row {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+  background: var(--bg-card);
+}
+.ai-chat-input {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-size: 13px;
+  color: var(--text-primary);
+  outline: none;
+  resize: none;
+  min-height: 36px;
+  max-height: 100px;
+  line-height: 1.4;
+  font-family: inherit;
+  transition: border-color var(--transition);
+}
+.ai-chat-input:focus { border-color: var(--accent); }
+.ai-chat-input::placeholder { color: var(--text-muted); }
+.ai-chat-send {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: opacity var(--transition);
+  align-self: flex-end;
+}
+.ai-chat-send:disabled { opacity: 0.4; cursor: not-allowed; }
+.ai-chat-send:hover:not(:disabled) { opacity: 0.85; }
+
+.ai-error-banner {
+  margin: 12px 14px;
+  padding: 10px 12px;
+  background: var(--red-dim);
+  border: 1px solid var(--red);
+  border-radius: var(--radius);
+  font-size: 12px;
+  color: var(--red);
+  line-height: 1.5;
+}
+.ai-not-configured {
+  padding: 20px 16px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.ai-not-configured strong { display: block; color: var(--text-secondary); margin-bottom: 6px; font-size: 14px; }
+.ai-spin {
+  animation: ai-spin-anim 1s linear infinite;
+  display: inline-block;
+}
+@keyframes ai-spin-anim { to { transform: rotate(360deg); } }
+
+@media (max-width: 480px) {
+  .ai-fab { bottom: 18px; right: 18px; }
+  .ai-panel { right: 10px; bottom: 82px; width: calc(100vw - 20px); }
+}
 `;
 
 // ─── Theme init (runs before first render to avoid flash) ───
@@ -5696,6 +5981,239 @@ function ApiDocsPage({ addToast }) {
   );
 }
 
+// ─── AI Assistant ───
+function AIAssistant() {
+  const [open, setOpen] = useState(false);
+  const [tab, setTab] = useState('chat'); // 'summary' | 'chat'
+  const [summary, setSummary] = useState(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
+  const [summaryError, setSummaryError] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [chatLoading, setChatLoading] = useState(false);
+  const [chatError, setChatError] = useState(null);
+  const [notConfigured, setNotConfigured] = useState(false);
+  const messagesEndRef = useState(null)[0];
+  const chatBottomRef = { current: null };
+  const textareaRef = { current: null };
+
+  const scrollToBottom = () => {
+    chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // Load summary when switching to summary tab or first opening
+  useEffect(() => {
+    if (open && tab === 'summary' && !summary && !summaryLoading) {
+      loadSummary();
+    }
+  }, [open, tab]);
+
+  useEffect(() => {
+    if (tab === 'chat') scrollToBottom();
+  }, [messages, chatLoading]);
+
+  const loadSummary = async () => {
+    setSummaryLoading(true);
+    setSummaryError(null);
+    try {
+      const data = await api.getAssistantSummary();
+      setSummary(data.summary);
+      setNotConfigured(false);
+    } catch (err) {
+      const msg = err.message || '';
+      if (msg.includes('not configured') || msg.includes('503')) {
+        setNotConfigured(true);
+      } else {
+        setSummaryError('Failed to load summary. Please try again.');
+      }
+    } finally {
+      setSummaryLoading(false);
+    }
+  };
+
+  const sendMessage = async () => {
+    const text = input.trim();
+    if (!text || chatLoading) return;
+
+    const userMsg = { role: 'user', content: text };
+    const nextMessages = [...messages, userMsg];
+    setMessages(nextMessages);
+    setInput('');
+    setChatLoading(true);
+    setChatError(null);
+
+    try {
+      const data = await api.chatWithAssistant(nextMessages);
+      setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
+      setNotConfigured(false);
+    } catch (err) {
+      const msg = err.message || '';
+      if (msg.includes('not configured') || msg.includes('503')) {
+        setNotConfigured(true);
+      } else {
+        setChatError('Failed to get a response. Please try again.');
+        // Remove the user message on failure so they can retry
+        setMessages(messages);
+      }
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
+
+  const formatTime = (now = new Date()) => {
+    return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  // Render markdown-ish text: bold **text**, bullet lines
+  const renderContent = (text) => {
+    return text
+      .split('\n')
+      .map((line, i) => {
+        // Bold: **text**
+        const parts = line.split(/\*\*(.*?)\*\*/g);
+        const rendered = parts.map((part, j) =>
+          j % 2 === 1 ? <strong key={j}>{part}</strong> : part
+        );
+        return <div key={i} style={{ minHeight: line === '' ? '8px' : undefined }}>{rendered}</div>;
+      });
+  };
+
+  const unreadCount = messages.filter(m => m.role === 'assistant').length === 0 && messages.length === 0 ? 0 : 0;
+
+  return (
+    <>
+      {/* Floating action button */}
+      <button className="ai-fab" onClick={() => setOpen(v => !v)} title="AI Assistant">
+        {open ? (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        ) : (
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l4.93-1.37A9.96 9.96 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/>
+            <circle cx="8.5" cy="12" r="1.2" fill="currentColor"/>
+            <circle cx="12" cy="12" r="1.2" fill="currentColor"/>
+            <circle cx="15.5" cy="12" r="1.2" fill="currentColor"/>
+          </svg>
+        )}
+      </button>
+
+      {/* Slide-up panel */}
+      {open && (
+        <div className="ai-panel">
+          {/* Header */}
+          <div className="ai-panel-header">
+            <div className="ai-panel-avatar">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+              </svg>
+            </div>
+            <div>
+              <div className="ai-panel-title">AI Assistant</div>
+              <div className="ai-panel-subtitle">Powered by Groq · LLaMA 3.3</div>
+            </div>
+            <button onClick={() => setOpen(false)} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px' }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Tabs */}
+          <div className="ai-panel-tabs">
+            <button className={`ai-tab${tab === 'summary' ? ' active' : ''}`} onClick={() => setTab('summary')}>Daily Briefing</button>
+            <button className={`ai-tab${tab === 'chat' ? ' active' : ''}`} onClick={() => setTab('chat')}>Chat</button>
+          </div>
+
+          {/* Not configured banner */}
+          {notConfigured && (
+            <div className="ai-not-configured">
+              <strong>Assistant Not Configured</strong>
+              Set the <code>GROQ_API_KEY</code> environment variable on your server to enable the AI assistant.
+            </div>
+          )}
+
+          {/* Summary tab */}
+          {!notConfigured && tab === 'summary' && (
+            <div className="ai-summary-pane">
+              {summaryLoading && (
+                <div className="ai-summary-loading">
+                  <svg className="ai-spin" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                  </svg>
+                  Generating briefing…
+                </div>
+              )}
+              {summaryError && <div className="ai-error-banner">{summaryError}</div>}
+              {summary && !summaryLoading && (
+                <>
+                  <div className="ai-summary-content">{renderContent(summary)}</div>
+                  <button className="ai-summary-refresh" onClick={loadSummary}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.06-8.78"/>
+                    </svg>
+                    Refresh
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Chat tab */}
+          {!notConfigured && tab === 'chat' && (
+            <>
+              <div className="ai-chat-messages">
+                {messages.length === 0 && (
+                  <div style={{ color: 'var(--text-muted)', fontSize: '13px', textAlign: 'center', padding: '20px 10px', lineHeight: 1.6 }}>
+                    Ask me anything about your bookings, contacts, tasks, or pipeline. I have live access to your CRM data.
+                  </div>
+                )}
+                {messages.map((m, i) => (
+                  <div key={i} className={`ai-msg ${m.role}`}>
+                    <div className="ai-msg-bubble">{renderContent(m.content)}</div>
+                    <div className="ai-msg-time">{formatTime()}</div>
+                  </div>
+                ))}
+                {chatLoading && (
+                  <div className="ai-typing">
+                    <span /><span /><span />
+                  </div>
+                )}
+                {chatError && <div className="ai-error-banner">{chatError}</div>}
+                <div ref={el => { chatBottomRef.current = el; }} />
+              </div>
+              <div className="ai-chat-input-row">
+                <textarea
+                  ref={el => { textareaRef.current = el; }}
+                  className="ai-chat-input"
+                  placeholder="Ask a question…"
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  rows={1}
+                  disabled={chatLoading}
+                />
+                <button className="ai-chat-send" onClick={sendMessage} disabled={!input.trim() || chatLoading}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
+                  </svg>
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </>
+  );
+}
+
 // ─── Tutorial Overlay ───
 const TUTORIAL_STEPS = [
   {
@@ -6001,6 +6519,7 @@ export default function ArmvetDashboard() {
           {content}
         </main>
         <Toast toasts={toasts} />
+        <AIAssistant />
         {showSetupWizard && (
           <SetupWizard
             onComplete={() => {

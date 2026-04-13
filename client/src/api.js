@@ -104,4 +104,7 @@ export const api = {
   removeEntityTag: (data) => request('POST', '/entity-tags/remove', data),
   // Analytics
   getAnalytics: () => request('GET', '/analytics'),
+  // AI Assistant
+  getAssistantSummary: () => request('GET', '/assistant/summary'),
+  chatWithAssistant: (messages) => request('POST', '/assistant/chat', { messages }),
 };
