@@ -12,6 +12,7 @@ import dealsRoutes from './routes/deals';
 import activityRoutes from './routes/activity';
 import tasksRoutes from './routes/tasks';
 import analyticsRoutes from './routes/analytics';
+import assistantRoutes from './routes/assistant';
 import configRoutes from './routes/config';
 import { tagsApp, entityTagsApp } from './routes/tags';
 
@@ -64,6 +65,7 @@ app.route('/api/tasks',        tasksRoutes);
 app.route('/api/tags',         tagsApp);
 app.route('/api/entity-tags',  entityTagsApp);
 app.route('/api/analytics',    analyticsRoutes);
+app.route('/api/assistant',    assistantRoutes);
 app.route('/api/admin',        configRoutes);
 
 // ─── Debug endpoint ───────────────────────────────────────────────────────────
@@ -86,6 +88,7 @@ app.get('/debug', async (c) => {
     db: dbStatus,
     adminUsernameConfigured: !!c.env.ADMIN_USERNAME,
     adminPasswordConfigured: !!c.env.ADMIN_PASSWORD,
+    groqKeyConfigured: !!(c.env.GROQ_API_KEY && c.env.GROQ_API_KEY.trim().length > 0),
     allowedOrigins,
     requestOrigin: c.req.header('origin') ?? 'none (direct request)',
     requestHost: c.req.header('host') ?? 'unknown',

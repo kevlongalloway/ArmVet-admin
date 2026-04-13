@@ -8,6 +8,8 @@ export interface Env {
   ADMIN_USERNAME: string;
   /** Admin password (plaintext env var or secret) */
   ADMIN_PASSWORD: string;
+  /** Groq API key for AI assistant — set as a secret in Cloudflare dashboard */
+  GROQ_API_KEY?: string;
   ENVIRONMENT?: string;
 }
 

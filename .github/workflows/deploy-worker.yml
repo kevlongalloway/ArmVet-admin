@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - claude/serverless-cloudflare-migration-kYve0
+      - claude/crm-ai-assistant-agent-ZZP7m
     paths:
       - 'workers/**'
       - '.github/workflows/deploy-worker.yml'

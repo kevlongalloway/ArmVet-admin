@@ -107,4 +107,5 @@ export const api = {
   // AI Assistant
   getAssistantSummary: () => request('GET', '/assistant/summary'),
   chatWithAssistant: (messages) => request('POST', '/assistant/chat', { messages }),
+  getAssistantDebug: () => request('GET', '/assistant/debug'),
 };
