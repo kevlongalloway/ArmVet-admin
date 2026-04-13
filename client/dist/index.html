@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="theme-color" content="#0C0F14" />
+    <link rel="manifest" href="/manifest.json" />
+    <title>Armvet Admin</title>
+    <script type="module" crossorigin src="/assets/index-GgFrEsEA.js"></script>
+  </head>
+  <body>
+    <div id="root"><div id="preload" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#0C0F14;color:#C8A84E;font-family:sans-serif;font-size:16px;letter-spacing:1px">Loading…</div></div>
+    <script>
+      window.onerror = function(msg, src, line, col, err) {
+        document.getElementById('root').innerHTML = '<div style="padding:32px;font-family:monospace;background:#0C0F14;min-height:100vh;color:#F87171"><h2 style="color:#C8A84E;margin-bottom:16px">App Error</h2><pre style="white-space:pre-wrap;font-size:13px">' + msg + '\n' + src + ':' + line + '\n' + (err && err.stack || '') + '</pre></div>';
+      };
+      window.addEventListener('unhandledrejection', function(e) {
+        document.getElementById('root').innerHTML = '<div style="padding:32px;font-family:monospace;background:#0C0F14;min-height:100vh;color:#F87171"><h2 style="color:#C8A84E;margin-bottom:16px">App Error (Promise)</h2><pre style="white-space:pre-wrap;font-size:13px">' + (e.reason && (e.reason.stack || e.reason)) + '</pre></div>';
+      });
+    </script>
+  </body>
+</html>

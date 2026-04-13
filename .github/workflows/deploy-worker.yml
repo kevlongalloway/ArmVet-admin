@@ -1,0 +1,54 @@
+name: Deploy Cloudflare Worker
+
+on:
+  push:
+    branches:
+      - claude/serverless-cloudflare-migration-kYve0
+    paths:
+      - 'workers/**'
+      - '.github/workflows/deploy-worker.yml'
+
+  # Allow manual trigger from the GitHub Actions tab
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Migrate + Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+
+      - name: Install Worker dependencies
+        working-directory: workers
+        run: npm install
+
+      # Injects CF_D1_DATABASE_ID and CF_KV_NAMESPACE_ID from GitHub secrets
+      # into wrangler.toml before any wrangler commands run
+      - name: Inject D1 database ID into wrangler.toml
+        working-directory: workers
+        run: |
+          sed -i "s/CF_D1_DATABASE_ID/${{ secrets.CF_D1_DATABASE_ID }}/g" wrangler.toml
+
+      # Wrangler tracks which migration files have already been applied in a
+      # d1_migrations table inside your D1 database. On every deploy it only
+      # runs migration files that haven't been applied yet — safe to run every time.
+      - name: Run D1 migrations (new ones only)
+        working-directory: workers
+        run: npx wrangler d1 migrations apply armvet-db --remote
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Deploy Worker to Cloudflare
+        working-directory: workers
+        run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

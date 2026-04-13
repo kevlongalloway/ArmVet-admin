@@ -1,0 +1,31 @@
+# ─── ArmVet Admin — Render Static Site Deployment ────────────────────────────
+#
+# The API now runs on Cloudflare Workers (see workers/).
+# This file only deploys the React SPA as a static site on Render.
+#
+# Set VITE_API_URL in the Render environment variables dashboard to the URL of
+# your deployed Cloudflare Worker, e.g.:
+#   https://armvet-api.<your-account>.workers.dev
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+  - type: web
+    name: armvet-admin-frontend
+    env: static
+    buildCommand: cd client && npm install --include=dev && npm run build
+    staticPublishPath: ./client/dist
+    pullRequestPreviewsEnabled: false
+    envVars:
+      - key: VITE_API_URL
+        sync: false    # Set this manually in the Render dashboard
+    headers:
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+      - path: /*
+        name: Cache-Control
+        value: no-cache, no-store, must-revalidate
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
